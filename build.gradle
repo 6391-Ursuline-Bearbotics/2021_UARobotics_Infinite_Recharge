@@ -54,6 +54,8 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
 
+    implementation "com.github.Oblarg.Oblog:lib:3.1.2"
+
     // Enable simulation gui support. Must check the box in vscode to enable support
     // upon debugging
     simulation wpi.deps.sim.gui(wpi.platforms.desktop, false)
