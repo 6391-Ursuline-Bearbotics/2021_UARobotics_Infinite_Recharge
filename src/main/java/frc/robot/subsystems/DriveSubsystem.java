@@ -23,8 +23,13 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj.simulation.Field2d;
+import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
@@ -32,7 +37,14 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.RobotController;
+
 import java.nio.file.Paths;
 import java.io.IOException;
 
@@ -54,6 +66,17 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   
   private final WPI_TalonSRX m_talonsrxright2 = new WPI_TalonSRX(DriveConstants.kRightMotor1Port);
 
+  // The motors on the left side of the drive.
+  private final SpeedControllerGroup m_leftMotors =
+        new SpeedControllerGroup(m_talonsrxleft, m_victorspxleft);
+
+  // The motors on the right side of the drive.
+  private final SpeedControllerGroup m_rightMotors =
+        new SpeedControllerGroup(m_talonsrxright, m_talonsrxright2); 
+        
+  // The robot's drive
+  private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotors, m_rightMotors);
+
   // Pigeon is plugged into the second talon on the left side
   private final PigeonIMU m_pigeon = new PigeonIMU(m_talonsrxright2);
 	
@@ -65,6 +88,15 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
       new SimpleMotorFeedforward(DriveConstants.kS,
                                  DriveConstants.kV,
                                  DriveConstants.kA);
+
+  // These classes help us simulate our drivetrain
+  public DifferentialDrivetrainSim m_drivetrainSimulator;
+  private EncoderSim m_leftEncoderSim;
+  private EncoderSim m_rightEncoderSim;
+  // The Field2d class simulates the field in the sim GUI. Note that we can have only one
+  // instance!
+  private Field2d m_fieldSim;
+  private SimDouble m_gyroAngleSim;
 
   /** Tracking variables */
 	boolean _firstCall = false;
@@ -81,6 +113,27 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    */
   public DriveSubsystem() {
 		m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
+
+    // Simulation Setup
+    if (RobotBase.isSimulation()) { // If our robot is simulated
+      // This class simulates our drivetrain's motion around the field.
+      m_drivetrainSimulator = new DifferentialDrivetrainSim(
+          DriveConstants.kDrivetrainPlant,
+          DriveConstants.kDriveGearbox,
+          DriveConstants.kDriveGearing,
+          DriveConstants.TRACK_WIDTH_METERS,
+          DriveConstants.kWheelDiameterMeters / 2.0);
+
+      // The encoder and gyro angle sims let us set simulated sensor readings // Encoders are not real
+      m_leftEncoderSim = new EncoderSim(new Encoder(0, 1));
+      m_rightEncoderSim = new EncoderSim(new Encoder(2, 3));
+      m_gyroAngleSim =
+            new SimDeviceSim("ADXRS450_Gyro" + "[" + SPI.Port.kOnboardCS0.value + "]")
+                  .getDouble("Angle");
+
+      // the Field2d class lets us visualize our robot in the simulation GUI.
+      m_fieldSim = new Field2d();
+    }
 
     // Set factory defaults
     m_talonsrxleft.configFactoryDefault();
@@ -209,6 +262,29 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
       m_talonsrxleft.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse,
       m_talonsrxright.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse);
     SmartDashboard.putString("Pose", m_odometry.getPoseMeters().toString());
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    // To update our simulation, we set motor voltage inputs, update the simulation,
+    // and write the simulated positions and velocities to our simulated encoder and gyro.
+    // We negate the right side so that positive voltages make the right side
+    // move forward.
+    m_drivetrainSimulator.setInputs(m_leftMotors.get() * RobotController.getBatteryVoltage(),
+          -m_rightMotors.get() * RobotController.getBatteryVoltage());
+    m_drivetrainSimulator.update(0.020);
+
+    m_leftEncoderSim.setDistance(m_drivetrainSimulator.getState(DifferentialDrivetrainSim.State.kLeftPosition));
+    m_leftEncoderSim.setRate(m_drivetrainSimulator.getState(DifferentialDrivetrainSim.State.kLeftVelocity));
+    m_rightEncoderSim.setDistance(m_drivetrainSimulator.getState(DifferentialDrivetrainSim.State.kRightPosition));
+    m_rightEncoderSim.setRate(m_drivetrainSimulator.getState(DifferentialDrivetrainSim.State.kRightVelocity));
+    m_gyroAngleSim.set(-m_drivetrainSimulator.getHeading().getDegrees());
+
+    m_fieldSim.setRobotPose(getCurrentPose());
+  }
+
+  public double getDrawnCurrentAmps() {
+    return m_drivetrainSimulator.getCurrentDrawAmps();
   }
 
   /**

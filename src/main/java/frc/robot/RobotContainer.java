@@ -79,7 +79,7 @@ public class RobotContainer {
   @Log
   public final ConveyorSubsystem m_conveyor = new ConveyorSubsystem();
   @Log
-  public final ClimbSubsystem m_climb = new ClimbSubsystem();
+  public final ClimbSubsystem m_climb = ClimbSubsystem.Create();
 
   public final Limelight m_Limelight = new Limelight();
 
@@ -247,6 +247,10 @@ public class RobotContainer {
   public HttpCamera getLimelightFeed() {
     return m_limelightFeed;
   } */
+
+  public DriveSubsystem getRobotDrive() {
+    return m_robotDrive;
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

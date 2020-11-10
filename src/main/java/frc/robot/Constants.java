@@ -8,7 +8,11 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.system.LinearSystem;
+import edu.wpi.first.wpilibj.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.util.Units;
+import edu.wpi.first.wpiutil.math.numbers.N2;
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants.  This class should not be used for any other purpose.  All constants should be
@@ -27,6 +31,30 @@ public final class Constants {
         public static final int kRightMotor2Port = 4;
         public static final int kPigeonPort = 0;
     
+        public static final DCMotor kDriveGearbox = DCMotor.getCIM(2);
+        public static final double kDriveGearing = 8;
+
+        /** Voltage needed to overcome the motor’s static friction. kS */
+        public static final double kS = 1.01; //.829
+
+        /** Voltage needed to hold (or "cruise") at a given constant velocity. kV */
+        public static final double kV = 2.93; //3.04
+
+        /** Voltage needed to induce a given acceleration in the motor shaft. kA */
+        public static final double kA = 0.761; //.676
+
+        public static final double ksVolts = 0.22;
+        public static final double kvVoltSecondsPerMeter = 1.98;
+        public static final double kaVoltSecondsSquaredPerMeter = 0.2;
+
+        // These two values are "angular" kV and kA
+        public static final double kvVoltSecondsPerRadian = 1.5;
+        public static final double kaVoltSecondsSquaredPerRadian = 0.3;
+
+        public static final LinearSystem<N2, N2, N2> kDrivetrainPlant =
+          LinearSystemId.identifyDrivetrainSystem(kvVoltSecondsPerMeter, kaVoltSecondsSquaredPerMeter,
+                kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian);
+
         public static final boolean kLeftEncoderReversed = false;
         public static final boolean kRightEncoderReversed = true;
 
@@ -93,15 +121,6 @@ public final class Constants {
         public final static int kSlot_Turning = SLOT_1;
         public final static int kSlot_Velocit = SLOT_2;
         public final static int kSlot_MotProf = SLOT_3;
-        
-        /** Voltage needed to overcome the motor’s static friction. kS */
-        public static final double kS = 1.01; //.829
-
-        /** Voltage needed to hold (or "cruise") at a given constant velocity. kV */
-        public static final double kV = 2.93; //3.04
-
-        /** Voltage needed to induce a given acceleration in the motor shaft. kA */
-        public static final double kA = 0.761; //.676
 
         // Example value only - as above, this must be tuned for your drive!
         public static final double kPDriveVel = 8.5;       

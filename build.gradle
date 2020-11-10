@@ -53,6 +53,7 @@ dependencies {
     nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
 
     testImplementation 'junit:junit:4.12'
+    testCompile "org.mockito:mockito-core:2.+"
 
     implementation "com.github.Oblarg.Oblog:lib:3.1.2"
 
@@ -76,4 +77,5 @@ jar {
 
 repositories {
   maven { url 'https://jitpack.io' }
+  mavenCentral()
 }

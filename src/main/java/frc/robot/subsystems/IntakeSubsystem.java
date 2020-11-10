@@ -30,20 +30,13 @@ public class IntakeSubsystem extends SubsystemBase implements Loggable{
 
     @Config
     public void toggleIntakePosition(boolean enabled) {
-        if(m_intakeSolenoid1.get() == DoubleSolenoid.Value.kForward) {
-            m_intakeSolenoid1.set(DoubleSolenoid.Value.kReverse);
-            m_intakeSolenoid2.set(DoubleSolenoid.Value.kReverse);
-        }
-        else{
-            m_intakeSolenoid1.set(DoubleSolenoid.Value.kForward);
-            m_intakeSolenoid2.set(DoubleSolenoid.Value.kForward);
-        }
-        
+        m_intakeSolenoid1.toggle();
+        m_intakeSolenoid2.toggle();        
     }
 
     @Config
     public void toggleIntakeWheels(boolean enabled) {
-        if(m_IntakeMotor.get() > 0 || m_intakeSolenoid1.get() == DoubleSolenoid.Value.kForward) {
+        if(m_IntakeMotor.get() > 0 || m_intakeSolenoid1.get() == DoubleSolenoid.Value.kForward) { // If intake is on or if the intake position is in turn it off
             m_IntakeMotor.set(0);
         }
         else{

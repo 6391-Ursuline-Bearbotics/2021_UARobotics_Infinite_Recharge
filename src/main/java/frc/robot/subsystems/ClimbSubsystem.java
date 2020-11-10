@@ -11,13 +11,11 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotState;
 
 public class ClimbSubsystem extends SubsystemBase implements Loggable{
-    //private final WPI_TalonSRX m_ClimbMotor = new WPI_TalonSRX(ClimbConstants.kClimbControllerPort);
     @Config(name="ClimbMotorLeft")
-    private final WPI_TalonSRX m_LeftClimbMotor = new WPI_TalonSRX(ClimbConstants.kClimbLeftControllerPort);
+    private WPI_TalonSRX m_LeftClimbMotor;
     
-    //private final WPI_TalonSRX m_ClimbMotor2 = new WPI_TalonSRX(ClimbConstants.kClimbController2Port);
     @Config(name="ClimbMotorRight")
-    private final WPI_TalonSRX m_RightClimbMotor = new WPI_TalonSRX(ClimbConstants.kClimbRightControllerPort);
+    private WPI_TalonSRX m_RightClimbMotor;
 
     @Log
     private int climbinvert = 1;
@@ -28,8 +26,10 @@ public class ClimbSubsystem extends SubsystemBase implements Loggable{
     @Log
     public int setpoint = 4200;
 
-    public ClimbSubsystem() {
-        //m_RightClimbMotor.setInverted(true);
+    public ClimbSubsystem(WPI_TalonSRX m_LeftClimbMotor, WPI_TalonSRX m_RightClimbMotor) {
+        this.m_LeftClimbMotor = m_LeftClimbMotor;
+        this.m_RightClimbMotor = m_RightClimbMotor;
+
         setOutput(0,0);
         m_LeftClimbMotor.setInverted(true);
         m_LeftClimbMotor.setSensorPhase(true);
@@ -39,6 +39,12 @@ public class ClimbSubsystem extends SubsystemBase implements Loggable{
         m_RightClimbMotor.config_kP(0, ClimbConstants.kClimbP);
         m_LeftClimbMotor.configPeakOutputReverse(0);
         m_RightClimbMotor.configPeakOutputReverse(0);
+    }
+
+    public static ClimbSubsystem Create() {
+        WPI_TalonSRX m_LeftClimbMotor = new WPI_TalonSRX(ClimbConstants.kClimbLeftControllerPort);
+        WPI_TalonSRX m_RightClimbMotor = new WPI_TalonSRX(ClimbConstants.kClimbRightControllerPort);
+        return new ClimbSubsystem(m_LeftClimbMotor, m_RightClimbMotor);
     }
 
     @Config
@@ -65,6 +71,7 @@ public class ClimbSubsystem extends SubsystemBase implements Loggable{
 
     @Config
     public void setPosition(double position) {
+        // Show the climbing camera if it isn't already
         if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("stream").getDouble(0) < 2)  {
             NetworkTableInstance.getDefault().getTable("limelight").getEntry("stream").setNumber(2);
         }
