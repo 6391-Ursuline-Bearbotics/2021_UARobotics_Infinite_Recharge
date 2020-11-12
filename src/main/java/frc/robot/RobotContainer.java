@@ -15,6 +15,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.simulation.XboxControllerSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.PerpetualCommand;
@@ -97,8 +98,11 @@ public class RobotContainer {
   private final Timer timer = new Timer();
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  XboxControllerSim m_driverControllerSim = new XboxControllerSim(OIConstants.kDriverControllerPort);
+
   // The operator's controller
   XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
+  XboxControllerSim m_operatorControllerSim = new XboxControllerSim(OIConstants.kOperatorControllerPort);
 
   Button frontConveyorSensor = new Button(() -> m_conveyor.getFrontConveyor());
   Button topConveyorSensor = new Button(() -> m_conveyor.getTopConveyor());
@@ -109,6 +113,9 @@ public class RobotContainer {
    * The container for the robot.  Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    // Detect if controllers are missing / Stop multiple warnings
+    
+
     // Configure the button bindings
     configureButtonBindings();
 

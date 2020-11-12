@@ -8,6 +8,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -73,6 +74,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void disabledInit() {
+    Shuffleboard.selectTab("Tab Title");
   }
 
   @Override

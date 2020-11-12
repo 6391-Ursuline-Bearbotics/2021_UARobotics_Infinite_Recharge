@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.*;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.subsystems.ClimbSubsystem;
 
-import org.junit.*;
+import org.junit.jupiter.*;
 
 import static org.mockito.Mockito.*;
 

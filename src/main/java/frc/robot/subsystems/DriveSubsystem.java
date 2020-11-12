@@ -125,11 +125,11 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
           DriveConstants.kWheelDiameterMeters / 2.0);
 
       // The encoder and gyro angle sims let us set simulated sensor readings // Encoders are not real
-      m_leftEncoderSim = new EncoderSim(new Encoder(0, 1));
-      m_rightEncoderSim = new EncoderSim(new Encoder(2, 3));
-      m_gyroAngleSim =
+      m_leftEncoderSim = new EncoderSim(new Encoder(2, 3));
+      m_rightEncoderSim = new EncoderSim(new Encoder(4, 5));
+/*       m_gyroAngleSim =
             new SimDeviceSim("ADXRS450_Gyro" + "[" + SPI.Port.kOnboardCS0.value + "]")
-                  .getDouble("Angle");
+                  .getDouble("Angle"); */
 
       // the Field2d class lets us visualize our robot in the simulation GUI.
       m_fieldSim = new Field2d();
@@ -278,7 +278,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     m_leftEncoderSim.setRate(m_drivetrainSimulator.getState(DifferentialDrivetrainSim.State.kLeftVelocity));
     m_rightEncoderSim.setDistance(m_drivetrainSimulator.getState(DifferentialDrivetrainSim.State.kRightPosition));
     m_rightEncoderSim.setRate(m_drivetrainSimulator.getState(DifferentialDrivetrainSim.State.kRightVelocity));
-    m_gyroAngleSim.set(-m_drivetrainSimulator.getHeading().getDegrees());
+    //m_gyroAngleSim.set(-m_drivetrainSimulator.getHeading().getDegrees());
 
     m_fieldSim.setRobotPose(getCurrentPose());
   }
