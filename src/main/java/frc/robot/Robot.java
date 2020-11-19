@@ -125,6 +125,9 @@ public class Robot extends TimedRobot {
     m_robotContainer.m_climb.climbstage = 0;
     m_robotContainer.m_climb.resetEnc(true);
     NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
+
+    // Reset our loop to make sure it's in a known state.
+    m_robotContainer.m_shooter.loopreset();
   }
 
   /**

@@ -356,8 +356,13 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    */
   @Log
   public double getAverageEncoderDistance() {
-    return (m_talonsrxleft.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse
+    if (!RobotBase.isSimulation()) {
+      return (m_talonsrxleft.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse
         + m_talonsrxright.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse) / 2.0;
+    }
+    else {
+      return 0;
+    }
   }
 
   /** Deadband 15 percent, used on the gamepad */

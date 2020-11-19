@@ -170,6 +170,8 @@ public final class Constants {
         public static final double kShooterAutoLineRPM = 1000;
         public static final double kShooterToleranceRPM = 200;
         
+        public static final double kSpinupRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(500.0);
+
         public static final int kEncoderCPR = 2048;
         public static final double kWheelDiameterInches = 4;
         public static final double kEncoderDistancePerPulse =

@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.simulation.XboxControllerSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.PerpetualCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -31,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
@@ -68,7 +70,7 @@ import frc.robot.Constants.OIConstants;
  */
 public class RobotContainer {
   @Log
-  private final ShooterSubsystem m_shooter = new ShooterSubsystem();
+  public final ShooterSubsystem m_shooter = new ShooterSubsystem();
   @Log
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
  /*  @Log
@@ -165,6 +167,9 @@ public class RobotContainer {
         .andThen(new InstantCommand(() -> {
         m_shooter.setSetpoint(ShooterConstants.kShooterFarTrenchRPM);
         m_shooter.enable();
+        if (RobotBase.isSimulation()) {
+          m_shooter.nextR(ShooterConstants.kSpinupRadPerSec);    
+        }
       }, m_shooter)))));
 
     // Stop the Shooter when the B button is pressed
@@ -173,6 +178,9 @@ public class RobotContainer {
       .whenActive(new InstantCommand(() -> {
         m_shooter.setSetpoint(0);
         m_shooter.disable();
+        if (RobotBase.isSimulation()) {
+          m_shooter.nextR(0.0);    
+        }
       }, m_shooter));
     
     // Turn on the conveyor when either the button is pressed or if the bottom sensor is blocked
@@ -206,9 +214,10 @@ public class RobotContainer {
      // .whenActive(new InstantCommand(() -> m_climb.nextClimbStage(true))
      //   .perpetually().withInterrupt(() -> m_climb.atposition()));
     
-    new JoystickButton(m_operatorController, XboxController.Button.kBack.value)
-      .whenPressed(new InstantCommand(m_conveyor::turnBackwards, m_conveyor))
-      .whenReleased(new InstantCommand(m_conveyor::turnOff, m_conveyor));
+    new JoystickButton(m_driverController, XboxController.Button.kBack.value)
+      .whenPressed(new PrintCommand("myButton is pressed"));
+      //.whenPressed(new InstantCommand(m_conveyor::turnBackwards, m_conveyor))
+      //.whenReleased(new InstantCommand(m_conveyor::turnOff, m_conveyor));
     
     // When driver presses the Y button Auto Aim to the goal
     new JoystickButton(m_driverController, XboxController.Button.kY.value)
