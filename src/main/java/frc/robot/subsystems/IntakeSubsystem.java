@@ -5,6 +5,7 @@ import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -21,6 +22,8 @@ public class IntakeSubsystem extends SubsystemBase implements Loggable{
 
     public IntakeSubsystem() {
         setOutput(0);
+        m_intakeSolenoid1.set(Value.kReverse);
+        m_intakeSolenoid2.set(Value.kReverse);
     }
 
     @Config
@@ -36,11 +39,11 @@ public class IntakeSubsystem extends SubsystemBase implements Loggable{
 
     @Config
     public void toggleIntakeWheels(boolean enabled) {
-        if(m_IntakeMotor.get() > 0 || m_intakeSolenoid1.get() == DoubleSolenoid.Value.kForward) { // If intake is on or if the intake position is in turn it off
-            m_IntakeMotor.set(0);
+        if(m_IntakeMotor.get() == 0 && m_intakeSolenoid1.get() == DoubleSolenoid.Value.kReverse) { // Only turn it on if intake is down and it is currently off
+            m_IntakeMotor.set(IntakeConstants.kIntakeMotorSpeed);
         }
         else{
-            m_IntakeMotor.set(IntakeConstants.kIntakeMotorSpeed);
+            m_IntakeMotor.set(0);
         }
     }
 }

@@ -2,6 +2,9 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.CounterBase;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.LinearFilter;
+import edu.wpi.first.wpilibj.Timer;
+
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.ctre.phoenix.motorcontrol.InvertType;
 
@@ -73,6 +76,14 @@ public class ShooterSubsystem extends PIDSubsystem implements Loggable{
         12.0,
         0.020);
 
+  private LinearFilter m_velocityFilterMA = LinearFilter.movingAverage(4);
+  private LinearFilter m_velocityFilterIIR = LinearFilter.singlePoleIIR(.1, .02);
+
+  private double m_time = 0;
+  private double m_lastTime = 0;
+  private double m_angle = 0;
+  private double m_lastAngle = 0;
+
   // The shooter subsystem for the robot.
   public ShooterSubsystem() {
     super(new PIDController(ShooterConstants.kP, ShooterConstants.kI, ShooterConstants.kD));
@@ -113,17 +124,29 @@ public class ShooterSubsystem extends PIDSubsystem implements Loggable{
   }
 
   @Override
-  public void useOutput(double outputIn, double setpoint) {
-    output = outputIn / 60;
-    //1.111 is a fudge factor to get the F closer to the setpoint
-    m_shooterMotor.setVoltage(MathUtil.clamp(output + (m_shooterFeedforward.calculate(setpoint) / 60 * 1.02), 0, 14));
+  public void useOutput(double output, double setpoint) {
+    m_angle = getAngle();
+    m_time = Timer.getFPGATimestamp();
+    
+    m_velocityFilterMA.calculate((m_angle - m_lastAngle) / (m_time - m_lastTime));
+    
+    var feedforward = m_shooterFeedforward.calculate(setpoint);
+    SmartDashboard.putNumber("ShooterPID", output);
+    SmartDashboard.putNumber("feedforward", feedforward);
+    m_shooterMotor.setVoltage(MathUtil.clamp(output + feedforward, 0, 14));
+    m_lastTime = Timer.getFPGATimestamp();
+    m_lastAngle = getAngle();
   }
 
   @Log
   @Log(tabName = "Dashboard", name = "Shooter Speed")
   @Override
   public double getMeasurement() {
-    return m_shooterEncoder.getRate();
+    return (m_shooterEncoder.getRate() / 60.0);
+  }
+
+  public double getAngle() {
+    return m_shooterEncoder.getDistance();
   }
 
   @Log

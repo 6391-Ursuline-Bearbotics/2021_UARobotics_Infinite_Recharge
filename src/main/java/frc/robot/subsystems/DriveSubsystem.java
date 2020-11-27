@@ -75,7 +75,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
         new SpeedControllerGroup(m_talonsrxright, m_talonsrxright2); 
         
   // The robot's drive
-  private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotors, m_rightMotors);
+  //private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotors, m_rightMotors);
 
   // Pigeon is plugged into the second talon on the left side
   private final PigeonIMU m_pigeon = new PigeonIMU(m_talonsrxright2);
@@ -558,10 +558,15 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
       .andThen(() -> {m_talonsrxleft.set(0);m_talonsrxright.set(0);});
   }
 
-  public Command drivePositionGyro(double distance) {
-    target_sensorUnits = (distance * DriveConstants.SENSOR_UNITS_PER_ROTATION) / DriveConstants.WHEEL_CIRCUMFERENCE_INCHES ;
+  public Command drivePositionGyro(double distanceInches) {
+    target_sensorUnits = (distanceInches * DriveConstants.SENSOR_UNITS_PER_ROTATION) / DriveConstants.WHEEL_CIRCUMFERENCE_INCHES ;
     return new RunCommand(() -> 
     m_talonsrxright.set(ControlMode.Position, target_sensorUnits, DemandType.AuxPID, m_talonsrxright.getSelectedSensorPosition(1)))
     .withInterrupt(() -> atSetpoint());
+  }
+
+  @Config
+  public void drivePositionGyroTest(boolean enabled) {
+    drivePositionGyro(12);
   }
 }

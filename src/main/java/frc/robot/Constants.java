@@ -165,10 +165,10 @@ public final class Constants {
         public static final int kShooterMotorPort = 8;
         public static final int kShooterMotorPort2 = 9;
     
-        public static final double kShooterFarTrenchRPM = 7400;
-        public static final double kShooterNearTrenchRPM = 2000;
-        public static final double kShooterAutoLineRPM = 1000;
-        public static final double kShooterToleranceRPM = 200;
+        public static final double kShooterFarTrenchRPM = 7400/60;
+        public static final double kShooterNearTrenchRPM = 2000/60;
+        public static final double kShooterAutoLineRPM = 1000/60;
+        public static final double kShooterToleranceRPM = 200/60;
         
         public static final double kSpinupRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(500.0);
 
@@ -179,16 +179,16 @@ public final class Constants {
             60.0 / (double) kEncoderCPR;
 
         // These are not real PID gains, and will have to be tuned for your specific robot.
-        public static final double kP = 1.2; // .000321
+        public static final double kP = 0.000321; // .000321 / 1.2 was competition number
         public static final double kI = 0;
         public static final double kD = 0;
-        public static final double kF = 0.0; //Not used
+        public static final double kF = 0; //Not used
     
         // On a real robot the feedforward constants should be empirically determined; these are
         // reasonable guesses.
-        public static final double kSVolts = .92; // .05 original
-        public static final double kVVoltSecondsPerRotation = .0764; // 12
-        public static final double kA = .0429;
+        public static final double kSVolts = 0.87; // .05 original / .92 comp
+        public static final double kVVoltSecondsPerRotation = 0.0774; // 12 / .0764 comp
+        public static final double kA = 0.00003; //.0429 comp
     }
     
     public static final class ControlPanelConstants {
@@ -226,8 +226,9 @@ public final class Constants {
     }
     
     public static final class OIConstants {
-        public static final int kDriverControllerPort = 1;
-        public static final int kOperatorControllerPort = 2;
+        public static final int kDriverControllerPort = 0;
+        public static final int kOperatorControllerPort = 1;
+        public static final boolean kPractice = true;
     }
 
     public static final class IntakeConstants {

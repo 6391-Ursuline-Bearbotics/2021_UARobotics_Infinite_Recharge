@@ -1,0 +1,587 @@
+{
+  "tabPane": [
+    {
+      "title": "SmartDashboard",
+      "autoPopulate": true,
+      "autoPopulatePrefix": "SmartDashboard/",
+      "widgetPane": {
+        "gridSize": 128.0,
+        "showGrid": true,
+        "hgap": 16.0,
+        "vgap": 16.0,
+        "tiles": {
+          "0,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DB/Slider 0",
+              "_title": "DB/Slider 0"
+            }
+          },
+          "1,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DB/Slider 1",
+              "_title": "DB/Slider 1"
+            }
+          },
+          "2,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "ComboBox Chooser",
+              "_source0": "network_table:///SmartDashboard/Auto choices",
+              "_title": "Auto choices"
+            }
+          },
+          "3,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DB/Slider 3",
+              "_title": "DB/Slider 3"
+            }
+          },
+          "4,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DB/Slider 2",
+              "_title": "DB/Slider 2"
+            }
+          },
+          "5,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "ComboBox Chooser",
+              "_source0": "network_table:///SmartDashboard/Auto choices 7",
+              "_title": "Auto choices 7"
+            }
+          },
+          "6,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "ComboBox Chooser",
+              "_source0": "network_table:///SmartDashboard/Auto choices Drop/No Drop",
+              "_title": "Auto choices Drop/No Drop"
+            }
+          },
+          "7,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Auto Selector",
+              "_title": "Auto Selector"
+            }
+          },
+          "0,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/DB/Button 1",
+              "_title": "DB/Button 1",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "1,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/DB/Button 3",
+              "_title": "DB/Button 3",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "2,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/DB/Button 2",
+              "_title": "DB/Button 2",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "3,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/DB/Button 0",
+              "_title": "DB/Button 0",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "4,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DB/String 0",
+              "_title": "DB/String 0"
+            }
+          },
+          "5,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DB/String 1",
+              "_title": "DB/String 1"
+            }
+          },
+          "6,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DB/String 2",
+              "_title": "DB/String 2"
+            }
+          },
+          "7,1": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DB/String 3",
+              "_title": "DB/String 3"
+            }
+          },
+          "0,2": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DB/String 4",
+              "_title": "DB/String 4"
+            }
+          },
+          "1,2": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DB/String 5",
+              "_title": "DB/String 5"
+            }
+          },
+          "2,2": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DB/String 6",
+              "_title": "DB/String 6"
+            }
+          },
+          "3,2": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DB/String 7",
+              "_title": "DB/String 7"
+            }
+          },
+          "4,2": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DB/String 8",
+              "_title": "DB/String 8"
+            }
+          },
+          "5,2": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/DB/String 9",
+              "_title": "DB/String 9"
+            }
+          },
+          "6,2": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Voltage View",
+              "_source0": "network_table:///SmartDashboard/Front Sensor: ",
+              "_title": "Front Sensor: ",
+              "Range/Min": 0.0,
+              "Range/Max": 5.0,
+              "Range/Center": 0.0,
+              "Visuals/Orientation": "HORIZONTAL",
+              "Visuals/Number of tick marks": 5
+            }
+          },
+          "0,3": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Pose",
+              "_title": "Pose"
+            }
+          },
+          "1,3": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "ComboBox Chooser",
+              "_source0": "network_table:///SmartDashboard/Auto Chooser",
+              "_title": "Auto Chooser"
+            }
+          },
+          "2,3": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/fwd",
+              "_title": "fwd"
+            }
+          },
+          "3,3": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/rot",
+              "_title": "rot"
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "LiveWindow",
+      "autoPopulate": true,
+      "autoPopulatePrefix": "LiveWindow/",
+      "widgetPane": {
+        "gridSize": 128.0,
+        "showGrid": true,
+        "hgap": 16.0,
+        "vgap": 16.0,
+        "tiles": {
+          "0,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///LiveWindow/Ungrouped/DoubleSolenoid[0,2]/Value",
+              "_title": "Ungrouped/DoubleSolenoid[0,2]/Value"
+            }
+          },
+          "1,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///LiveWindow/Ungrouped/DoubleSolenoid[0,0]/Value",
+              "_title": "Ungrouped/DoubleSolenoid[0,0]/Value"
+            }
+          },
+          "2,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///LiveWindow/Ungrouped/DoubleSolenoid[1,0]/Value",
+              "_title": "Ungrouped/DoubleSolenoid[1,0]/Value"
+            }
+          },
+          "3,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///LiveWindow/Ungrouped/DoubleSolenoid[0,6]/Value",
+              "_title": "Ungrouped/DoubleSolenoid[0,6]/Value"
+            }
+          },
+          "4,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///LiveWindow/Ungrouped/Compressor[0]/Pressure switch",
+              "_title": "Ungrouped/Compressor[0]/Pressure switch",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "5,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///LiveWindow/Ungrouped/DoubleSolenoid[0,4]/Value",
+              "_title": "Ungrouped/DoubleSolenoid[0,4]/Value"
+            }
+          },
+          "6,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///LiveWindow/Ungrouped/Compressor[0]/Enabled",
+              "_title": "Ungrouped/Compressor[0]/Enabled",
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "0,1": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Voltage View",
+              "_source0": "network_table:///LiveWindow/Ungrouped/AnalogInput[1]",
+              "_title": "Ungrouped/AnalogInput[1]",
+              "Range/Min": 0.0,
+              "Range/Max": 5.0,
+              "Range/Center": 0.0,
+              "Visuals/Orientation": "HORIZONTAL",
+              "Visuals/Number of tick marks": 5
+            }
+          },
+          "2,1": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Voltage View",
+              "_source0": "network_table:///LiveWindow/Ungrouped/AnalogInput[0]",
+              "_title": "Ungrouped/AnalogInput[0]",
+              "Range/Min": 0.0,
+              "Range/Max": 5.0,
+              "Range/Center": 0.0,
+              "Visuals/Orientation": "HORIZONTAL",
+              "Visuals/Number of tick marks": 5
+            }
+          },
+          "4,1": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Encoder",
+              "_source0": "network_table:///LiveWindow/Ungrouped/Encoder[1]",
+              "_title": "Ungrouped/Encoder[1]"
+            }
+          },
+          "6,1": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Encoder",
+              "_source0": "network_table:///LiveWindow/Ungrouped/Encoder[0]",
+              "_title": "Ungrouped/Encoder[0]"
+            }
+          },
+          "0,2": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Encoder",
+              "_source0": "network_table:///LiveWindow/Ungrouped/Encoder[2]",
+              "_title": "Ungrouped/Encoder[2]"
+            }
+          },
+          "2,2": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Speed Controller",
+              "_source0": "network_table:///LiveWindow/Ungrouped/Talon SRX [11]",
+              "_title": "Ungrouped/Talon SRX [11]",
+              "Visuals/Orientation": "HORIZONTAL"
+            }
+          },
+          "4,2": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Speed Controller",
+              "_source0": "network_table:///LiveWindow/Ungrouped/Victor SPX [22]",
+              "_title": "Ungrouped/Victor SPX [22]",
+              "Visuals/Orientation": "HORIZONTAL"
+            }
+          },
+          "6,2": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Speed Controller",
+              "_source0": "network_table:///LiveWindow/Ungrouped/Talon SRX [3]",
+              "_title": "Ungrouped/Talon SRX [3]",
+              "Visuals/Orientation": "HORIZONTAL"
+            }
+          },
+          "7,0": {
+            "size": [
+              1,
+              1
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///LiveWindow/Ungrouped/DoubleSolenoid[0,1]/Value",
+              "_title": "Ungrouped/DoubleSolenoid[0,1]/Value"
+            }
+          },
+          "0,3": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Speed Controller",
+              "_source0": "network_table:///LiveWindow/Ungrouped/Talon SRX [4]",
+              "_title": "Ungrouped/Talon SRX [4]",
+              "Visuals/Orientation": "HORIZONTAL"
+            }
+          },
+          "2,3": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Speed Controller",
+              "_source0": "network_table:///LiveWindow/Ungrouped/Victor SPX [5]",
+              "_title": "Ungrouped/Victor SPX [5]",
+              "Visuals/Orientation": "HORIZONTAL"
+            }
+          },
+          "4,3": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Speed Controller",
+              "_source0": "network_table:///LiveWindow/Ungrouped/Victor SPX [11]",
+              "_title": "Ungrouped/Victor SPX [11]",
+              "Visuals/Orientation": "HORIZONTAL"
+            }
+          },
+          "6,3": {
+            "size": [
+              2,
+              1
+            ],
+            "content": {
+              "_type": "Speed Controller",
+              "_source0": "network_table:///LiveWindow/Ungrouped/Victor SPX [21]",
+              "_title": "Ungrouped/Victor SPX [21]",
+              "Visuals/Orientation": "HORIZONTAL"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "windowGeometry": {
+    "x": -7.333333492279053,
+    "y": -7.333333492279053,
+    "width": 1294.6666259765625,
+    "height": 694.6666870117188
+  }
+}

@@ -116,7 +116,7 @@ public class RobotContainer {
    */
   public RobotContainer() {
     // Detect if controllers are missing / Stop multiple warnings
-    
+    DriverStation.getInstance().silenceJoystickConnectionWarning(OIConstants.kPractice);
 
     // Configure the button bindings
     configureButtonBindings();
