@@ -49,6 +49,7 @@ import java.nio.file.Paths;
 import java.io.IOException;
 
 import frc.robot.Constants.DriveConstants;
+import frc.robot.commands.DriveStraight;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
@@ -567,6 +568,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   @Config
   public void drivePositionGyroTest(boolean enabled) {
-    drivePositionGyro(12);
+    new DriveStraight(120, this);
   }
 }

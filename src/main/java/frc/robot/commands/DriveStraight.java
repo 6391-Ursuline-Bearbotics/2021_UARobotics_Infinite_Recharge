@@ -29,7 +29,7 @@ public class DriveStraight extends CommandBase implements Loggable{
   @Override
   public void initialize() {
     m_robotDrive.distancesetup();
-    m_robotDrive.drivePositionGyro(distance);
+    m_robotDrive.drivePositionGyro(distance).withTimeout(10);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
