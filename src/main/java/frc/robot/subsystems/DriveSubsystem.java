@@ -568,6 +568,11 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   @Config
   public void drivePositionGyroTest(boolean enabled) {
-    new DriveStraight(120, this);
+    new DriveStraight(120, this).schedule();
+  }
+
+  @Config
+  public void driveTimeTest(boolean enabled) {
+    driveTime(5, .25).schedule();
   }
 }
