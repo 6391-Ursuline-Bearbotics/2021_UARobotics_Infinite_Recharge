@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.CounterBase;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.LinearFilter;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
@@ -12,9 +13,14 @@ import edu.wpi.first.wpilibj.controller.LinearQuadraticRegulator;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.estimator.KalmanFilter;
+import edu.wpi.first.wpilibj.simulation.BatterySim;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpilibj.system.LinearSystemLoop;
+import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import edu.wpi.first.wpiutil.math.MathUtil;
@@ -52,29 +58,9 @@ public class ShooterSubsystem extends PIDSubsystem implements Loggable{
   private final LinearSystem<N1, N1, N1> m_flywheelPlant = LinearSystemId.identifyVelocitySystem(
     ShooterConstants.kVVoltSecondsPerRotation, ShooterConstants.kA);
 
-  // The observer fuses our encoder data and voltage inputs to reject noise.
-  private final KalmanFilter<N1, N1, N1> m_observer = new KalmanFilter<>(
-        Nat.N1(), Nat.N1(),
-        m_flywheelPlant,
-        VecBuilder.fill(3.0), // How accurate we think our model is
-        VecBuilder.fill(0.01), // How accurate we think our encoder
-        // data is
-        0.020);
-
-  // A LQR uses feedback to create voltage commands.
-  private final LinearQuadraticRegulator<N1, N1, N1> m_controller
-        = new LinearQuadraticRegulator<>(m_flywheelPlant,
-        VecBuilder.fill(8.0), // Velocity error tolerance
-        VecBuilder.fill(12.0), // Control effort (voltage) tolerance
-        0.020);
-
-  // The state-space loop combines a controller, observer, feedforward and plant for easy control.
-  private final LinearSystemLoop<N1, N1, N1> m_loop = new LinearSystemLoop<>(
-      m_flywheelPlant,
-        m_controller,
-        m_observer,
-        12.0,
-        0.020);
+  private final DCMotor m_flywheelGearbox = DCMotor.getVex775Pro(2);
+  private final FlywheelSim m_flywheelSim = new FlywheelSim(m_flywheelPlant, m_flywheelGearbox, 2);
+  private final EncoderSim m_encoderSim = new EncoderSim(m_shooterEncoder);
 
   private LinearFilter m_velocityFilterMA = LinearFilter.movingAverage(4);
   private LinearFilter m_velocityFilterIIR = LinearFilter.singlePoleIIR(.1, .02);
@@ -100,29 +86,19 @@ public class ShooterSubsystem extends PIDSubsystem implements Loggable{
 		m_shooterMotor2.setNeutralMode(NeutralMode.Coast);
   }
 
-  public void loopreset() {
-    // Reset our loop to make sure it's in a known state.
-    m_loop.reset(VecBuilder.fill(m_angularVelocity));
-  }
-
   @Override
   public void simulationPeriodic() {
-    // Correct our Kalman filter's state vector estimate with encoder data.
-    m_loop.correct(VecBuilder.fill(m_angularVelocity));
+    // In this method, we update our simulation of what our elevator is doing
+    // First, we set our "inputs" (voltages)
+    m_flywheelSim.setInput(m_shooterMotor.get() * RobotController.getBatteryVoltage());
 
-    // Update our LQR to generate new voltage commands and use the voltages to predict the next
-    // state with out Kalman filter.
-    m_loop.predict(0.020);
+    // Next, we update it. The standard loop time is 20ms.
+    m_flywheelSim.update(0.020);
 
-    // Send the new calculated voltage to the motors.
-    // voltage = duty cycle * battery voltage, so
-    // duty cycle = voltage / battery voltage
-    double nextVoltage = m_loop.getU(0);
-    m_shooterMotor.setVoltage(nextVoltage);
-  }
-
-  public void nextR(double spinUp) {
-    m_loop.setNextR(VecBuilder.fill(spinUp));
+    // Finally, we set our simulated encoder's readings and simulated battery voltage
+    m_encoderSim.setRate(m_flywheelSim.getAngularVelocityRPM());
+    // SimBattery estimates loaded battery voltages
+    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_flywheelSim.getCurrentDrawAmps()));
   }
 
   @Override
