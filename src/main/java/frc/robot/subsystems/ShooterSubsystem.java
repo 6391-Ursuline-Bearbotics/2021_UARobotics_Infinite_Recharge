@@ -84,6 +84,8 @@ public class ShooterSubsystem extends PIDSubsystem implements Loggable{
   private double m_angle = 0;
   private double m_lastAngle = 0;
 
+  private double m_angularVelocity = 0;
+
   // The shooter subsystem for the robot.
   public ShooterSubsystem() {
     super(new PIDController(ShooterConstants.kP, ShooterConstants.kI, ShooterConstants.kD));
@@ -100,13 +102,13 @@ public class ShooterSubsystem extends PIDSubsystem implements Loggable{
 
   public void loopreset() {
     // Reset our loop to make sure it's in a known state.
-    m_loop.reset(VecBuilder.fill(m_shooterEncoder.getRate()));
+    m_loop.reset(VecBuilder.fill(m_angularVelocity));
   }
 
   @Override
   public void simulationPeriodic() {
     // Correct our Kalman filter's state vector estimate with encoder data.
-    m_loop.correct(VecBuilder.fill(m_shooterEncoder.getRate()));
+    m_loop.correct(VecBuilder.fill(m_angularVelocity));
 
     // Update our LQR to generate new voltage commands and use the voltages to predict the next
     // state with out Kalman filter.
@@ -125,24 +127,25 @@ public class ShooterSubsystem extends PIDSubsystem implements Loggable{
 
   @Override
   public void useOutput(double output, double setpoint) {
-    m_angle = getAngle();
-    m_time = Timer.getFPGATimestamp();
-    
-    m_velocityFilterMA.calculate((m_angle - m_lastAngle) / (m_time - m_lastTime));
-    
     var feedforward = m_shooterFeedforward.calculate(setpoint);
     SmartDashboard.putNumber("ShooterPID", output);
     SmartDashboard.putNumber("feedforward", feedforward);
     m_shooterMotor.setVoltage(MathUtil.clamp(output + feedforward, 0, 14));
-    m_lastTime = Timer.getFPGATimestamp();
-    m_lastAngle = getAngle();
   }
 
   @Log
   @Log(tabName = "Dashboard", name = "Shooter Speed")
   @Override
   public double getMeasurement() {
-    return (m_shooterEncoder.getRate() / 60.0);
+    // old way was getRate
+    m_angle = getAngle();
+    m_time = Timer.getFPGATimestamp();
+    
+    m_angularVelocity = m_velocityFilterMA.calculate((m_angle - m_lastAngle) / (m_time - m_lastTime));
+    m_lastTime = m_time;
+    m_lastAngle = m_angle;
+
+    return m_angularVelocity;
   }
 
   public double getAngle() {
