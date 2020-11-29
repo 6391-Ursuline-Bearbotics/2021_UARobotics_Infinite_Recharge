@@ -37,9 +37,9 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 public class ShooterSubsystem extends PIDSubsystem implements Loggable {
   @Log
-  private final WPI_VictorSPX m_shooterMotor = new WPI_VictorSPX(ShooterConstants.kShooterMotorPort);
+  private final WPI_VictorSPX m_shooterMotor = new WPI_VictorSPX(ShooterConstants.kShooterMotorPort2);
 
-  private final WPI_VictorSPX m_shooterMotor2 = new WPI_VictorSPX(ShooterConstants.kShooterMotorPort2);
+  private final WPI_VictorSPX m_shooterMotor2 = new WPI_VictorSPX(ShooterConstants.kShooterMotorPort);
 
   private final Encoder m_shooterEncoder = new Encoder(ShooterConstants.kEncoderPorts[0],
       ShooterConstants.kEncoderPorts[1], ShooterConstants.kEncoderReversed, CounterBase.EncodingType.k1X);
@@ -79,7 +79,7 @@ public class ShooterSubsystem extends PIDSubsystem implements Loggable {
     m_shooterEncoder.setDistancePerPulse(ShooterConstants.kEncoderDistancePerPulse);
     m_shooterEncoder.setSamplesToAverage(50);
     m_shooterMotor2.follow(m_shooterMotor);
-    m_shooterMotor.setInverted(true);
+    m_shooterMotor.setInverted(false);
     m_shooterMotor2.setInverted(InvertType.OpposeMaster);
     m_shooterMotor.setNeutralMode(NeutralMode.Coast);
 		m_shooterMotor2.setNeutralMode(NeutralMode.Coast);
