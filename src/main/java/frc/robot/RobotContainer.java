@@ -167,9 +167,6 @@ public class RobotContainer {
         .andThen(new InstantCommand(() -> {
         m_shooter.setSetpoint(ShooterConstants.kShooterFarTrenchRPM);
         m_shooter.enable();
-        if (RobotBase.isSimulation()) {
-          m_shooter.nextR(ShooterConstants.kSpinupRadPerSec);    
-        }
       }, m_shooter)))));
 
     // Stop the Shooter when the B button is pressed
@@ -178,9 +175,6 @@ public class RobotContainer {
       .whenActive(new InstantCommand(() -> {
         m_shooter.setSetpoint(0);
         m_shooter.disable();
-        if (RobotBase.isSimulation()) {
-          m_shooter.nextR(0.0);    
-        }
       }, m_shooter));
     
     // Turn on the conveyor when either the button is pressed or if the bottom sensor is blocked
