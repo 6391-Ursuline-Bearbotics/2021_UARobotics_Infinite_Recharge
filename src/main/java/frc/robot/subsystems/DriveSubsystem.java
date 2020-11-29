@@ -491,6 +491,10 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     return metersToSteps(metersPerSec) * .1d;
   }
 
+  public WPI_TalonSRX getRightMaster() {
+    return m_talonsrxright;
+  }
+
   protected static Trajectory loadTrajectory(String trajectoryName) throws IOException {
     return TrajectoryUtil.fromPathweaverJson(
         Filesystem.getDeployDirectory().toPath().resolve(Paths.get("paths", trajectoryName + ".wpilib.json")));
@@ -573,6 +577,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   @Config
   public void driveTimeTest(boolean enabled) {
-    driveTime(5, .25).schedule();
+    driveTime(5, .25).schedule();;
   }
 }
