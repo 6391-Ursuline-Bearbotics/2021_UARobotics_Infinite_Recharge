@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.estimator.KalmanFilter;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.system.LinearSystem;
@@ -27,26 +28,24 @@ import edu.wpi.first.wpiutil.math.MathUtil;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N1;
+import edu.wpi.first.wpiutil.math.numbers.N2;
 import frc.robot.Constants.ShooterConstants;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 import io.github.oblarg.oblog.annotations.Config;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
-public class ShooterSubsystem extends PIDSubsystem implements Loggable{
+public class ShooterSubsystem extends PIDSubsystem implements Loggable {
   @Log
   private final WPI_VictorSPX m_shooterMotor = new WPI_VictorSPX(ShooterConstants.kShooterMotorPort);
 
   private final WPI_VictorSPX m_shooterMotor2 = new WPI_VictorSPX(ShooterConstants.kShooterMotorPort2);
 
-  private final Encoder m_shooterEncoder =
-      new Encoder(ShooterConstants.kEncoderPorts[0], ShooterConstants.kEncoderPorts[1],
-                  ShooterConstants.kEncoderReversed, CounterBase.EncodingType.k1X);
+  private final Encoder m_shooterEncoder = new Encoder(ShooterConstants.kEncoderPorts[0],
+      ShooterConstants.kEncoderPorts[1], ShooterConstants.kEncoderReversed, CounterBase.EncodingType.k1X);
 
-  private final SimpleMotorFeedforward m_shooterFeedforward =
-      new SimpleMotorFeedforward(ShooterConstants.kSVolts,
-                                 ShooterConstants.kVVoltSecondsPerRotation,
-                                 ShooterConstants.kA);
+  private final SimpleMotorFeedforward m_shooterFeedforward = new SimpleMotorFeedforward(ShooterConstants.kSVolts,
+      ShooterConstants.kVVoltSecondsPerRotation, ShooterConstants.kA);
 
   @Config
   private final PIDController shooterPID;
@@ -55,11 +54,11 @@ public class ShooterSubsystem extends PIDSubsystem implements Loggable{
   private double output;
 
   // The Kv and Ka constants are found using the FRC Characterization toolsuite.
-  private final LinearSystem<N1, N1, N1> m_flywheelPlant = LinearSystemId.identifyVelocitySystem(
-    ShooterConstants.kVVoltSecondsPerRotation, ShooterConstants.kA);
+  LinearSystem<N2, N1, N1> m_flywheelPosition = LinearSystemId.identifyPositionSystem(ShooterConstants.kVVoltSecondsPerRotation, ShooterConstants.kA);
+  LinearSystemSim<N2, N1, N1> m_flywheelPositionSim = new LinearSystemSim<>(m_flywheelPosition);
 
   private final DCMotor m_flywheelGearbox = DCMotor.getVex775Pro(2);
-  private final FlywheelSim m_flywheelSim = new FlywheelSim(m_flywheelPlant, m_flywheelGearbox, 2);
+  //private final FlywheelSim m_flywheelSim = new FlywheelSim(m_flywheelPositionSim, m_flywheelGearbox, 2);
   private final EncoderSim m_encoderSim = new EncoderSim(m_shooterEncoder);
 
   private LinearFilter m_velocityFilterMA = LinearFilter.movingAverage(4);
@@ -90,15 +89,15 @@ public class ShooterSubsystem extends PIDSubsystem implements Loggable{
   public void simulationPeriodic() {
     // In this method, we update our simulation of what our elevator is doing
     // First, we set our "inputs" (voltages)
-    m_flywheelSim.setInput(m_shooterMotor.get() * RobotController.getBatteryVoltage());
+    m_flywheelPositionSim.setInput(m_shooterMotor.get() * RobotController.getBatteryVoltage());
 
     // Next, we update it. The standard loop time is 20ms.
-    m_flywheelSim.update(0.020);
+    m_flywheelPositionSim.update(0.020);
 
     // Finally, we set our simulated encoder's readings and simulated battery voltage
-    m_encoderSim.setRate(m_flywheelSim.getAngularVelocityRPM());
+    m_encoderSim.setDistance(m_flywheelPositionSim.getOutput(0));
     // SimBattery estimates loaded battery voltages
-    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_flywheelSim.getCurrentDrawAmps()));
+    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_flywheelPositionSim.getCurrentDrawAmps()));
   }
 
   @Override

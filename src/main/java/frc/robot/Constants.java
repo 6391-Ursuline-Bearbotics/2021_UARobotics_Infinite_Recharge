@@ -175,8 +175,8 @@ public final class Constants {
         public static final int kEncoderCPR = 2048;
         public static final double kWheelDiameterInches = 4;
         public static final double kEncoderDistancePerPulse =
-            // Distance units will be rotations per minute
-            60.0 / (double) kEncoderCPR;
+            // Distance units will be rotations per second
+            1.0 / (double) kEncoderCPR;
 
         // These are not real PID gains, and will have to be tuned for your specific robot.
         public static final double kP = 0.000321; // .000321 / 1.2 was competition number
