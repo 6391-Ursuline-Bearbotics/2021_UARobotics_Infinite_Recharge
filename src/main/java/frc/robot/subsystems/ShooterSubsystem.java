@@ -80,7 +80,7 @@ public class ShooterSubsystem extends PIDSubsystem implements Loggable{
   private LinearFilter m_velocityFilterIIR = LinearFilter.singlePoleIIR(.1, .02);
 
   private double m_time = 0;
-  private double m_lastTime = 0;
+  private double m_lastTime = Timer.getFPGATimestamp() - 0.02;
   private double m_angle = 0;
   private double m_lastAngle = 0;
 
@@ -145,6 +145,7 @@ public class ShooterSubsystem extends PIDSubsystem implements Loggable{
     m_lastTime = m_time;
     m_lastAngle = m_angle;
 
+    m_angularVelocity = m_velocityFilterIIR.calculate(m_angularVelocity);
     return m_angularVelocity;
   }
 
