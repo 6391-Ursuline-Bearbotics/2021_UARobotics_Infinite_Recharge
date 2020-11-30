@@ -52,8 +52,7 @@ public class StealAuto extends SequentialCommandGroup implements Loggable{
 
       //drive forward distance of two balls (x feet)
       //new DriveStraight(AutoConstants.kTrenchAutoBallPickup, m_robotDrive),
-      //new InstantCommand(() -> m_robotDrive.driveTime(4, 0.5)),
-      m_robotDrive.driveTime(3, -.25),
+      new RunCommand(() -> m_robotDrive.driveTime(4, 0.5)),
 
       // Probably need to do a Limelight based AutoAim here but need to get it working first
       new TimedAutoAim(2, m_robotDrive),

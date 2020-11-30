@@ -7,6 +7,7 @@ import frc.robot.subsystems.IntakeSubsystem;
 import io.github.oblarg.oblog.annotations.Log;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.controller.PIDController;
@@ -54,7 +55,7 @@ public class TrenchAuto extends SequentialCommandGroup implements Loggable{
 
       //drive forward distance of two balls (x feet)
       //new DriveStraight(AutoConstants.kTrenchAutoBallPickup, m_robotDrive),
-      new InstantCommand(() -> m_robotDrive.driveTime(4, 0.5)),
+      new RunCommand(() -> m_robotDrive.driveTime(4, 0.5)),
       
       // Retract intake
       new InstantCommand(() -> {m_intake.toggleIntakePosition(true);
@@ -78,7 +79,8 @@ public class TrenchAuto extends SequentialCommandGroup implements Loggable{
       new TurnToAngle(AutoConstants.kTrenchAutoShootAngle, m_robotDrive),
 
       // Drive some more down field
-      new DriveStraight(AutoConstants.kTrenchAutoDriveCenter, m_robotDrive)
+      //new DriveStraight(AutoConstants.kTrenchAutoDriveCenter, m_robotDrive)
+      new RunCommand(() -> m_robotDrive.driveTime(4, 0.5))
     );
   }
 }

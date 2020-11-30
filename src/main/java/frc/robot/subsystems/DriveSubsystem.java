@@ -164,7 +164,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 		
 		/* Configure the Pigeon IMU as a Remote Sensor for the right Talon */
 		m_talonsrxright.configRemoteFeedbackFilter(m_pigeon.getDeviceID(),			// Device ID of Source
-												RemoteSensorSource.Pigeon_Yaw,	// Remote Feedback Source
+												RemoteSensorSource.GadgeteerPigeon_Yaw,	// Remote Feedback Source
 												DriveConstants.REMOTE_1,				// Remote number [0, 1]
 												DriveConstants.kTimeoutMs);			// Configuration Timeout
 		
