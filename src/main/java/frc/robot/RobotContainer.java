@@ -177,7 +177,18 @@ public class RobotContainer {
         m_shooter.disable();
       }, m_shooter));
     
-    // Turn on the conveyor when either the button is pressed or if the bottom sensor is blocked
+    // When driver presses the Y button Auto Aim to the goal
+    new JoystickButton(m_driverController, XboxController.Button.kY.value)
+      .whenPressed(new InstantCommand(() -> m_Limelight.beforeTurnToTarget()))
+      .whileHeld(new InstantCommand(() -> m_Limelight.turnToTargetVolts(m_robotDrive,m_shooter), m_robotDrive))
+      .whenReleased(new InstantCommand(() -> m_Limelight.afterTurnToTarget()));
+    //.whenPressed(new AutoAim(m_robotDrive));
+
+    // When Y button is pressed on operators controller deploy the intake but do not spin the wheels
+    new JoystickButton(m_operatorController, XboxController.Button.kY.value)
+      .whenPressed(new InstantCommand(() -> m_intake.toggleIntakePosition(true)));
+
+    // Turn on the conveyor when either the A button is pressed or if the bottom sensor is blocked
     // (new ball) and the top sensor is not blocked (ball has a place to go)
     (topConveyorSensor.negate()
       .and(frontConveyorSensor))
@@ -194,40 +205,29 @@ public class RobotContainer {
       .whenActive(new InstantCommand(() -> m_intake.toggleIntakeWheels(true))
       .andThen(new InstantCommand(() -> m_intake.toggleIntakePosition(true))));
     
-    // TEST when back is pressed drive straight 120 inches
-    /* new JoystickButton(m_driverController, XboxController.Button.kBack.value)
-      .or(new JoystickButton(m_operatorController, XboxController.Button.kBack.value))
-      .whenActive(new DriveStraight(120, m_robotDrive).withTimeout(10)); */
-    
     // When the left bumper is pressed on either controller go to the next climber stage
-     new JoystickButton(m_operatorController, XboxController.Button.kBumperLeft.value)
+    new JoystickButton(m_operatorController, XboxController.Button.kBumperLeft.value)
       .or(new JoystickButton(m_driverController, XboxController.Button.kBumperLeft.value))
-      .whenActive(new NextClimbPosition(m_climb).withTimeout(5));
+      .whileActiveOnce(new WaitCommand(1).andThen(new NextClimbPosition(m_climb).withTimeout(5)));
      // new PerpetualCommand(new InstantCommand(() -> m_climb.nextClimbStage(true))
      // .withInterrupt(() -> m_climb.atposition())));
      // .whenActive(new InstantCommand(() -> m_climb.nextClimbStage(true))
      //   .perpetually().withInterrupt(() -> m_climb.atposition()));
-    
+
+    // TEST when back is pressed drive straight 120 inches
+    /* new JoystickButton(m_driverController, XboxController.Button.kBack.value)
+      .or(new JoystickButton(m_operatorController, XboxController.Button.kBack.value))
+      .whenActive(new DriveStraight(120, m_robotDrive).withTimeout(10)); */
+
     new JoystickButton(m_driverController, XboxController.Button.kBack.value)
       .whenPressed(new PrintCommand("myButton is pressed"));
       //.whenPressed(new InstantCommand(m_conveyor::turnBackwards, m_conveyor))
       //.whenReleased(new InstantCommand(m_conveyor::turnOff, m_conveyor));
     
-    // When driver presses the Y button Auto Aim to the goal
-    new JoystickButton(m_driverController, XboxController.Button.kY.value)
-      .whenPressed(new InstantCommand(() -> m_Limelight.beforeTurnToTarget()))
-      .whileHeld(new InstantCommand(() -> m_Limelight.turnToTargetVolts(m_robotDrive,m_shooter), m_robotDrive))
-      .whenReleased(new InstantCommand(() -> m_Limelight.afterTurnToTarget()));
-    //.whenPressed(new AutoAim(m_robotDrive));
-    
     // TEST when start is pressed follow trajectory
     new JoystickButton(m_driverController, XboxController.Button.kStart.value)
       .whenPressed(new DriveDistanceProfiled(3, m_robotDrive).withTimeout(10));
     //.whenPressed(() -> m_robotDrive.createCommandForTrajectory("LS to CP"));
-    
-    // When Y button is pressed on operators controller deploy the intake but do not spin the wheels
-    new JoystickButton(m_operatorController, XboxController.Button.kY.value)
-      .whenPressed(new InstantCommand(() -> m_intake.toggleIntakePosition(true)));
     
     // Create "button" from POV Hat in up direction.  Use both of the angles to the left and right also.
     new POVButton(m_driverController, 315).or(new POVButton(m_driverController, 0)).or(new POVButton(m_driverController, 45))
