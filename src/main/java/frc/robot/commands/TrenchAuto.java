@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import io.github.oblarg.oblog.Loggable;
@@ -49,25 +50,40 @@ public class TrenchAuto extends SequentialCommandGroup implements Loggable{
         m_shooter.enable();
       }, m_shooter),
 
+      //run conveyor when shooter is at speed (stop moving conveyor when not at speed)
+      new Shoot(AutoConstants.kAutoShootTimeSeconds, m_shooter, m_conveyor),
+      
+      new TurnToAngle(180, m_robotDrive),
+
       //lower intake and spin intake
       new InstantCommand(() -> {m_intake.toggleIntakePosition(true);
         m_intake.toggleIntakeWheels(true);}, m_intake),
 
-      //drive forward distance of two balls (x feet)
-      //new DriveStraight(AutoConstants.kTrenchAutoBallPickup, m_robotDrive),
-      new RunCommand(() -> m_robotDrive.driveTime(4, 0.5)),
-      
+      //drive forward distance of three balls (x feet)
+      new DriveStraight(AutoConstants.kTrenchAutoBallPickup, m_robotDrive),
+      //new RunCommand(() -> m_robotDrive.driveTime(4, 0.5)),
+
       // Retract intake
       new InstantCommand(() -> {m_intake.toggleIntakePosition(true);
         m_intake.toggleIntakeWheels(true);}, m_intake),
 
-      //turn around to face goal (-160)
-      new TurnToAngle(AutoConstants.kTrenchAutoShootAngle, m_robotDrive),
+      //turn around to face goal (0)
+      new TurnToAngle(0, m_robotDrive),
+
+      //drive forward back to the line
+      new DriveStraight(AutoConstants.kTrenchAutoBallPickup, m_robotDrive),
       
       // Probably need to do a Limelight based AutoAim here but need to get it working first
 
+      //start shooter to speed we want
+      new InstantCommand(() -> {
+        m_shooter.setSetpoint(AutoConstants.kTrenchAutoShootRPM);
+        m_shooter.enable();
+      }, m_shooter),
+
       //run conveyor when shooter is at speed (stop moving conveyor when not at speed)
       new Shoot(AutoConstants.kAutoShootTimeSeconds, m_shooter, m_conveyor),
+      
       
       // Stop shooter
       new InstantCommand(() -> {

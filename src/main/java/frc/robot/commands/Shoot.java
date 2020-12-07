@@ -43,13 +43,13 @@ public class Shoot extends CommandBase implements Loggable{
 
   @Override
   public void execute() {
-    m_conveyor.turnOn();
-    /* if(m_shooter.atSetpoint()) {
+    //m_conveyor.turnOn();
+    if(m_shooter.atSetpoint()) {
       m_conveyor.turnOn();
     }
     else{
       m_conveyor.turnOff();
-    } */
+    }
   }
 
   @Override

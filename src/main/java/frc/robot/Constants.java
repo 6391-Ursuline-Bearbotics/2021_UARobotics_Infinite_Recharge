@@ -128,7 +128,7 @@ public final class Constants {
         public static final double kTurnP = .1;
         public static final double kTurnI = 0;
         public static final double kTurnD = 0.15;
-        public static final double kTurnFriction = 0.3;
+        public static final double kTurnFriction = 0.5;
 
         public static final double kMaxTurnRateDegPerS = 100;
         public static final double kMaxTurnAccelerationDegPerSSquared = 300;
@@ -139,7 +139,7 @@ public final class Constants {
         public static final double kRelTurnP = .1;
         public static final double kRelTurnI = 0;
         public static final double kRelTurnD = 0.15;
-        public static final double kRelTurnFriction = 0.3;
+        public static final double kRelTurnFriction = 0.5;
 
         public static final double kMaxRelTurnRateDegPerS = 20;
         public static final double kMaxRelTurnAccelerationDegPerSSquared = 300;
@@ -179,7 +179,7 @@ public final class Constants {
             1.0 / (double) kEncoderCPR;
 
         // These are not real PID gains, and will have to be tuned for your specific robot.
-        public static final double kP = 0.000321; // .000321 / 1.2 was competition number
+        public static final double kP = 1.2; // .000321 / 1.2 was competition number
         public static final double kI = 0;
         public static final double kD = 0;
         public static final double kF = 0; //Not used
@@ -206,7 +206,7 @@ public final class Constants {
         public static final double kAutoTimeoutSeconds = 12;
         public static final double kAutoShootTimeSeconds = 7;
 
-        public static final double kTrenchAutoShootRPM = 7000;
+        public static final double kTrenchAutoShootRPM = 7000/60;
         public static final double kTrenchAutoBallPickup = 60;
         public static final double kTrenchAutoShootAngle = -160;
         public static final double kTrenchAutoCenterAngle = -45;

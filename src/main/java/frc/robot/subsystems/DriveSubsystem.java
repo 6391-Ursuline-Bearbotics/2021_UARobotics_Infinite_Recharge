@@ -345,6 +345,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   /**
    * Resets the drive encoders to currently read a position of 0.
    */
+  @Config
   public void resetEncoders() {
     m_talonsrxleft.setSelectedSensorPosition(0);
     m_talonsrxright.setSelectedSensorPosition(0);
@@ -527,7 +528,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   @Log
   public double getrighterror() {
-    return metersToSteps(m_talonsrxright.getClosedLoopError());
+    //return metersToSteps(m_talonsrxright.getClosedLoopError());
+    return m_talonsrxright.getClosedLoopError();
   }
 
   @Log
@@ -563,19 +565,20 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
       .andThen(() -> {m_talonsrxleft.set(0);m_talonsrxright.set(0);});
   }
 
-  public Command drivePositionGyro(double distanceInches) {
+  @Config
+  public void drivePositionGyro(double distanceInches, double heading) {
+    var sensorposition = heading * 10;
+    distancesetup();
     target_sensorUnits = (distanceInches * DriveConstants.SENSOR_UNITS_PER_ROTATION) / DriveConstants.WHEEL_CIRCUMFERENCE_INCHES ;
-    return new RunCommand(() -> 
-    m_talonsrxright.set(ControlMode.Position, target_sensorUnits, DemandType.AuxPID, m_talonsrxright.getSelectedSensorPosition(1)))
-    .withInterrupt(() -> atSetpoint());
+    m_talonsrxright.set(ControlMode.Position, target_sensorUnits, DemandType.AuxPID, sensorposition);
   }
 
-  @Config
+  @Config.ToggleButton
   public void drivePositionGyroTest(boolean enabled) {
-    new DriveStraight(120, this).schedule();
+    new RunCommand(() -> drivePositionGyro(120, getHeading())).withInterrupt(() -> atSetpoint()).withTimeout(5).schedule();
   }
 
-  @Config
+  @Config.ToggleButton
   public void driveTimeTest(boolean enabled) {
     driveTime(5, .25).schedule();;
   }

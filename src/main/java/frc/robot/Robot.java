@@ -98,6 +98,8 @@ public class Robot extends TimedRobot {
     m_robotContainer.m_climb.setOutput(0, 0);
     m_robotContainer.m_climb.climbstage = 0;
     m_robotContainer.m_climb.resetEnc(true);
+    m_robotContainer.m_shooter.setSetpoint(0);
+    m_robotContainer.m_shooter.disable();
     NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
   }
 
@@ -124,6 +126,8 @@ public class Robot extends TimedRobot {
     m_robotContainer.m_climb.setOutput(0, 0);
     m_robotContainer.m_climb.climbstage = 0;
     m_robotContainer.m_climb.resetEnc(true);
+    m_robotContainer.m_shooter.setSetpoint(0);
+    m_robotContainer.m_shooter.disable();
     NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
   }
 
