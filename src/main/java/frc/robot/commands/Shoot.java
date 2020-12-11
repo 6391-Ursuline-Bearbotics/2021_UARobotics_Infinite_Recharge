@@ -11,8 +11,6 @@ import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 import edu.wpi.first.wpilibj.Timer;
 
-import frc.robot.commands.TurnToRelativeAngle;
-
 public class Shoot extends CommandBase implements Loggable{
   private final ShooterSubsystem m_shooter;
   private final ConveyorSubsystem m_conveyor;

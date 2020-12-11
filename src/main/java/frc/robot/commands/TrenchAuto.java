@@ -16,7 +16,6 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 import frc.robot.commands.Shoot;
-import frc.robot.commands.TurnToAngle;
 import frc.robot.commands.DriveStraight;
 
 import frc.robot.Constants.AutoConstants;
@@ -53,7 +52,7 @@ public class TrenchAuto extends SequentialCommandGroup implements Loggable{
       //run conveyor when shooter is at speed (stop moving conveyor when not at speed)
       new Shoot(AutoConstants.kAutoShootTimeSeconds, m_shooter, m_conveyor),
       
-      new TurnToAngle(180, m_robotDrive),
+      new RunCommand(() -> m_robotDrive.turnToAngle(180)),
 
       //lower intake and spin intake
       new InstantCommand(() -> {m_intake.toggleIntakePosition(true);
@@ -68,7 +67,7 @@ public class TrenchAuto extends SequentialCommandGroup implements Loggable{
         m_intake.toggleIntakeWheels(true);}, m_intake),
 
       //turn around to face goal (0)
-      new TurnToAngle(0, m_robotDrive),
+      new RunCommand(() -> m_robotDrive.turnToAngle(0)),
 
       //drive forward back to the line
       new DriveStraight(AutoConstants.kTrenchAutoBallPickup, m_robotDrive),
@@ -92,11 +91,10 @@ public class TrenchAuto extends SequentialCommandGroup implements Loggable{
       }, m_shooter),
 
       //turn (-45) to pick up more balls
-      new TurnToAngle(AutoConstants.kTrenchAutoShootAngle, m_robotDrive),
+      new RunCommand(() -> m_robotDrive.turnToAngle(AutoConstants.kTrenchAutoShootAngle))
 
       // Drive some more down field
       //new DriveStraight(AutoConstants.kTrenchAutoDriveCenter, m_robotDrive)
-      new RunCommand(() -> m_robotDrive.driveTime(4, 0.5))
     );
   }
 }

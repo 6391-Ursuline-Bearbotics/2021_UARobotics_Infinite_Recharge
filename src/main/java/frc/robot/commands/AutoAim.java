@@ -9,8 +9,6 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 
-import frc.robot.commands.TurnToRelativeAngle;
-
 public class AutoAim extends CommandBase implements Loggable{
   private final DriveSubsystem m_robotDrive;
   /**
@@ -39,7 +37,7 @@ public class AutoAim extends CommandBase implements Loggable{
 
     if (tv == 1)
     {
-      new TurnToRelativeAngle(tx, m_robotDrive);
+      m_robotDrive.turnToRelativeAngle(tx);
     }
     else
     {

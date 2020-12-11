@@ -124,11 +124,6 @@ public final class Constants {
 
         // Example value only - as above, this must be tuned for your drive!
         public static final double kPDriveVel = 8.5;       
-        
-        public static final double kTurnP = .1;
-        public static final double kTurnI = 0;
-        public static final double kTurnD = 0.15;
-        public static final double kTurnFriction = 0.5;
 
         public static final double kMaxTurnRateDegPerS = 100;
         public static final double kMaxTurnAccelerationDegPerSSquared = 300;
@@ -151,9 +146,23 @@ public final class Constants {
         public static final double RAMSETE_B = 2;
         public static final double RAMSETE_ZETA = 0.7;
 
-        // Drive straight profiled
+        // Turn angle constraints
         public static final double kMaxSpeedMetersPerSecond = 3;
         public static final double kMaxAccelerationMetersPerSecondSquared = 2;
+
+        // Turn angle PID
+        public static final double kTurnP = .1;
+        public static final double kTurnI = 0;
+        public static final double kTurnD = 0.15;
+
+        // Turn Velocity constraints
+        public static final double kVelocityMaxSpeedMetersPerSecond = 3;
+        public static final double kVelocityMaxAccelerationMetersPerSecondSquared = 2;
+
+        // Turn Velocity PID
+        public static final double kVelocityP = .1;
+        public static final double kVelocityI = 0;
+        public static final double kVelocityD = 0.15;
     }
     
     public static final class ShooterConstants {

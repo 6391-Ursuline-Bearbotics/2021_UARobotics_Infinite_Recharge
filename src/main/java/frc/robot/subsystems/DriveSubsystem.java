@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.Field2d;
 import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.controller.RamseteController;
@@ -36,6 +37,7 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.SPI;
@@ -108,6 +110,20 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   private Trajectory straightTrajectory;
   @Log
   double target_sensorUnits;
+
+  // Turn PIDControllers
+  Constraints turnconstraints = new TrapezoidProfile.Constraints(DriveConstants.kMaxSpeedMetersPerSecond,
+                                             DriveConstants.kMaxAccelerationMetersPerSecondSquared);
+  @Config
+  ProfiledPIDController turnangle = new ProfiledPIDController(DriveConstants.kTurnP, DriveConstants.kTurnI, DriveConstants.kTurnD, turnconstraints);
+
+  Constraints velocityconstraints = new TrapezoidProfile.Constraints(DriveConstants.kVelocityMaxSpeedMetersPerSecond,
+                                             DriveConstants.kVelocityMaxAccelerationMetersPerSecondSquared);
+  @Config
+  ProfiledPIDController velocityleft = new ProfiledPIDController(DriveConstants.kVelocityP, DriveConstants.kVelocityI, DriveConstants.kVelocityD, velocityconstraints);
+
+  @Config
+  ProfiledPIDController velocityright = new ProfiledPIDController(DriveConstants.kVelocityP, DriveConstants.kVelocityI, DriveConstants.kVelocityD, turnconstraints);
 
   /**
    * Creates a new DriveSubsystem.
@@ -414,6 +430,13 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     return Math.IEEEremainder(ypr[0], 360);
   }
 
+  @Log
+  public double getTurnRate() {
+    final double[] xyz = new double[3];
+    m_pigeon.getRawGyro(xyz);
+    return xyz[0];
+  }
+
   public void tankDriveVelocity(double leftVelocity, double rightVelocity) {
     var leftAccel = (leftVelocity - stepsPerDecisecToMetersPerSec(m_talonsrxleft.getSelectedSensorVelocity())) / 20;
     var rightAccel = (rightVelocity - stepsPerDecisecToMetersPerSec(m_talonsrxright.getSelectedSensorVelocity())) / 20;
@@ -506,6 +529,17 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     target_sensorUnits = (distance * DriveConstants.SENSOR_UNITS_PER_ROTATION) / DriveConstants.WHEEL_CIRCUMFERENCE_INCHES ;
     m_talonsrxright.set(ControlMode.Position, target_sensorUnits, DemandType.AuxPID, m_talonsrxright.getSelectedSensorPosition(1));
 		m_talonsrxleft.follow(m_talonsrxright, FollowerType.AuxOutput1);
+  }
+
+  // Turns to a specified angle using the cascading PID
+  public void turnToAngle(double angle) {
+    Double angleVelocity = turnangle.calculate(getHeading(), angle);
+    tankDrive(velocityleft.calculate(m_talonsrxleft.getSelectedSensorVelocity(), -angleVelocity), velocityright.calculate(m_talonsrxright.getSelectedSensorVelocity(), angleVelocity));
+  }
+
+  // Turns to an angle relative to the current angle
+  public void turnToRelativeAngle(double angle) {
+    angle = 0;
   }
 
   // Sets up the talons to drive straightDistance with aux pid from Pigeon 
