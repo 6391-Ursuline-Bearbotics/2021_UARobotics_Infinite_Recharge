@@ -13,6 +13,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
@@ -25,7 +26,7 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
-import edu.wpi.first.wpilibj.simulation.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
@@ -139,7 +140,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
           DriveConstants.kDriveGearbox,
           DriveConstants.kDriveGearing,
           DriveConstants.TRACK_WIDTH_METERS,
-          DriveConstants.kWheelDiameterMeters / 2.0);
+          DriveConstants.kWheelDiameterMeters / 2.0,
+          VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
 
       // The encoder and gyro angle sims let us set simulated sensor readings // Encoders are not real
       m_leftEncoderSim = new EncoderSim(new Encoder(2, 3));
@@ -291,10 +293,10 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
           -m_rightMotors.get() * RobotController.getBatteryVoltage());
     m_drivetrainSimulator.update(0.020);
 
-    m_leftEncoderSim.setDistance(m_drivetrainSimulator.getState(DifferentialDrivetrainSim.State.kLeftPosition));
-    m_leftEncoderSim.setRate(m_drivetrainSimulator.getState(DifferentialDrivetrainSim.State.kLeftVelocity));
-    m_rightEncoderSim.setDistance(m_drivetrainSimulator.getState(DifferentialDrivetrainSim.State.kRightPosition));
-    m_rightEncoderSim.setRate(m_drivetrainSimulator.getState(DifferentialDrivetrainSim.State.kRightVelocity));
+    m_leftEncoderSim.setDistance(m_drivetrainSimulator.getLeftPositionMeters());
+    m_leftEncoderSim.setRate(m_drivetrainSimulator.getLeftVelocityMetersPerSecond());
+    m_rightEncoderSim.setDistance(m_drivetrainSimulator.getRightPositionMeters());
+    m_rightEncoderSim.setRate(m_drivetrainSimulator.getRightVelocityMetersPerSecond());
     //m_gyroAngleSim.set(-m_drivetrainSimulator.getHeading().getDegrees());
 
     m_fieldSim.setRobotPose(getCurrentPose());
