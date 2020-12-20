@@ -613,7 +613,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   }
 
   @Config.ToggleButton
-  public void driveTimeTest(boolean enabled) {
-    driveTime(5, .25).schedule();;
+  public void driveVelocityTest(boolean enabled) {
+    new RunCommand(() -> tankDriveVelocity(.5, .5)).withTimeout(5).schedule();
   }
 }
