@@ -12,38 +12,29 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj.geometry.Transform2d;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
-import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
-import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
@@ -52,11 +43,11 @@ import java.nio.file.Paths;
 import java.io.IOException;
 
 import frc.robot.Constants.DriveConstants;
-import frc.robot.commands.DriveStraight;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.sim.PhysicsSim;
 
 public class DriveSubsystem extends SubsystemBase implements Loggable{
 	// The motors on the left and right side of the drivetrain
@@ -100,7 +91,9 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   // The Field2d class simulates the field in the sim GUI. Note that we can have only one
   // instance!
   private Field2d m_fieldSim;
-  private SimDouble m_gyroAngleSim;
+
+  private AnalogGyro m_gyro;
+  private AnalogGyroSim m_gyroSim;
 
   /** Tracking variables */
 	boolean _firstCall = false;
@@ -146,12 +139,17 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
       // The encoder and gyro angle sims let us set simulated sensor readings // Encoders are not real
       m_leftEncoderSim = new EncoderSim(new Encoder(2, 3));
       m_rightEncoderSim = new EncoderSim(new Encoder(4, 5));
-/*       m_gyroAngleSim =
-            new SimDeviceSim("ADXRS450_Gyro" + "[" + SPI.Port.kOnboardCS0.value + "]")
-                  .getDouble("Angle"); */
+
+      m_gyro = new AnalogGyro(1);
+      m_gyroSim = new AnalogGyroSim(m_gyro);
+
+      PhysicsSim.getInstance().addTalonSRX(m_talonsrxleft, 0.75, 5100, false);
+      PhysicsSim.getInstance().addTalonSRX(m_talonsrxright, 0.75, 5100, false);
 
       // the Field2d class lets us visualize our robot in the simulation GUI.
       m_fieldSim = new Field2d();
+
+      SmartDashboard.putData("Field", m_fieldSim);
     }
 
     // Set factory defaults
@@ -276,11 +274,22 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    m_odometry.update(
-      Rotation2d.fromDegrees(getHeading()),
-      m_talonsrxleft.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse,
-      m_talonsrxright.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse);
-    SmartDashboard.putString("Pose", m_odometry.getPoseMeters().toString());
+    if (RobotBase.isSimulation()) { // If our robot is simulated
+      // This will get the simulated sensor readings that we set
+      // in the previous article while in simulation, but will use
+      // real values on the robot itself.
+      m_odometry.update(m_gyro.getRotation2d(),
+        m_leftEncoderSim.getDistance(),
+        m_rightEncoderSim.getDistance());
+      m_fieldSim.setRobotPose(m_odometry.getPoseMeters());
+    }
+    else {
+      m_odometry.update(
+        Rotation2d.fromDegrees(getHeading()),
+        m_talonsrxleft.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse,
+        m_talonsrxright.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse);
+      SmartDashboard.putString("Pose", m_odometry.getPoseMeters().toString());
+    }
   }
 
   @Override
@@ -297,9 +306,11 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     m_leftEncoderSim.setRate(m_drivetrainSimulator.getLeftVelocityMetersPerSecond());
     m_rightEncoderSim.setDistance(m_drivetrainSimulator.getRightPositionMeters());
     m_rightEncoderSim.setRate(m_drivetrainSimulator.getRightVelocityMetersPerSecond());
-    //m_gyroAngleSim.set(-m_drivetrainSimulator.getHeading().getDegrees());
+    m_gyroSim.setAngle(-m_drivetrainSimulator.getHeading().getDegrees());
 
     m_fieldSim.setRobotPose(getCurrentPose());
+
+    PhysicsSim.getInstance().run();
   }
 
   public double getDrawnCurrentAmps() {
@@ -440,8 +451,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   }
 
   public void tankDriveVelocity(double leftVelocity, double rightVelocity) {
-    var leftAccel = (leftVelocity - stepsPerDecisecToMetersPerSec(m_talonsrxleft.getSelectedSensorVelocity())) / 20;
-    var rightAccel = (rightVelocity - stepsPerDecisecToMetersPerSec(m_talonsrxright.getSelectedSensorVelocity())) / 20;
+    var leftAccel = (leftVelocity - stepsPerDecisecToMetersPerSec((int)m_talonsrxleft.getSelectedSensorVelocity())) / 20;
+    var rightAccel = (rightVelocity - stepsPerDecisecToMetersPerSec((int)m_talonsrxright.getSelectedSensorVelocity())) / 20;
     
     var leftFeedForwardVolts = m_driveFeedforward.calculate(leftVelocity, leftAccel);
     var rightFeedForwardVolts = m_driveFeedforward.calculate(rightVelocity, rightAccel);
@@ -450,12 +461,12 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
         ControlMode.Velocity, 
         metersPerSecToStepsPerDecisec(leftVelocity), 
         DemandType.ArbitraryFeedForward,
-        leftFeedForwardVolts / 12);
+        (int)leftFeedForwardVolts / 12);
     m_talonsrxright.set(
         ControlMode.Velocity,
         metersPerSecToStepsPerDecisec(rightVelocity),
         DemandType.ArbitraryFeedForward,
-        rightFeedForwardVolts / 12);
+        (int)rightFeedForwardVolts / 12);
   }
 
   /**
