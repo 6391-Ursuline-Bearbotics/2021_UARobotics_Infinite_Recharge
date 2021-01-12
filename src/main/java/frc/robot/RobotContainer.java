@@ -7,39 +7,21 @@
 
 package frc.robot;
 
-import java.io.IOException;
-
 // WPI Imports
 import edu.wpi.cscore.HttpCamera;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.XboxControllerSim;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.PerpetualCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.NetworkButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.Timer;
-import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 
 // Command Imports
@@ -54,7 +36,6 @@ import frc.robot.commands.StealAuto;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
-import frc.robot.subsystems.ControlPanelSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ConveyorSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
@@ -62,7 +43,6 @@ import frc.robot.subsystems.Limelight;
 
 // Constant Imports
 import frc.robot.Constants.ShooterConstants;
-import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OIConstants;
 
 /**
@@ -98,7 +78,6 @@ public class RobotContainer {
   @Log(tabName = "DriveSubsystem")
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
-  private final Timer timer = new Timer();
   // The driver's controller
   Xbox6391 drv = new Xbox6391(OIConstants.kDriverControllerPort);
   XboxControllerSim m_driverControllerSim = new XboxControllerSim(OIConstants.kDriverControllerPort);

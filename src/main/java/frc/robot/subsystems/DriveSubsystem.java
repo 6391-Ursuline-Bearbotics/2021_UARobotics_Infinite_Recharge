@@ -86,8 +86,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   // These classes help us simulate our drivetrain
   public DifferentialDrivetrainSim m_drivetrainSimulator;
-  private EncoderSim m_leftEncoderSim;
-  private EncoderSim m_rightEncoderSim;
+  //private EncoderSim m_leftEncoderSim;
+  //private EncoderSim m_rightEncoderSim;
   // The Field2d class simulates the field in the sim GUI. Note that we can have only one
   // instance!
   private Field2d m_fieldSim;
@@ -137,8 +137,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
           VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
 
       // The encoder and gyro angle sims let us set simulated sensor readings // Encoders are not real
-      m_leftEncoderSim = new EncoderSim(new Encoder(2, 3));
-      m_rightEncoderSim = new EncoderSim(new Encoder(4, 5));
+      //m_leftEncoderSim = new EncoderSim(new Encoder(2, 3));
+      //m_rightEncoderSim = new EncoderSim(new Encoder(4, 5));
 
       m_gyro = new AnalogGyro(1);
       m_gyroSim = new AnalogGyroSim(m_gyro);
@@ -279,8 +279,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
       // in the previous article while in simulation, but will use
       // real values on the robot itself.
       m_odometry.update(m_gyro.getRotation2d(),
-        m_leftEncoderSim.getDistance(),
-        m_rightEncoderSim.getDistance());
+        m_talonsrxleft.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse,
+        m_talonsrxright.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse);
       m_fieldSim.setRobotPose(m_odometry.getPoseMeters());
     }
     else {
@@ -299,13 +299,19 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     // We negate the right side so that positive voltages make the right side
     // move forward.
     m_drivetrainSimulator.setInputs(m_leftMotors.get() * RobotController.getBatteryVoltage(),
-          -m_rightMotors.get() * RobotController.getBatteryVoltage());
+          m_rightMotors.get() * RobotController.getBatteryVoltage());
     m_drivetrainSimulator.update(0.020);
 
-    m_leftEncoderSim.setDistance(m_drivetrainSimulator.getLeftPositionMeters());
+/*     m_leftEncoderSim.setDistance(m_drivetrainSimulator.getLeftPositionMeters());
     m_leftEncoderSim.setRate(m_drivetrainSimulator.getLeftVelocityMetersPerSecond());
     m_rightEncoderSim.setDistance(m_drivetrainSimulator.getRightPositionMeters());
-    m_rightEncoderSim.setRate(m_drivetrainSimulator.getRightVelocityMetersPerSecond());
+    m_rightEncoderSim.setRate(m_drivetrainSimulator.getRightVelocityMetersPerSecond()); */
+
+    m_talonsrxleft.getSimCollection().setQuadratureRawPosition((int)metersToSteps(m_drivetrainSimulator.getLeftPositionMeters()));
+    m_talonsrxleft.getSimCollection().setQuadratureVelocity((int)metersPerSecToStepsPerDecisec(m_drivetrainSimulator.getLeftVelocityMetersPerSecond()));
+    m_talonsrxright.getSimCollection().setQuadratureRawPosition((int)metersToSteps(m_drivetrainSimulator.getRightPositionMeters()));
+    m_talonsrxright.getSimCollection().setQuadratureVelocity((int)metersPerSecToStepsPerDecisec(m_drivetrainSimulator.getRightVelocityMetersPerSecond()));
+
     m_gyroSim.setAngle(-m_drivetrainSimulator.getHeading().getDegrees());
 
     m_fieldSim.setRobotPose(getCurrentPose());
@@ -520,7 +526,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   }
 
   /**
-   * Convers from meters per second to encoder units per 100 milliseconds.
+   * Converts from meters per second to encoder units per 100 milliseconds.
    * @param metersPerSec meters per second
    * @return encoder units per decisecond
    */
