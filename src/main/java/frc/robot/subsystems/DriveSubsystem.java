@@ -279,7 +279,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
       // in the previous article while in simulation, but will use
       // real values on the robot itself.
       m_odometry.update(m_gyro.getRotation2d(),
-        m_talonsrxleft.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse,
+        -m_talonsrxleft.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse,
         m_talonsrxright.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse);
       m_fieldSim.setRobotPose(m_odometry.getPoseMeters());
     }

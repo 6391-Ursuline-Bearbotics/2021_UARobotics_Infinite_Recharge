@@ -188,13 +188,14 @@ public class RobotContainer {
       .or(new JoystickButton(m_operatorController, XboxController.Button.kBack.value))
       .whenActive(new DriveStraight(120, m_robotDrive).withTimeout(10)); */
 
-    drv.BackButton.whenPressed(new InstantCommand(m_conveyor::turnBackwards, m_conveyor))
-      .whenReleased(new InstantCommand(m_conveyor::turnOff, m_conveyor));
+    drv.BackButton.whenPressed(() -> m_robotDrive.tankDriveVelocity(1, 1));
+    //.whenPressed(new InstantCommand(m_conveyor::turnBackwards, m_conveyor))
+    //  .whenReleased(new InstantCommand(m_conveyor::turnOff, m_conveyor));
     
     // TEST when start is pressed follow trajectory
-    drv.StartButton.whenPressed(new DriveDistanceProfiled(3, m_robotDrive).withTimeout(10));
-    //.whenPressed(() -> m_robotDrive.createCommandForTrajectory("LS to CP"));
-    
+    drv.StartButton.whenPressed(() -> m_robotDrive.createCommandForTrajectory("LS to CP"));
+    //.whenPressed(new DriveDistanceProfiled(3, m_robotDrive).withTimeout(10));
+
     // Create "button" from POV Hat in up direction.  Use both of the angles to the left and right also.
     drv.POVUp.whenActive(new RunCommand(() -> m_robotDrive.turnToAngle(90)).withTimeout(5));
     
