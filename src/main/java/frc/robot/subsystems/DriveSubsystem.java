@@ -255,12 +255,12 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     zeroHeading(true);
   }
 
-  public void resetOdometry() {
-    setCurrentPose(new Pose2d(0, 0, Rotation2d.fromDegrees(0)));
+  public void resetOdometry(Pose2d pose) {
+    setCurrentPose(pose);
   }
 
   /**
-   * Resets the current pose to the specified pose. This this ONLY be called
+   * Resets the current pose to the specified pose. This should ONLY be called
    * when the robot's position on the field is known, like at the beginnig of
    * a match. This will also reset the saved pose since the old pose could be invalidated.
    * @param newPose new pose
@@ -488,6 +488,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     }
     Transform2d transform = new Pose2d(0, 0, Rotation2d.fromDegrees(0)).minus(straightTrajectory.getInitialPose());
     Trajectory trajectory = straightTrajectory.transformBy(transform);
+    this.resetOdometry(straightTrajectory.getInitialPose());
     return new RamseteCommand(
             trajectory,
             this::getCurrentPose,
