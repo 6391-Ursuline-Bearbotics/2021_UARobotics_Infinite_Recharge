@@ -62,12 +62,12 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   private final WPI_TalonSRX m_talonsrxright2 = new WPI_TalonSRX(DriveConstants.kRightMotor1Port);
 
   // The motors on the left side of the drive.
-  private final SpeedControllerGroup m_leftMotors =
-        new SpeedControllerGroup(m_talonsrxleft, m_victorspxleft);
+  /* private final SpeedControllerGroup m_leftMotors =
+        new SpeedControllerGroup(m_talonsrxleft, m_victorspxleft); */
 
   // The motors on the right side of the drive.
-  private final SpeedControllerGroup m_rightMotors =
-        new SpeedControllerGroup(m_talonsrxright, m_talonsrxright2); 
+/*   private final SpeedControllerGroup m_rightMotors =
+        new SpeedControllerGroup(m_talonsrxright, m_talonsrxright2);  */
         
   // The robot's drive
   //private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotors, m_rightMotors);
@@ -195,7 +195,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 														DriveConstants.kTimeoutMs);														// Configuration Timeout
 		/* Configure output and sensor direction */
 		m_talonsrxleft.setInverted(false);
-		m_talonsrxleft.setSensorPhase(true);
+		m_talonsrxleft.setSensorPhase(false);
 		m_talonsrxright.setInverted(true);
     m_talonsrxright.setSensorPhase(true);
     m_talonsrxright2.setInverted(true);
@@ -237,7 +237,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 		 * - sensor deltas are very small per update, so derivative error never gets large enough to be useful.
 		 * - sensor movement is very slow causing the derivative error to be near zero.
 		 */
-        final int closedLoopTimeMs = 1;
+    final int closedLoopTimeMs = 1;
     m_talonsrxright.configClosedLoopPeriod(0, closedLoopTimeMs, DriveConstants.kTimeoutMs);
     m_talonsrxright.configClosedLoopPeriod(1, closedLoopTimeMs, DriveConstants.kTimeoutMs);
 
@@ -279,7 +279,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
       // in the previous article while in simulation, but will use
       // real values on the robot itself.
       m_odometry.update(m_gyro.getRotation2d(),
-        -m_talonsrxleft.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse,
+        m_talonsrxleft.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse,
         m_talonsrxright.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse);
       m_fieldSim.setRobotPose(m_odometry.getPoseMeters());
     }
@@ -298,8 +298,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     // and write the simulated positions and velocities to our simulated encoder and gyro.
     // We negate the right side so that positive voltages make the right side
     // move forward.
-    m_drivetrainSimulator.setInputs(m_leftMotors.get() * RobotController.getBatteryVoltage(),
-          m_rightMotors.get() * RobotController.getBatteryVoltage());
+    m_drivetrainSimulator.setInputs(m_talonsrxleft.getMotorOutputPercent() * RobotController.getBatteryVoltage(),
+          m_talonsrxright.getMotorOutputPercent() * RobotController.getBatteryVoltage());
     m_drivetrainSimulator.update(0.020);
 
 /*     m_leftEncoderSim.setDistance(m_drivetrainSimulator.getLeftPositionMeters());
@@ -467,12 +467,12 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
         ControlMode.Velocity, 
         metersPerSecToStepsPerDecisec(leftVelocity), 
         DemandType.ArbitraryFeedForward,
-        (int)leftFeedForwardVolts / 12);
+        leftFeedForwardVolts / 12);
     m_talonsrxright.set(
         ControlMode.Velocity,
         metersPerSecToStepsPerDecisec(rightVelocity),
         DemandType.ArbitraryFeedForward,
-        (int)rightFeedForwardVolts / 12);
+        rightFeedForwardVolts / 12);
   }
 
   /**
@@ -489,6 +489,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     Transform2d transform = new Pose2d(0, 0, Rotation2d.fromDegrees(0)).minus(straightTrajectory.getInitialPose());
     Trajectory trajectory = straightTrajectory.transformBy(transform);
     this.resetOdometry(straightTrajectory.getInitialPose());
+    velocitysetup();
     return new RamseteCommand(
             trajectory,
             this::getCurrentPose,
@@ -588,7 +589,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   @Log
   public double getlefterror() {
-    return metersToSteps(m_talonsrxleft.getClosedLoopError());
+    return m_talonsrxleft.getClosedLoopError();
   }
 
   @Log
@@ -634,6 +635,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   @Config.ToggleButton
   public void driveVelocityTest(boolean enabled) {
-    new RunCommand(() -> tankDriveVelocity(.5, .5)).withTimeout(5).schedule();
+    new RunCommand(() -> tankDriveVelocity(2.5, 2.5)).withTimeout(5).schedule();
   }
 }
