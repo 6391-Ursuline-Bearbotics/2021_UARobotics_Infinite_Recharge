@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
+import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
@@ -132,6 +133,12 @@ public class TalonDriveConfig {
       m_talonsrxleft.configClosedLoopPeakOutput(DriveConstants.kSlot_MotProf, DriveConstants.kGains_MotProf.kPeakOutput, DriveConstants.kTimeoutMs);
       m_talonsrxleft.configAllowableClosedloopError(DriveConstants.kSlot_MotProf, 0, DriveConstants.kTimeoutMs);	
       
+      m_talonsrxleft.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_1Ms);
+      m_talonsrxleft.configVelocityMeasurementWindow(1);
+
+      m_talonsrxright.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_1Ms);
+      m_talonsrxright.configVelocityMeasurementWindow(1);
+
       /* 1ms per loop.  PID loop can be slowed down if need be.
       * For example,
       * - if sensor updates are too slow
