@@ -32,7 +32,7 @@ public final class Constants {
         public static final int kPigeonPort = 0;
     
         public static final DCMotor kDriveGearbox = DCMotor.getCIM(2);
-        public static final double kDriveGearing = 8;
+        public static final double kDriveGearing = 10.71;
 
         /** Voltage needed to overcome the motor’s static friction. kS */
         public static final double kS = 1.01; //.829

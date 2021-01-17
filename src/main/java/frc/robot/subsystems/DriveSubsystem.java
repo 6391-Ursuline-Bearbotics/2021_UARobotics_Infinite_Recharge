@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FollowerType;
+import com.ctre.phoenix.motorcontrol.TalonSRXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.ctre.phoenix.sensors.PigeonIMU;
@@ -51,6 +52,10 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   private final WPI_TalonSRX m_talonsrxright = new WPI_TalonSRX(DriveConstants.kRightMotor2Port);
   
   private final WPI_TalonSRX m_talonsrxright2 = new WPI_TalonSRX(DriveConstants.kRightMotor1Port);
+
+  // Object for simulated inputs into Talon.
+  TalonSRXSimCollection m_leftDriveSim = m_talonsrxleft.getSimCollection();
+  TalonSRXSimCollection m_rightDriveSim = m_talonsrxright.getSimCollection();
 
   // Pigeon is plugged into the second talon on the left side
   private final PigeonIMU m_pigeon = new PigeonIMU(m_talonsrxright2);
@@ -110,12 +115,12 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
           DriveConstants.kDriveGearing,
           DriveConstants.TRACK_WIDTH_METERS,
           DriveConstants.kWheelDiameterMeters / 2.0,
-          VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
+          null); //VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
 
       m_gyroSim = new AnalogGyroSim(1);
 
-      PhysicsSim.getInstance().addTalonSRX(m_talonsrxleft, 0.75, 5100, false);
-      PhysicsSim.getInstance().addTalonSRX(m_talonsrxright, 0.75, 5100, false);
+      // PhysicsSim.getInstance().addTalonSRX(m_talonsrxleft, 0.75, 5100, false);
+      // PhysicsSim.getInstance().addTalonSRX(m_talonsrxright, 0.75, 5100, false);
 
       // the Field2d class lets us visualize our robot in the simulation GUI.
       m_fieldSim = new Field2d();
@@ -174,7 +179,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
       Rotation2d.fromDegrees(getHeading()),
       m_talonsrxleft.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse,
       m_talonsrxright.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse);
-    SmartDashboard.putString("Pose", m_odometry.getPoseMeters().toString());
+    //SmartDashboard.putString("Pose", m_odometry.getPoseMeters().toString());
     m_fieldSim.setRobotPose(m_odometry.getPoseMeters());
   }
 
@@ -184,20 +189,25 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     // and write the simulated positions and velocities to our simulated encoder and gyro.
     // We negate the right side so that positive voltages make the right side
     // move forward.
-    m_drivetrainSimulator.setInputs(m_talonsrxleft.getMotorOutputPercent() * RobotController.getBatteryVoltage(),
-          m_talonsrxright.getMotorOutputPercent() * RobotController.getBatteryVoltage());
+    //m_drivetrainSimulator.setInputs(m_talonsrxleft.getMotorOutputPercent() * RobotController.getBatteryVoltage(),
+    //      m_talonsrxright.getMotorOutputPercent() * RobotController.getBatteryVoltage());
+    m_drivetrainSimulator.setInputs(m_talonsrxleft.getMotorOutputVoltage(),
+          m_talonsrxright.getMotorOutputVoltage());
     m_drivetrainSimulator.update(0.020);
 
-    m_talonsrxleft.getSimCollection().setQuadratureRawPosition((int)metersToSteps(m_drivetrainSimulator.getLeftPositionMeters()));
-    m_talonsrxleft.getSimCollection().setQuadratureVelocity((int)metersPerSecToStepsPerDecisec(m_drivetrainSimulator.getLeftVelocityMetersPerSecond()));
-    m_talonsrxright.getSimCollection().setQuadratureRawPosition((int)metersToSteps(m_drivetrainSimulator.getRightPositionMeters()));
-    m_talonsrxright.getSimCollection().setQuadratureVelocity((int)metersPerSecToStepsPerDecisec(m_drivetrainSimulator.getRightVelocityMetersPerSecond()));
+    m_leftDriveSim.setQuadratureRawPosition(metersToSteps(m_drivetrainSimulator.getLeftPositionMeters()));
+    m_leftDriveSim.setQuadratureVelocity(metersPerSecToStepsPerDecisec(m_drivetrainSimulator.getLeftVelocityMetersPerSecond()));
+    m_rightDriveSim.setQuadratureRawPosition(metersToSteps(m_drivetrainSimulator.getRightPositionMeters()));
+    m_rightDriveSim.setQuadratureVelocity(metersPerSecToStepsPerDecisec(m_drivetrainSimulator.getRightVelocityMetersPerSecond()));
+
+    m_leftDriveSim.setBusVoltage(RobotController.getBatteryVoltage());
+    m_rightDriveSim.setBusVoltage(RobotController.getBatteryVoltage());
 
     m_gyroSim.setAngle(-m_drivetrainSimulator.getHeading().getDegrees());
 
     m_fieldSim.setRobotPose(getCurrentPose());
 
-    PhysicsSim.getInstance().run();
+    // PhysicsSim.getInstance().run();
   }
 
   public double getDrawnCurrentAmps() {
@@ -261,7 +271,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   /**
    * Resets the drive encoders to currently read a position of 0.
    */
-  @Config
+  @Config.ToggleButton
   public void resetEncoders() {
     m_talonsrxleft.setSelectedSensorPosition(0);
     m_talonsrxright.setSelectedSensorPosition(0);
@@ -415,8 +425,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    * @param meters meters
    * @return encoder units
    */
-  public static double metersToSteps(double meters) {
-    return (meters / DriveConstants.WHEEL_CIRCUMFERENCE_METERS) * DriveConstants.SENSOR_UNITS_PER_ROTATION;
+  public static int metersToSteps(double meters) {
+    return (int)(meters / DriveConstants.WHEEL_CIRCUMFERENCE_METERS * DriveConstants.SENSOR_UNITS_PER_ROTATION);
   }
 
   /**
@@ -424,8 +434,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    * @param metersPerSec meters per second
    * @return encoder units per decisecond
    */
-  public static double metersPerSecToStepsPerDecisec(double metersPerSec) {
-    return metersToSteps(metersPerSec) * .1d;
+  public static int metersPerSecToStepsPerDecisec(double metersPerSec) {
+    return (int)(metersToSteps(metersPerSec) * .1d);
   }
 
   public WPI_TalonSRX getRightMaster() {
@@ -447,7 +457,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   // Turns to a specified angle using the cascading PID
   public void turnToAngle(double angle) {
     Double angleVelocity = turnangle.calculate(getHeading(), angle);
-    tankDrive(velocityleft.calculate(m_talonsrxleft.getSelectedSensorVelocity(), -angleVelocity), velocityright.calculate(m_talonsrxright.getSelectedSensorVelocity(), angleVelocity));
+    tankDriveVelocity(velocityleft.calculate(m_talonsrxleft.getSelectedSensorVelocity(), -angleVelocity), velocityright.calculate(m_talonsrxright.getSelectedSensorVelocity(), angleVelocity));
   }
 
   // Turns to an angle relative to the current angle
@@ -531,6 +541,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   @Config.ToggleButton
   public void driveVelocityTest(boolean enabled) {
     velocitysetup();
-    new RunCommand(() -> tankDriveVelocity(1, -1)).withTimeout(5).schedule();
+    new RunCommand(() -> tankDriveVelocity(1, 1)).withTimeout(5).schedule();
   }
 }
