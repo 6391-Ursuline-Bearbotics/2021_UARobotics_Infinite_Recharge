@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj.geometry.Transform2d;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
@@ -28,6 +29,8 @@ import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 
@@ -84,22 +87,21 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 	double _targetAngle = 0;
   int _printCount = 0;
   private Pose2d savedPose;
-  private Trajectory straightTrajectory;
+  private Trajectory trajectory;
   @Log
   double target_sensorUnits;
 
   // Turn PIDControllers
   Constraints turnconstraints = new TrapezoidProfile.Constraints(DriveConstants.kMaxSpeedMetersPerSecond,
                                              DriveConstants.kMaxAccelerationMetersPerSecondSquared);
-  @Config
+
   ProfiledPIDController turnangle = new ProfiledPIDController(DriveConstants.kTurnP, DriveConstants.kTurnI, DriveConstants.kTurnD, turnconstraints);
 
   Constraints velocityconstraints = new TrapezoidProfile.Constraints(DriveConstants.kVelocityMaxSpeedMetersPerSecond,
                                              DriveConstants.kVelocityMaxAccelerationMetersPerSecondSquared);
-  @Config
+
   ProfiledPIDController velocityleft = new ProfiledPIDController(DriveConstants.kVelocityP, DriveConstants.kVelocityI, DriveConstants.kVelocityD, velocityconstraints);
 
-  @Config
   ProfiledPIDController velocityright = new ProfiledPIDController(DriveConstants.kVelocityP, DriveConstants.kVelocityI, DriveConstants.kVelocityD, turnconstraints);
 
   /**
@@ -179,7 +181,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
       Rotation2d.fromDegrees(getHeading()),
       m_talonsrxleft.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse,
       m_talonsrxright.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse);
-    //SmartDashboard.putString("Pose", m_odometry.getPoseMeters().toString());
+    SmartDashboard.putString("Pose", m_odometry.getPoseMeters().toString());
     m_fieldSim.setRobotPose(m_odometry.getPoseMeters());
   }
 
@@ -215,15 +217,22 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   }
 
   /**
-   * Returns the current wheel speeds of the robot.
+   * Returns the current left wheel speed of the robot.
    *
-   * @return The current wheel speeds.
+   * @return The current left wheel speed.
    */
-  /* public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-    return new DifferentialDriveWheelSpeeds(
-        m_talonsrxleft.getSelectedSensorVelocity() * DriveConstants.kEncoderDistancePerPulse,
-        m_talonsrxright.getSelectedSensorVelocity() * DriveConstants.kEncoderDistancePerPulse);
-  } */
+  public double getLeftWheelSpeed() {
+    return m_talonsrxleft.getSelectedSensorVelocity() * DriveConstants.kEncoderDistancePerPulse;
+  }
+
+  /**
+   * Returns the current right wheel speed of the robot.
+   *
+   * @return The current right wheel speed.
+   */
+  public double getRightWheelSpeed() {
+    return m_talonsrxright.getSelectedSensorVelocity() * DriveConstants.kEncoderDistancePerPulse;
+  }
 
   /**
    * Drives the robot using arcade controls.
@@ -374,6 +383,10 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
         metersPerSecToStepsPerDecisec(rightVelocity),
         DemandType.ArbitraryFeedForward,
         rightFeedForwardVolts / 12);
+    SmartDashboard.putNumber("left setpoint", leftVelocity);
+    SmartDashboard.putNumber("left speed", getLeftWheelSpeed());
+    SmartDashboard.putNumber("right setpoint", rightVelocity);
+    SmartDashboard.putNumber("right speed", getRightWheelSpeed());
   }
 
   /**
@@ -383,12 +396,20 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    */
   public Command createCommandForTrajectory(String trajname) {
     try {
-      straightTrajectory = loadTrajectory(trajname);
+      trajectory = loadTrajectory(trajname);
     } catch (IOException e) {
       DriverStation.reportError("Failed to load auto trajectory: " + trajname, false);
     }
-    Transform2d transform = new Pose2d(0, 0, Rotation2d.fromDegrees(0)).minus(straightTrajectory.getInitialPose());
-    Trajectory trajectory = straightTrajectory.transformBy(transform);
+    //Transform2d transform = new Pose2d(0, 0, Rotation2d.fromDegrees(0)).minus(straightTrajectory.getInitialPose());
+    //Trajectory trajectory = straightTrajectory.transformBy(transform);
+    // Paste this variable in
+/*     RamseteController disabledRamsete = new RamseteController() {
+      @Override
+      public ChassisSpeeds calculate(Pose2d currentPose, Pose2d poseRef, double linearVelocityRefMeters,
+              double angularVelocityRefRadiansPerSecond) {
+          return new ChassisSpeeds(linearVelocityRefMeters, 0.0, angularVelocityRefRadiansPerSecond);
+      }
+    }; */
     velocitysetup();
     RamseteCommand ramseteCommand =  new RamseteCommand(
             trajectory,
@@ -397,7 +418,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
             DriveConstants.kDriveKinematics,
             this::tankDriveVelocity,
             this);
-    this.resetOdometry(straightTrajectory.getInitialPose());
+    this.resetOdometry(trajectory.getInitialPose());
     return ramseteCommand.andThen(() -> this.tankDriveVolts(0, 0));
   }
 

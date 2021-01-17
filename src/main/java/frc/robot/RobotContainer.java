@@ -32,6 +32,7 @@ import frc.robot.commands.NextClimbPosition;
 import frc.robot.commands.TrenchAuto;
 import frc.robot.commands.CenterAuto;
 import frc.robot.commands.StealAuto;
+import frc.robot.commands.Bounce;
 // Subsystem Imports
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -193,7 +194,7 @@ public class RobotContainer {
     //  .whenReleased(new InstantCommand(m_conveyor::turnOff, m_conveyor));
     
     // TEST when start is pressed follow trajectory
-    drv.StartButton.whenPressed(() -> m_robotDrive.createCommandForTrajectory("Straight").withTimeout(5).schedule());
+    drv.StartButton.whenPressed(new Bounce(m_robotDrive)); //() -> m_robotDrive.createCommandForTrajectory("Bounce2").withTimeout(5).withName("Bounce2").schedule()); //new Bounce(m_robotDrive));
     //.whenPressed(new DriveDistanceProfiled(3, m_robotDrive).withTimeout(10));
 
     // Create "button" from POV Hat in up direction.  Use both of the angles to the left and right also.
