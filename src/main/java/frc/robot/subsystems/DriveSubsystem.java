@@ -394,12 +394,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    * @param trajectory trajectory to follow
    * @return command that will run the trajectory
    */
-  public Command createCommandForTrajectory(String trajname) {
-    try {
-      trajectory = loadTrajectory(trajname);
-    } catch (IOException e) {
-      DriverStation.reportError("Failed to load auto trajectory: " + trajname, false);
-    }
+  public Command createCommandForTrajectory(Trajectory trajectory) {
     //Transform2d transform = new Pose2d(0, 0, Rotation2d.fromDegrees(0)).minus(straightTrajectory.getInitialPose());
     //Trajectory trajectory = straightTrajectory.transformBy(transform);
     // Paste this variable in
@@ -418,8 +413,17 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
             DriveConstants.kDriveKinematics,
             this::tankDriveVelocity,
             this);
-    this.resetOdometry(trajectory.getInitialPose());
+    //this.resetOdometry(trajectory.getInitialPose());
     return ramseteCommand.andThen(() -> this.tankDriveVolts(0, 0));
+  }
+
+  public Trajectory loadTrajectoryFromFile(String filename) {
+    try {
+      return loadTrajectory(filename);
+    } catch (IOException e) {
+      DriverStation.reportError("Failed to load auto trajectory: " + filename, false);
+      return new Trajectory();
+    }
   }
 
     /**

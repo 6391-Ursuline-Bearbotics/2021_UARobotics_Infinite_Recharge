@@ -1,40 +1,25 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.DriveSubsystem;
 
-public class Bounce extends CommandBase {
-  private final DriveSubsystem m_robotDrive;
-  
-  public Bounce(DriveSubsystem robotDrive) {
-    m_robotDrive = robotDrive;
-    // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(m_robotDrive);
-  }
-
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {}
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    new SequentialCommandGroup(
-      m_robotDrive.createCommandForTrajectory("Bounce1").withTimeout(5).withName("Bounce1"),
-      m_robotDrive.createCommandForTrajectory("Bounce2").withTimeout(5).withName("Bounce2")
-    );
-  }
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {}
-
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return true;
+public class Bounce extends SequentialCommandGroup {
+  public Bounce(DriveSubsystem m_robotDrive) {        
+      Trajectory trajectory1 = m_robotDrive.loadTrajectoryFromFile("Bounce1");
+      Trajectory trajectory2 = m_robotDrive.loadTrajectoryFromFile("Bounce2");
+      Trajectory trajectory3 = m_robotDrive.loadTrajectoryFromFile("Bounce3");
+      Trajectory trajectory4 = m_robotDrive.loadTrajectoryFromFile("Bounce4");
+      
+      addCommands(
+          new InstantCommand(() -> {
+              m_robotDrive.resetOdometry(trajectory1.getInitialPose());
+          }),
+          m_robotDrive.createCommandForTrajectory(trajectory1).withTimeout(5).withName("Bounce1"),
+          m_robotDrive.createCommandForTrajectory(trajectory2).withTimeout(5).withName("Bounce2"),
+          m_robotDrive.createCommandForTrajectory(trajectory3).withTimeout(5).withName("Bounce3"),
+          m_robotDrive.createCommandForTrajectory(trajectory4).withTimeout(5).withName("Bounce4")
+      );
   }
 }
