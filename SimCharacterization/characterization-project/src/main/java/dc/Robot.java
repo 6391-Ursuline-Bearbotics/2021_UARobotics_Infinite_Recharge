@@ -15,13 +15,14 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 // WPI_Talon* imports are needed in case a user has a Pigeon on a Talon
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.TalonSRXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.SPI;
@@ -48,9 +49,11 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.util.Units;
@@ -70,6 +73,18 @@ public class Robot extends TimedRobot {
   Joystick stick;
   DifferentialDrive drive;
 
+  WPI_TalonSRX leftMotor = setupWPI_TalonSRX(2, Sides.LEFT, false);
+  WPI_TalonSRX rightMotor = setupWPI_TalonSRX(4, Sides.RIGHT, false);
+
+  TalonSRXSimCollection m_leftDriveSim = leftMotor.getSimCollection();
+  TalonSRXSimCollection m_rightDriveSim = rightMotor.getSimCollection();
+
+  AnalogGyro gyro = new AnalogGyro(1);
+  AnalogGyroSim m_gyroSim = new AnalogGyroSim(gyro);
+
+  Field2d m_fieldSim;
+
+  DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
 
   Supplier<Double> leftEncoderPosition;
   Supplier<Double> leftEncoderRate;
@@ -241,12 +256,12 @@ public class Robot extends TimedRobot {
     stick = new Joystick(0);
     
     // create left motor
-    WPI_TalonSRX leftMotor = setupWPI_TalonSRX(2, Sides.LEFT, false);
+    leftMotor = setupWPI_TalonSRX(2, Sides.LEFT, false);
 
     WPI_VictorSPX leftFollowerID1 = setupWPI_VictorSPX(1, Sides.FOLLOWER, false);
     leftFollowerID1.follow(leftMotor);
 
-    WPI_TalonSRX rightMotor = setupWPI_TalonSRX(4, Sides.RIGHT, false);
+    rightMotor = setupWPI_TalonSRX(4, Sides.RIGHT, false);
     WPI_TalonSRX rightFollowerID3 = setupWPI_TalonSRX(3, Sides.FOLLOWER, false);    
     rightFollowerID3.follow(rightMotor);
     drive = new DifferentialDrive(leftMotor, rightMotor);
@@ -258,8 +273,7 @@ public class Robot extends TimedRobot {
 
     // Note that the angle from the NavX and all implementors of WPILib Gyro
     // must be negated because getAngle returns a clockwise positive angle
-    AnalogGyro gyro = new AnalogGyro(1);
-    AnalogGyroSim m_gyroSim = new AnalogGyroSim(gyro);
+    
     gyroAngleRadians = () -> -1 * Math.toRadians(gyro.getAngle());
 
     // Set the update rate instead of using flush because of a ntcore bug
@@ -301,16 +315,14 @@ public class Robot extends TimedRobot {
     m_rightDriveSim.setBusVoltage(RobotController.getBatteryVoltage());
 
     m_gyroSim.setAngle(-m_drivetrainSimulator.getHeading().getDegrees());
-
-    m_fieldSim.setRobotPose(getCurrentPose());
   }
 
   @Override
   public void robotPeriodic() {
     m_odometry.update(
       Rotation2d.fromDegrees(getHeading()),
-      m_talonsrxleft.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse,
-      m_talonsrxright.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse);
+      leftMotor.getSelectedSensorPosition() * 1.1504855909142309E-4,
+      rightMotor.getSelectedSensorPosition() * 1.1504855909142309E-4);
     SmartDashboard.putString("Pose", m_odometry.getPoseMeters().toString());
     m_fieldSim.setRobotPose(m_odometry.getPoseMeters());
 
@@ -336,6 +348,18 @@ public class Robot extends TimedRobot {
     System.out.println("Robot in autonomous mode");
     startTime = Timer.getFPGATimestamp();
     counter = 0;
+  }
+
+  public double getHeading() {
+    return -m_gyroSim.getAngle();
+  }
+
+  public static int metersToSteps(double meters) {
+    return (int)(meters / Units.inchesToMeters(8) * Math.PI * ENCODER_EDGES_PER_REV);
+  }
+
+  public static int metersPerSecToStepsPerDecisec(double metersPerSec) {
+    return (int)(metersToSteps(metersPerSec) * .1d);
   }
 
   /**
