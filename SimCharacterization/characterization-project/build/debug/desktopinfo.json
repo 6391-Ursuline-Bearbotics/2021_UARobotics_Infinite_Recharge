@@ -1,0 +1,12 @@
+[
+  {
+    "name": "characterization-project (in project characterization-project)",
+    "file": "C:\\Users\\jason\\Documents\\FRC\\2021_UARobotics_Infinite_Recharge\\SimCharacterization\\characterization-project\\build\\libs\\characterization-project.jar",
+    "extensions": [
+      "C:\\Users\\jason\\Documents\\FRC\\2021_UARobotics_Infinite_Recharge\\SimCharacterization\\characterization-project\\build\\tmp\\expandedArchives\\halsim_gui-2021.1.2-windowsx86-64.zip_a65f029882460810c7d9fdb675bf2f07\\windows\\x86-64\\shared\\halsim_gui.dll"
+    ],
+    "env": {},
+    "librarydir": "C:\\Users\\jason\\Documents\\FRC\\2021_UARobotics_Infinite_Recharge\\SimCharacterization\\characterization-project\\build\\tmp\\jniExtractDir",
+    "mainclass": "dc.Main"
+  }
+]

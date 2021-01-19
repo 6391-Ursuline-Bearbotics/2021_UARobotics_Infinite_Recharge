@@ -26,6 +26,7 @@ import io.github.oblarg.oblog.annotations.Log;
 
 // Command Imports
 import frc.robot.commands.AutoAim;
+import frc.robot.commands.Barrel;
 import frc.robot.commands.DriveStraight;
 import frc.robot.commands.DriveDistanceProfiled;
 import frc.robot.commands.NextClimbPosition;
@@ -124,6 +125,8 @@ public class RobotContainer {
     // Sets the LEDs to start up with a rainbow config
     //m_LED.rainbow();
 
+    autoChooser.addOption("Bounce", new Bounce(m_robotDrive));
+    autoChooser.addOption("Barrel", new Barrel(m_robotDrive));
     autoChooser.addOption("Auto Aim", new AutoAim(m_robotDrive));
     autoChooser.addOption("Trench Auto", new TrenchAuto(m_shooter, m_robotDrive, m_intake, m_conveyor));
     autoChooser.addOption("Center Auto", new CenterAuto(m_shooter, m_robotDrive, m_intake, m_conveyor));

@@ -82,7 +82,7 @@ public class Robot extends TimedRobot {
   AnalogGyro gyro = new AnalogGyro(1);
   AnalogGyroSim m_gyroSim = new AnalogGyroSim(gyro);
 
-  Field2d m_fieldSim;
+  Field2d m_fieldSim  = new Field2d();
 
   DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
 
@@ -158,7 +158,7 @@ public class Robot extends TimedRobot {
         // set right side methods = encoder methods
 
           
-        motor.setSensorPhase(false);
+        motor.setSensorPhase(true);
         rightEncoderPosition = ()
           -> motor.getSelectedSensorPosition(PIDIDX) * encoderConstant;
         rightEncoderRate = ()
@@ -168,7 +168,7 @@ public class Robot extends TimedRobot {
 
         break;
       case LEFT:
-        motor.setSensorPhase(true);
+        motor.setSensorPhase(false);
         
         leftEncoderPosition = ()
           -> motor.getSelectedSensorPosition(PIDIDX) * encoderConstant;
@@ -254,14 +254,10 @@ public class Robot extends TimedRobot {
     if (!isReal()) SmartDashboard.putData(new SimEnabler());
 
     stick = new Joystick(0);
-    
-    // create left motor
-    leftMotor = setupWPI_TalonSRX(2, Sides.LEFT, false);
 
     WPI_VictorSPX leftFollowerID1 = setupWPI_VictorSPX(1, Sides.FOLLOWER, false);
     leftFollowerID1.follow(leftMotor);
 
-    rightMotor = setupWPI_TalonSRX(4, Sides.RIGHT, false);
     WPI_TalonSRX rightFollowerID3 = setupWPI_TalonSRX(3, Sides.FOLLOWER, false);    
     rightFollowerID3.follow(rightMotor);
     drive = new DifferentialDrive(leftMotor, rightMotor);
@@ -297,10 +293,6 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledPeriodic() {
-  }
-
-  @Override
   public void simulationPeriodic() {
     m_drivetrainSimulator.setInputs(leftMotor.getMotorOutputVoltage(),
           rightMotor.getMotorOutputVoltage());
@@ -315,6 +307,8 @@ public class Robot extends TimedRobot {
     m_rightDriveSim.setBusVoltage(RobotController.getBatteryVoltage());
 
     m_gyroSim.setAngle(-m_drivetrainSimulator.getHeading().getDegrees());
+
+    m_fieldSim.setRobotPose(m_odometry.getPoseMeters());
   }
 
   @Override
@@ -324,7 +318,6 @@ public class Robot extends TimedRobot {
       leftMotor.getSelectedSensorPosition() * 1.1504855909142309E-4,
       rightMotor.getSelectedSensorPosition() * 1.1504855909142309E-4);
     SmartDashboard.putString("Pose", m_odometry.getPoseMeters().toString());
-    m_fieldSim.setRobotPose(m_odometry.getPoseMeters());
 
     // feedback for users, but not used by the control program
     SmartDashboard.putNumber("l_encoder_pos", leftEncoderPosition.get());

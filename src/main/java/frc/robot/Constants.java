@@ -35,13 +35,13 @@ public final class Constants {
         public static final double kDriveGearing = 10.71;
 
         /** Voltage needed to overcome the motor’s static friction. kS */
-        public static final double kS = 1.01; //.829
+        public static final double kS = 0.112; // 1.01 pneumatic //.829
 
         /** Voltage needed to hold (or "cruise") at a given constant velocity. kV */
-        public static final double kV = 2.93; //3.04
+        public static final double kV = 0.222; //2.93 pneumatic //3.04
 
         /** Voltage needed to induce a given acceleration in the motor shaft. kA */
-        public static final double kA = 0.761; //.676
+        public static final double kA = 0.00128; //0.761 pneumatic //.676
 
         public static final double ksVolts = 0.22;
         public static final double kvVoltSecondsPerMeter = 1.98;
@@ -101,7 +101,7 @@ public final class Constants {
          * 	                                    			  kP   kI   kD   kF               Iz    PeakOut */
         public final static Gains kGains_Distanc = new Gains( 0.5, 0.0,  0.0, 0.0,            100,  0.50 );
         public final static Gains kGains_Turning = new Gains( 2.0, 0.0,  4.0, 0.0,            200,  1.00 );
-        public final static Gains kGains_Velocit = new Gains( 0.1, 0.0, 0.0, 1023.0/6800.0,  300,  1.00 );
+        public final static Gains kGains_Velocit = new Gains( 0.2, 0.0, 0.0, 1023.0/6800.0,  300,  1.00 ); // .00712
         public final static Gains kGains_MotProf = new Gains( 1.0, 0.0,  0.0, 1023.0/6800.0,  400,  1.00 );
         
         /** ---- Flat constants, you should not need to change these ---- */
@@ -144,7 +144,7 @@ public final class Constants {
 
         // Baseline values for a RAMSETE follower in units of meters and seconds
         public static final double RAMSETE_B = 2;
-        public static final double RAMSETE_ZETA = 0.7;
+        public static final double RAMSETE_ZETA = 1;
 
         // Turn angle constraints
         public static final double kMaxSpeedMetersPerSecond = 3;
