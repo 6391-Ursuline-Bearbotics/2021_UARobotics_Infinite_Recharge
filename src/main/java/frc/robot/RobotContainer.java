@@ -28,7 +28,6 @@ import io.github.oblarg.oblog.annotations.Log;
 import frc.robot.commands.AutoAim;
 import frc.robot.commands.Barrel;
 import frc.robot.commands.DriveStraight;
-import frc.robot.commands.DriveDistanceProfiled;
 import frc.robot.commands.NextClimbPosition;
 import frc.robot.commands.TrenchAuto;
 import frc.robot.commands.CenterAuto;

@@ -47,4 +47,3 @@ public class IntakeSubsystem extends SubsystemBase implements Loggable{
         }
     }
 }
-

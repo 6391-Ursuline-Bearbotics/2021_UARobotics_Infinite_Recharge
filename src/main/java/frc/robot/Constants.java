@@ -21,16 +21,21 @@ import edu.wpi.first.wpiutil.math.numbers.N2;
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
-
-// TODO Need to tweak almost all of these constants.  Also going to use preferences to control some of the more variable things.
 public final class Constants {
     public static final class DriveConstants {
+        // The CAN Id that each of these devices is configured with
         public static final int kLeftMotor1Port = 1;
         public static final int kLeftMotor2Port = 2;
         public static final int kRightMotor1Port = 3;
         public static final int kRightMotor2Port = 4;
         public static final int kPigeonPort = 0;
     
+        // Differential Drive setup parameters.  These control how the drivers input translates to motor power.
+        public static final double kMaxOutputForward = 1;
+        public static final double kMaxOutputRotation = 0.6;
+        public static final double kDeadbandForward = 0.02;
+        public static final double kDeadbandRotation = 0.2;
+
         public static final DCMotor kDriveGearbox = DCMotor.getCIM(2);
         public static final double kDriveGearing = 10.71;
 

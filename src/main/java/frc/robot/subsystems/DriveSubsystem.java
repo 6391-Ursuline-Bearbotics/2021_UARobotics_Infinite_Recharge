@@ -37,6 +37,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import java.nio.file.Paths;
 import java.io.IOException;
 
+import frc.robot.DifferentialDrive6391;
 import frc.robot.Constants.DriveConstants;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
@@ -55,6 +56,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   private final WPI_TalonSRX m_talonsrxright = new WPI_TalonSRX(DriveConstants.kRightMotor2Port);
   
   private final WPI_TalonSRX m_talonsrxright2 = new WPI_TalonSRX(DriveConstants.kRightMotor1Port);
+
+  private final DifferentialDrive6391 m_drive = new DifferentialDrive6391(m_talonsrxleft, m_talonsrxright);
 
   // Object for simulated inputs into Talon.
   TalonSRXSimCollection m_leftDriveSim = m_talonsrxleft.getSimCollection();
@@ -108,6 +111,10 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    * Creates a new DriveSubsystem.
    */
   public DriveSubsystem() {
+    m_drive.setMaxOutput(DriveConstants.kMaxOutputForward, DriveConstants.kMaxOutputRotation);
+    m_drive.setDeadband(DriveConstants.kDeadbandForward, DriveConstants.kDeadbandRotation);
+    m_drive.setRightSideInverted(false);
+
     // Simulation Setup
     if (RobotBase.isSimulation()) { // If our robot is simulated
       // This class simulates our drivetrain's motion around the field.
@@ -241,10 +248,11 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    * @param rot the commanded rotation
    */
   public void arcadeDrive(double fwd, double rot) {
-    fwd = Deadband(fwd);
+    /* fwd = Deadband(fwd);
     rot = Deadband(rot);
     m_talonsrxleft.set(fwd + rot);
-    m_talonsrxright.set(fwd - rot);
+    m_talonsrxright.set(fwd - rot); */
+    m_drive.arcadeDrive(fwd, rot);
   }
 
    /**
@@ -541,6 +549,14 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     m_talonsrxleft.setVoltage(leftVolts);
     m_talonsrxright.setVoltage(rightVolts);
     //m_drive.feed();
+  }
+
+  public void setMaxOutput(double maxOutputForward, double maxOutputRotation) {
+    m_drive.setMaxOutput(maxOutputForward, maxOutputRotation);
+  }
+
+  public void setDeadband(double deadbandForward, double deadbandRotation) {
+    m_drive.setDeadband(deadbandForward, deadbandRotation);
   }
 
   public Command driveTime(double time, double speed) {
