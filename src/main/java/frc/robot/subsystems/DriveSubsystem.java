@@ -37,7 +37,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import java.nio.file.Paths;
 import java.io.IOException;
 
-import frc.robot.DifferentialDrive6391;
+import frc.robot.UA6391.DifferentialDrive6391;
 import frc.robot.Constants.DriveConstants;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
@@ -112,7 +112,9 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    */
   public DriveSubsystem() {
     m_drive.setMaxOutput(DriveConstants.kMaxOutputForward, DriveConstants.kMaxOutputRotation);
+    m_drive.setMinOutput(DriveConstants.kMinOutputForward, DriveConstants.kMinOutputRotation);
     m_drive.setDeadband(DriveConstants.kDeadbandForward, DriveConstants.kDeadbandRotation);
+    m_drive.setRamp(DriveConstants.kRampForward, DriveConstants.kRampRotation);
     m_drive.setRightSideInverted(false);
 
     // Simulation Setup
@@ -124,12 +126,9 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
           DriveConstants.kDriveGearing,
           DriveConstants.TRACK_WIDTH_METERS,
           DriveConstants.kWheelDiameterMeters / 2.0,
-          null); //VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
+          null);
 
       m_gyroSim = new AnalogGyroSim(1);
-
-      // PhysicsSim.getInstance().addTalonSRX(m_talonsrxleft, 0.75, 5100, false);
-      // PhysicsSim.getInstance().addTalonSRX(m_talonsrxright, 0.75, 5100, false);
 
       // the Field2d class lets us visualize our robot in the simulation GUI.
       m_fieldSim = new Field2d();
@@ -149,12 +148,21 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     m_victorspxleft.follow(m_talonsrxleft);
 		m_talonsrxright2.follow(m_talonsrxright);
 
-    /* Configure output and sensor direction */
-		m_talonsrxleft.setInverted(false);
-		m_talonsrxleft.setSensorPhase(false);
-		m_talonsrxright.setInverted(true);
-    m_talonsrxright.setSensorPhase(true);
-    m_talonsrxright2.setInverted(true);
+    // Simulation Setup
+    if (RobotBase.isSimulation()) { // If our robot is simulated
+      m_talonsrxleft.setInverted(false);
+      m_talonsrxleft.setSensorPhase(false);
+      m_talonsrxright.setInverted(true);
+      m_talonsrxright.setSensorPhase(true);
+      m_talonsrxright2.setInverted(true);
+    }
+    else {
+      m_talonsrxleft.setInverted(false);
+      m_talonsrxleft.setSensorPhase(true);
+      m_talonsrxright.setInverted(true);
+      m_talonsrxright.setSensorPhase(true);
+      m_talonsrxright2.setInverted(true);
+    }
 
     new TalonDriveConfig(m_talonsrxleft, m_talonsrxright, m_pigeon);
 
@@ -248,10 +256,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    * @param rot the commanded rotation
    */
   public void arcadeDrive(double fwd, double rot) {
-    /* fwd = Deadband(fwd);
-    rot = Deadband(rot);
-    m_talonsrxleft.set(fwd + rot);
-    m_talonsrxright.set(fwd - rot); */
     m_drive.arcadeDrive(fwd, rot);
   }
 
@@ -262,10 +266,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    * @param right the commanded right side drivetrain power
    */
   public void tankDrive(double left, double right) {
-    left = Deadband(left);
-    right = Deadband(right);
-    m_talonsrxleft.set(left);
-    m_talonsrxright.set(right);
+    m_drive.tankDrive(left, right);
   }
 
   /**
@@ -303,20 +304,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   public double getAverageEncoderDistance() {
     return (m_talonsrxleft.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse
       + m_talonsrxright.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse) / 2.0;
-  }
-
-  /** Deadband 15 percent, used on the gamepad */
-  double Deadband(final double value) {
-    /* Upper deadband */
-    if (value >= +0.15)
-      return value;
-
-    /* Lower deadband */
-    if (value <= -0.15)
-      return value;
-
-    /* Outside deadband */
-    return 0;
   }
 
   /** Zero all sensors used. */

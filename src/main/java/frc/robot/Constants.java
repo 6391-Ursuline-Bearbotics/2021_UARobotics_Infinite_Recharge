@@ -31,10 +31,14 @@ public final class Constants {
         public static final int kPigeonPort = 0;
     
         // Differential Drive setup parameters.  These control how the drivers input translates to motor power.
-        public static final double kMaxOutputForward = 1;
-        public static final double kMaxOutputRotation = 0.6;
-        public static final double kDeadbandForward = 0.02;
-        public static final double kDeadbandRotation = 0.2;
+        public static final double kMaxOutputForward = 1; // % motor ouput
+        public static final double kMaxOutputRotation = 0.6; // % motor ouput
+        public static final double kDeadbandForward = 0.05; // % motor ouput
+        public static final double kDeadbandRotation = 0.05; // % motor ouput
+        public static final double kRampForward = 0.2; // Seconds to go from min to max motor %
+        public static final double kRampRotation = 0.2; // Seconds to go from min to max motor %
+        public static final double kMinOutputForward = 0; // Minimum % motor power
+        public static final double kMinOutputRotation = 0.2; // Minimum % motor power
 
         public static final DCMotor kDriveGearbox = DCMotor.getCIM(2);
         public static final double kDriveGearing = 10.71;

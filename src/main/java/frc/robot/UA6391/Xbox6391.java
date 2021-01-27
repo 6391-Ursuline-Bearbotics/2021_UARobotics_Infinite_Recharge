@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.UA6391;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -7,23 +7,26 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Xbox6391 {
-   XboxController m_Xbox6391Controller;
+   public final XboxController m_Xbox6391Controller;
 
-   Trigger POVUp;
-   Trigger POVDown;
-   Trigger POVLeft;
-   Trigger POVRight;
+   public final Trigger POVUp;
+   public final Trigger POVDown;
+   public final Trigger POVLeft;
+   public final Trigger POVRight;
 
-   JoystickButton XButton;
-   JoystickButton YButton;
-   JoystickButton AButton;
-   JoystickButton BButton;
+   public final JoystickButton XButton;
+   public final JoystickButton YButton;
+   public final JoystickButton AButton;
+   public final JoystickButton BButton;
 
-   JoystickButton BumperL;
-   JoystickButton BumperR;
+   public final JoystickButton BumperL;
+   public final JoystickButton BumperR;
 
-   JoystickButton BackButton;
-   JoystickButton StartButton;
+   public final JoystickButton BackButton;
+   public final JoystickButton StartButton;
+
+   public final JoystickButton LeftStickButton;
+   public final JoystickButton RightStickButton;
 
    public Xbox6391 (int port) {
       m_Xbox6391Controller = new XboxController(port);
@@ -44,7 +47,8 @@ public class Xbox6391 {
       BackButton = new JoystickButton(m_Xbox6391Controller, XboxController.Button.kBack.value);
       StartButton = new JoystickButton(m_Xbox6391Controller, XboxController.Button.kStart.value);
 
-      
+      LeftStickButton = new JoystickButton(m_Xbox6391Controller, F310Controller.Button.kStickLeft.value);
+      RightStickButton = new JoystickButton(m_Xbox6391Controller, F310Controller.Button.kStickRight.value);
    }
    
    public double JoystickLX() {

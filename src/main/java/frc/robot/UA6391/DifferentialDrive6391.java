@@ -2,12 +2,13 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot;
+package frc.robot.UA6391;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.SlewRateLimiter;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -111,6 +112,9 @@ public class DifferentialDrive6391 extends RobotDriveBase6391 implements Sendabl
   private double m_rightSideInvertMultiplier = -1.0;
   private boolean m_reported;
 
+  private SlewRateLimiter forwardRamp = new SlewRateLimiter(9999999);
+  private SlewRateLimiter rotationRamp = new SlewRateLimiter(9999999);
+
   /**
    * Construct a DifferentialDrive.
    *
@@ -190,6 +194,9 @@ public class DifferentialDrive6391 extends RobotDriveBase6391 implements Sendabl
     zRotation = MathUtil.clamp(zRotation, -1.0, 1.0);
     zRotation = applyDeadband(zRotation, m_deadbandRotation);
 
+    xSpeed = MathUtil.clamp(forwardRamp.calculate(xSpeed), -1.0, 1.0);
+    zRotation = MathUtil.clamp(rotationRamp.calculate(zRotation), -1.0, 1.0);
+
     // Square the inputs (while preserving the sign) to increase fine control
     // while permitting full power.
     if (squareInputs) {
@@ -197,8 +204,15 @@ public class DifferentialDrive6391 extends RobotDriveBase6391 implements Sendabl
       zRotation = Math.copySign(zRotation * zRotation, zRotation);
     }
 
-    xSpeed = xSpeed * m_maxOutputForward;
-    zRotation = zRotation * m_maxOutputRotation;
+    xSpeed = xSpeed * (m_maxOutputForward - m_minOutputForward);
+    zRotation = zRotation * (m_maxOutputRotation - m_minOutputRotation);
+
+    if (xSpeed != 0) {
+      xSpeed = Math.copySign(Math.abs(xSpeed) + m_minOutputForward, xSpeed);
+    }
+    if (zRotation != 0) {
+      zRotation = Math.copySign(Math.abs(zRotation) + m_minOutputRotation, zRotation);
+    }
 
     double leftMotorOutput;
     double rightMotorOutput;
@@ -411,6 +425,18 @@ public class DifferentialDrive6391 extends RobotDriveBase6391 implements Sendabl
    */
   public void setRightSideInverted(boolean rightSideInverted) {
     m_rightSideInvertMultiplier = rightSideInverted ? -1.0 : 1.0;
+  }
+
+  /**
+   * Configure the minimum time it should take for the joystick values to go from minimum to maximum.
+   *
+   * <p>The default value is {@value #kDefaultMaxOutput}.
+   *
+   * @param maxOutput Multiplied with the output percentage computed by the drive functions.
+   */
+  public void setRamp(double rampForward, double rampRotation) {
+    forwardRamp = new SlewRateLimiter(1/rampForward);
+    rotationRamp = new SlewRateLimiter(1/rampRotation);
   }
 
   @Override
