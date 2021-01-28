@@ -47,8 +47,8 @@ public class Xbox6391 {
       BackButton = new JoystickButton(m_Xbox6391Controller, XboxController.Button.kBack.value);
       StartButton = new JoystickButton(m_Xbox6391Controller, XboxController.Button.kStart.value);
 
-      LeftStickButton = new JoystickButton(m_Xbox6391Controller, F310Controller.Button.kStickLeft.value);
-      RightStickButton = new JoystickButton(m_Xbox6391Controller, F310Controller.Button.kStickRight.value);
+      LeftStickButton = new JoystickButton(m_Xbox6391Controller, XboxController.Button.kStickLeft.value);
+      RightStickButton = new JoystickButton(m_Xbox6391Controller, XboxController.Button.kStickRight.value);
    }
    
    public double JoystickLX() {
