@@ -296,4 +296,9 @@ public final class Constants {
         public static final double RANGE_PRIME_START=0;
         public static final double RANGE_PRIME_END=-2;
     }
+
+    public static final class PhotonConstants {
+        public static final int kLimePipe = 0;
+        public static final int kHD3000Pipe = 0;
+    }
 }
