@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj.geometry.Transform2d;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -389,17 +390,11 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    * @param trajectory trajectory to follow
    * @return command that will run the trajectory
    */
-  public Command createCommandForTrajectory(Trajectory trajectory) {
-    //Transform2d transform = new Pose2d(0, 0, Rotation2d.fromDegrees(0)).minus(straightTrajectory.getInitialPose());
-    //Trajectory trajectory = straightTrajectory.transformBy(transform);
-    // Paste this variable in
-/*     RamseteController disabledRamsete = new RamseteController() {
-      @Override
-      public ChassisSpeeds calculate(Pose2d currentPose, Pose2d poseRef, double linearVelocityRefMeters,
-              double angularVelocityRefRadiansPerSecond) {
-          return new ChassisSpeeds(linearVelocityRefMeters, 0.0, angularVelocityRefRadiansPerSecond);
-      }
-    }; */
+  public Command createCommandForTrajectory(Trajectory trajectory, Boolean initPose) {
+    if (initPose) {
+      new InstantCommand(() -> {resetOdometry(trajectory.getInitialPose());});
+    }
+
     velocitysetup();
     RamseteCommand ramseteCommand =  new RamseteCommand(
             trajectory,

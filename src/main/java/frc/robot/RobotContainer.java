@@ -28,7 +28,9 @@ import io.github.oblarg.oblog.annotations.Log;
 import frc.robot.commands.AutoAim;
 import frc.robot.commands.Barrel;
 import frc.robot.commands.DriveStraight;
+import frc.robot.commands.GalacticSearch;
 import frc.robot.commands.NextClimbPosition;
+import frc.robot.commands.Slalom;
 import frc.robot.commands.TrenchAuto;
 import frc.robot.commands.CenterAuto;
 import frc.robot.commands.StealAuto;
@@ -45,7 +47,6 @@ import frc.robot.subsystems.Limelight;
 // Constant Imports
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.UA6391.F3106391;
 // Special Imports
 import frc.robot.UA6391.Xbox6391;
 
@@ -127,6 +128,8 @@ public class RobotContainer {
     // Sets the LEDs to start up with a rainbow config
     //m_LED.rainbow();
 
+    autoChooser.addOption("GalacticSearch", new GalacticSearch(m_robotDrive, m_intake));
+    autoChooser.addOption("Slalom", new Slalom(m_robotDrive));
     autoChooser.addOption("Bounce", new Bounce(m_robotDrive));
     autoChooser.addOption("Barrel", new Barrel(m_robotDrive));
     autoChooser.addOption("Auto Aim", new AutoAim(m_robotDrive));
