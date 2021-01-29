@@ -54,7 +54,8 @@ public class GalacticSearch extends SequentialCommandGroup {
          }
       }
 
-      Supplier<String> i  = ()-> selectedPath;
+      final String path = selectedPath;
+      Supplier<Object> i  = ()-> path;
       
       addCommands(
          // Deploy intake
