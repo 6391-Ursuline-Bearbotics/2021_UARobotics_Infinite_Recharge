@@ -2,13 +2,11 @@ package frc.robot.subsystems;
 
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
-import io.github.oblarg.oblog.annotations.Log;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
-import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import frc.robot.Constants.IntakeConstants;
 

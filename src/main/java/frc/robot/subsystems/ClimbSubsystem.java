@@ -8,7 +8,6 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.RobotState;
 
 public class ClimbSubsystem extends SubsystemBase implements Loggable{
     @Config(name="ClimbMotorLeft")
@@ -54,11 +53,6 @@ public class ClimbSubsystem extends SubsystemBase implements Loggable{
         m_RightClimbMotor.set(ControlMode.Position, targetposition);
     }
 
-/*     @Config
-    public void setP(double p){
-        m_LeftClimbMotor.config_kP(0, p);
-    }
- */
     public void setOutput(double leftMotorPercent, double rightMotorPercent) {
         this.m_LeftClimbMotor.set(leftMotorPercent * climbinvert);
         this.m_RightClimbMotor.set(rightMotorPercent * climbinvert);

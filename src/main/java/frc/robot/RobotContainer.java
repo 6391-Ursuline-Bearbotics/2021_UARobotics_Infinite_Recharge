@@ -27,7 +27,6 @@ import io.github.oblarg.oblog.annotations.Log;
 // Command Imports
 import frc.robot.commands.AutoAim;
 import frc.robot.commands.Barrel;
-import frc.robot.commands.DriveStraight;
 import frc.robot.commands.GalacticSearch;
 import frc.robot.commands.NextClimbPosition;
 import frc.robot.commands.Slalom;
@@ -61,7 +60,7 @@ public class RobotContainer {
   public final ShooterSubsystem m_shooter = new ShooterSubsystem();
   @Log
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
- /*  @Log
+ /* 
   private final ControlPanelSubsystem m_controlpanel = new ControlPanelSubsystem(); */
   @Log
   private final LEDSubsystem m_LED = new LEDSubsystem();
@@ -77,9 +76,6 @@ public class RobotContainer {
   @Log.PDP
   PowerDistributionPanel m_PDP = new PowerDistributionPanel(0);
   
-  // Creating this so we get logging in the Command
-  Command DriveStraight = new DriveStraight(0, m_robotDrive);
-
   @Log(tabName = "DriveSubsystem")
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
@@ -117,13 +113,6 @@ public class RobotContainer {
         // hand, and turning controlled by the right.
         new RunCommand(() -> m_robotDrive
             .arcadeDrive(-drv.JoystickLY(), drv.JoystickRX()), m_robotDrive));
-
-/*     m_climb.setDefaultCommand(
-      // Use right y axis to control the speed of the climber
-      new RunCommand(
-        () -> m_climb
-          .setOutput(Math.max(m_operatorController.getRawAxis(2),m_driverController.getRawAxis(2)),
-            Math.max(m_operatorController.getRawAxis(3), m_driverController.getRawAxis(3))), m_climb)); */
                          
     // Sets the LEDs to start up with a rainbow config
     //m_LED.rainbow();
@@ -192,17 +181,11 @@ public class RobotContainer {
      // .whenActive(new InstantCommand(() -> m_climb.nextClimbStage(true))
      //   .perpetually().withInterrupt(() -> m_climb.atposition()));
 
-    // TEST when back is pressed drive straight 120 inches
-    /* new JoystickButton(m_driverController, XboxController.Button.kBack.value)
-      .or(new JoystickButton(m_operatorController, XboxController.Button.kBack.value))
-      .whenActive(new DriveStraight(120, m_robotDrive).withTimeout(10)); */
-
-    drv.BackButton.whenPressed(() -> m_robotDrive.tankDriveVelocity(1, 1));
-    //.whenPressed(new InstantCommand(m_conveyor::turnBackwards, m_conveyor))
-    //  .whenReleased(new InstantCommand(m_conveyor::turnOff, m_conveyor));
+    drv.BackButton.whenPressed(new InstantCommand(m_conveyor::turnBackwards, m_conveyor))
+      .whenReleased(new InstantCommand(m_conveyor::turnOff, m_conveyor));
     
     // TEST when start is pressed follow trajectory
-    drv.StartButton.whenPressed(new Bounce(m_robotDrive)); //() -> m_robotDrive.createCommandForTrajectory("Bounce2").withTimeout(5).withName("Bounce2").schedule()); //new Bounce(m_robotDrive));
+    drv.StartButton.whenPressed(() -> m_robotDrive.createCommandForTrajectory(m_robotDrive.loadTrajectoryFromFile("Straight"), true).withTimeout(5).withName("Straight").schedule());
     //.whenPressed(new DriveDistanceProfiled(3, m_robotDrive).withTimeout(10));
 
     // Create "button" from POV Hat in up direction.  Use both of the angles to the left and right also.

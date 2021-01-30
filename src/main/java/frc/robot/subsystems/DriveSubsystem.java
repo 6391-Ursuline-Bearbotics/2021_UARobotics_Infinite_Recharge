@@ -8,15 +8,12 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
-import edu.wpi.first.wpilibj.geometry.Transform2d;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
@@ -30,8 +27,6 @@ import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 
@@ -44,7 +39,6 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.sim.PhysicsSim;
 
 public class DriveSubsystem extends SubsystemBase implements Loggable{
 	// The motors on the left and right side of the drivetrain
@@ -91,7 +85,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 	double _targetAngle = 0;
   int _printCount = 0;
   private Pose2d savedPose;
-  private Trajectory trajectory;
   @Log
   double target_sensorUnits;
 
