@@ -19,6 +19,7 @@ public class ConveyorSubsystem extends SubsystemBase implements Loggable{
     AnalogInput frontconveyor = new AnalogInput(2);
     AnalogInput topconveyor = new AnalogInput(3);
 
+    // The averaging here is so that supurious noise spikes don't trip the sensors.
     public ConveyorSubsystem() {
         frontconveyor.setAverageBits(4);
         topconveyor.setAverageBits(4);

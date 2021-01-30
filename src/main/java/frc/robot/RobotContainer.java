@@ -161,8 +161,9 @@ public class RobotContainer {
     // When Y button is pressed on operators controller deploy the intake but do not spin the wheels
     op.YButton.whenPressed(new InstantCommand(() -> m_intake.toggleIntakePosition(true)));
 
-    // Turn on the conveyor when either the A button is pressed or if the bottom sensor is blocked
-    // (new ball) and the top sensor is not blocked (ball has a place to go)
+    // Turn on the conveyor when:
+    // the A button is pressed (either controller) and either the top sensor is not blocked or the shooter is up to speed
+    // if the bottom sensor is blocked (ball waiting to go up) unless top sensor blocked (the ball has no place to go)
     (topConveyorSensor.negate()
       .and(frontConveyorSensor))
     .or(drv.AButton.and(shooteratsetpoint.or(topConveyorSensor.negate())))
@@ -181,6 +182,7 @@ public class RobotContainer {
      // .whenActive(new InstantCommand(() -> m_climb.nextClimbStage(true))
      //   .perpetually().withInterrupt(() -> m_climb.atposition()));
 
+    // When the back button is pressed run the conveyor backwards until released
     drv.BackButton.whenPressed(new InstantCommand(m_conveyor::turnBackwards, m_conveyor))
       .whenReleased(new InstantCommand(m_conveyor::turnOff, m_conveyor));
     

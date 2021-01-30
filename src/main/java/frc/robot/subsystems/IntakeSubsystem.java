@@ -18,6 +18,8 @@ public class IntakeSubsystem extends SubsystemBase implements Loggable{
     @Config
     private final DoubleSolenoid m_intakeSolenoid2 = new DoubleSolenoid(IntakeConstants.kSolenoid3ControllerPort, IntakeConstants.kSolenoid4ControllerPort);
 
+    // Since we are using DoubleSolenoids they must be initially set so when they are toggled they 
+    // know which direction to toggle to as their default state is kOff.
     public IntakeSubsystem() {
         setOutput(0);
         m_intakeSolenoid1.set(Value.kReverse);
@@ -37,7 +39,8 @@ public class IntakeSubsystem extends SubsystemBase implements Loggable{
 
     @Config
     public void toggleIntakeWheels(boolean enabled) {
-        if(m_IntakeMotor.get() == 0 && m_intakeSolenoid1.get() == DoubleSolenoid.Value.kReverse) { // Only turn it on if intake is down and it is currently off
+        // Only turn it on if intake is down and it is currently off
+        if(m_IntakeMotor.get() == 0 && m_intakeSolenoid1.get() == DoubleSolenoid.Value.kReverse) {
             m_IntakeMotor.set(IntakeConstants.kIntakeMotorSpeed);
         }
         else{

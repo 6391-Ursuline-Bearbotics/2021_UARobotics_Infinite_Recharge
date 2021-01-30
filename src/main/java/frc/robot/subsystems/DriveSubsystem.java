@@ -77,6 +77,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   // instance!
   private Field2d m_fieldSim;
 
+  // The pidgeon is currently supported so we create this analog gyro that doesn't exist to replace it.
   private AnalogGyroSim m_gyroSim;
 
   /** Tracking variables */
@@ -105,6 +106,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    * Creates a new DriveSubsystem.
    */
   public DriveSubsystem() {
+    // Differential Drive Configuration
     m_drive.setMaxOutput(DriveConstants.kMaxOutputForward, DriveConstants.kMaxOutputRotation);
     m_drive.setMinOutput(DriveConstants.kMinOutputForward, DriveConstants.kMinOutputRotation);
     m_drive.setDeadband(DriveConstants.kDeadbandForward, DriveConstants.kDeadbandRotation);
@@ -122,6 +124,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
           DriveConstants.kWheelDiameterMeters / 2.0,
           null);
 
+      // This doesn't exist but Pidgeon isn't supported yet.
       m_gyroSim = new AnalogGyroSim(1);
 
       // the Field2d class lets us visualize our robot in the simulation GUI.
@@ -130,6 +133,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
       SmartDashboard.putData("Field", m_fieldSim);
     }
 
+    // Odometry is the object that updates the pose (robots position and angle on the field)
     m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
 
     // Set factory defaults
@@ -191,7 +195,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
       m_talonsrxleft.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse,
       m_talonsrxright.getSelectedSensorPosition() * DriveConstants.kEncoderDistancePerPulse);
     SmartDashboard.putString("Pose", m_odometry.getPoseMeters().toString());
-    m_fieldSim.setRobotPose(m_odometry.getPoseMeters());
   }
 
   @Override
@@ -217,8 +220,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     m_gyroSim.setAngle(-m_drivetrainSimulator.getHeading().getDegrees());
 
     m_fieldSim.setRobotPose(getCurrentPose());
-
-    // PhysicsSim.getInstance().run();
   }
 
   public double getDrawnCurrentAmps() {
@@ -331,7 +332,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    * @return the robot's heading in degrees, from 180 to 180
    */
   @Log
-  //@Log(tabName = "Dashboard", name = "Gyro Heading")
   public double getHeading() {
     if (RobotBase.isSimulation()) { // If our robot is simulated
       return -m_gyroSim.getAngle();
@@ -355,6 +355,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     }
   }
 
+  // This is the closed loop velocity control method we use trajectory following.
   public void tankDriveVelocity(double leftVelocity, double rightVelocity) {
     var leftAccel = (leftVelocity - stepsPerDecisecToMetersPerSec((int)m_talonsrxleft.getSelectedSensorVelocity())) / 20;
     var rightAccel = (rightVelocity - stepsPerDecisecToMetersPerSec((int)m_talonsrxright.getSelectedSensorVelocity())) / 20;
@@ -396,7 +397,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
             DriveConstants.kDriveKinematics,
             this::tankDriveVelocity,
             this);
-    //this.resetOdometry(trajectory.getInitialPose());
     return ramseteCommand.andThen(() -> this.tankDriveVolts(0, 0));
   }
 
@@ -496,7 +496,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   @Log
   public double getrighterror() {
-    //return metersToSteps(m_talonsrxright.getClosedLoopError());
     return m_talonsrxright.getClosedLoopError();
   }
 
@@ -526,14 +525,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     //m_drive.feed();
   }
 
-  public void setMaxOutput(double maxOutputForward, double maxOutputRotation) {
-    m_drive.setMaxOutput(maxOutputForward, maxOutputRotation);
-  }
-
-  public void setDeadband(double deadbandForward, double deadbandRotation) {
-    m_drive.setDeadband(deadbandForward, deadbandRotation);
-  }
-
+  // Drives for a specified time at a specified speed.
   public Command driveTime(double time, double speed) {
     return new RunCommand(() -> {m_talonsrxleft.set(speed);
       m_talonsrxright.set(speed);})

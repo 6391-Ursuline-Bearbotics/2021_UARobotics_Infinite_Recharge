@@ -46,13 +46,7 @@ public class ClimbSubsystem extends SubsystemBase implements Loggable{
         return new ClimbSubsystem(m_LeftClimbMotor, m_RightClimbMotor);
     }
 
-    @Config
-    public void numOfRotations(double rotations) {
-        double targetposition = rotations * ClimbConstants.kEncoderCPR;
-        m_LeftClimbMotor.set(ControlMode.Position, targetposition);
-        m_RightClimbMotor.set(ControlMode.Position, targetposition);
-    }
-
+    // This is the open loop control of the climber when the "triggers" are used to manually control it
     public void setOutput(double leftMotorPercent, double rightMotorPercent) {
         this.m_LeftClimbMotor.set(leftMotorPercent * climbinvert);
         this.m_RightClimbMotor.set(rightMotorPercent * climbinvert);
@@ -63,12 +57,9 @@ public class ClimbSubsystem extends SubsystemBase implements Loggable{
         }
     }
 
+    // This is the closed loop position control of the climber
     @Config
     public void setPosition(double position) {
-        // Show the climbing camera if it isn't already
-        if (NetworkTableInstance.getDefault().getTable("limelight").getEntry("stream").getDouble(0) < 2)  {
-            NetworkTableInstance.getDefault().getTable("limelight").getEntry("stream").setNumber(2);
-        }
         m_RightClimbMotor.set(ControlMode.Position, position);
         m_LeftClimbMotor.set(ControlMode.Position, position);
     }
@@ -89,6 +80,7 @@ public class ClimbSubsystem extends SubsystemBase implements Loggable{
         m_RightClimbMotor.setSelectedSensorPosition(0);
     }
 
+    // This is very important for resetting the climber.  This should only be done in the pits with extreme care!
     @Config.ToggleButton
     public void invertclimber(boolean enabled) {
         if (enabled) {
@@ -103,6 +95,10 @@ public class ClimbSubsystem extends SubsystemBase implements Loggable{
         }
     }
 
+    // There are 3 "stages" that we go to.  While lining up we go to the first stage which raise
+    // the climbers all the way up.  Once we move forward and touch the bar we bring them down
+    // to the point they are on the bar but not actually pulling allowing teammates to get on but
+    // it they were to pull ahead of time we would raise too.  Then the actual hang.
     @Config.ToggleButton
     public void nextClimbStage(boolean enabled) {
         climbstage = climbstage + 1;
