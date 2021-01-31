@@ -262,6 +262,10 @@ public final class Constants {
         public static final int kSolenoid4ControllerPort = 5;
 
         public static final double kIntakeMotorSpeed = 0.5;
+
+        public static final double kIntakeStallCurrent = 100;
+        public static final int kStallTimeMS = 500;
+        public static final int kIntakePDPSlot = 5;
     }
 
     public static final class ConveyorConstants {

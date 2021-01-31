@@ -113,6 +113,9 @@ public class RobotContainer {
         // hand, and turning controlled by the right.
         new RunCommand(() -> m_robotDrive
             .arcadeDrive(-drv.JoystickLY(), drv.JoystickRX()), m_robotDrive));
+
+    // Constantly checks to see if the intake motor has stalled
+    m_intake.setDefaultCommand(new InstantCommand(m_intake::checkStall));
                          
     // Sets the LEDs to start up with a rainbow config
     //m_LED.rainbow();
