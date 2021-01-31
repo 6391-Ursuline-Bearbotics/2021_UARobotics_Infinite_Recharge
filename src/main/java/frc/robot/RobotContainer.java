@@ -115,7 +115,7 @@ public class RobotContainer {
             .arcadeDrive(-drv.JoystickLY(), drv.JoystickRX()), m_robotDrive));
 
     // Constantly checks to see if the intake motor has stalled
-    m_intake.setDefaultCommand(new InstantCommand(m_intake::checkStall));
+    m_intake.setDefaultCommand(new RunCommand(m_intake::checkStall, m_intake));
                          
     // Sets the LEDs to start up with a rainbow config
     //m_LED.rainbow();
