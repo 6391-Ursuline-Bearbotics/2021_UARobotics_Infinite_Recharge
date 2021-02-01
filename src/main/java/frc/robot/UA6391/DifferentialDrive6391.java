@@ -239,8 +239,8 @@ public class DifferentialDrive6391 extends RobotDriveBase6391 implements Sendabl
       }
     }
 
-    m_leftMotor.set(MathUtil.clamp(leftMotorOutput, -1.0, 1.0));
-    m_rightMotor.set(MathUtil.clamp(rightMotorOutput, -1.0, 1.0) * m_rightSideInvertMultiplier);
+    m_leftMotor.set(MathUtil.clamp(leftMotorOutput, -1.0, 1.0) * m_driveStraightLeft);
+    m_rightMotor.set(MathUtil.clamp(rightMotorOutput, -1.0, 1.0) * m_rightSideInvertMultiplier * m_driveStraightRight);
 
     feed();
   }

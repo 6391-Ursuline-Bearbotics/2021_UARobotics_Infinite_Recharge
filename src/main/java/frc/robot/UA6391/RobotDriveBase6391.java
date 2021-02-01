@@ -14,6 +14,8 @@ public abstract class RobotDriveBase6391 extends MotorSafety {
   public static final double kDefaultMaxOutputRotation = 0.75;
   public static final double kDefaultMinOutputForward = 0;
   public static final double kDefaultMinOutputRotation = 0.2;
+  public static final double kDriveStraightLeft = 1;
+  public static final double kDriveStraightRight = 1;
 
   protected double m_deadbandForward = kDefaultDeadbandForward;
   protected double m_deadbandRotation = kDefaultDeadbandRotation;
@@ -21,6 +23,8 @@ public abstract class RobotDriveBase6391 extends MotorSafety {
   protected double m_maxOutputRotation = kDefaultMaxOutputRotation;
   protected double m_minOutputForward = kDefaultMaxOutputForward;
   protected double m_minOutputRotation = kDefaultMaxOutputRotation;
+  protected double m_driveStraightLeft = kDriveStraightLeft;
+  protected double m_driveStraightRight = kDriveStraightRight;
 
   /** The location of a motor on the robot for the purpose of driving. */
   public enum MotorType {
@@ -81,6 +85,12 @@ public abstract class RobotDriveBase6391 extends MotorSafety {
   public void setMinOutput(double minOutputForward, double minOutputRotation) {
     m_minOutputForward = minOutputForward;
     m_minOutputRotation = minOutputRotation;
+  }
+
+  // Sets a number each motor power is multiplied by right before it is set to help the robot drive straight
+  public void setDriveStraight(double driveStraightLeft, double driveStraightRight) {
+    m_driveStraightLeft = driveStraightLeft;
+    m_driveStraightRight = driveStraightRight;
   }
 
   /**

@@ -111,6 +111,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     m_drive.setMinOutput(DriveConstants.kMinOutputForward, DriveConstants.kMinOutputRotation);
     m_drive.setDeadband(DriveConstants.kDeadbandForward, DriveConstants.kDeadbandRotation);
     m_drive.setRamp(DriveConstants.kRampForward, DriveConstants.kRampRotation);
+    m_drive.setDriveStraight(DriveConstants.kDriveStraightLeft, DriveConstants.kDriveStraightRight);
     m_drive.setRightSideInverted(false);
 
     // Simulation Setup
