@@ -5,6 +5,8 @@ import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
@@ -15,6 +17,8 @@ public class ConveyorSubsystem extends SubsystemBase implements Loggable{
     private final WPI_VictorSPX m_ConveyorMotor1 = new WPI_VictorSPX(ConveyorConstants.kConveyor1ControllerPort);
     @Config
     private final WPI_VictorSPX m_ConveyorMotor2 = new WPI_VictorSPX(ConveyorConstants.kConveyor2ControllerPort);
+
+    PowerDistributionPanel m_PDP = new PowerDistributionPanel(0);
 
     AnalogInput frontconveyor = new AnalogInput(2);
     AnalogInput topconveyor = new AnalogInput(3);
@@ -58,12 +62,14 @@ public class ConveyorSubsystem extends SubsystemBase implements Loggable{
     @Log
     @Log(tabName = "Dashboard", name = "Front Sensor")
     public boolean getFrontConveyor() {
-        return (frontconveyor.getAverageVoltage() < 4.75);
+        SmartDashboard.putNumber("FrontSensor", m_PDP.getVoltage());
+        return (frontconveyor.getAverageVoltage() < 0.5 && m_PDP.getVoltage() > 11);
     }
 
     @Log
     @Log(tabName = "Dashboard", name = "Top Sensor")
     public boolean getTopConveyor() {
+        SmartDashboard.putNumber("TopSensor", topconveyor.getAverageVoltage());
         return (topconveyor.getAverageVoltage() < 4.75);
     }
 

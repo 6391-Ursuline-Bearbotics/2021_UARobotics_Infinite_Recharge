@@ -58,6 +58,5 @@ public class IntakeSubsystem extends SubsystemBase implements Loggable{
         if (intakeStall.getStallStatus().isStalled) {
             setOutput(0);
         }
-        SmartDashboard.putNumber("IntakeCurrent", current);
     }
 }

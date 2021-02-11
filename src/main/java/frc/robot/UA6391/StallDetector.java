@@ -30,7 +30,7 @@ public class StallDetector {
         if (currentCurrent >= IntakeConstants.kIntakeStallCurrent) {
             stallMillis += elapsed;
         } else {
-            stallMillis -= elapsed;
+            stallMillis = Math.max(stallMillis - elapsed, 0);
         }
 
         lastRunMillis = System.currentTimeMillis();
@@ -42,5 +42,9 @@ public class StallDetector {
 
     public StallDetectorStatus getStallStatus() {
         return stallStatus;
+    }
+
+    public double getStallTime() {
+        return stallStatus.stalledForMillis;
     }
 }

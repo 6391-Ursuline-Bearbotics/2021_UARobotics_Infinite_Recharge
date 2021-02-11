@@ -190,7 +190,7 @@ public class RobotContainer {
       .whenReleased(new InstantCommand(m_conveyor::turnOff, m_conveyor));
     
     // TEST when start is pressed follow trajectory
-    drv.StartButton.whenPressed(() -> m_robotDrive.createCommandForTrajectory(m_robotDrive.loadTrajectoryFromFile("Straight"), true).withTimeout(5).withName("Straight").schedule());
+    drv.StartButton.whenPressed(() -> m_robotDrive.createCommandForTrajectory(m_robotDrive.loadTrajectoryFromFile("LS to CP"), true).withTimeout(5).withName("Straight").schedule());
     //.whenPressed(new DriveDistanceProfiled(3, m_robotDrive).withTimeout(10));
 
     // Create "button" from POV Hat in up direction.  Use both of the angles to the left and right also.
