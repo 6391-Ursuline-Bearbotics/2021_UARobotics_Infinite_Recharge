@@ -18,12 +18,6 @@ public class TalonDriveConfig {
       m_talonsrxright.set(0);
       m_talonsrxleft.set(0);
       
-      // Set Ramping
-      m_talonsrxleft.configClosedloopRamp(DriveConstants.kClosedRamp);
-      m_talonsrxleft.configOpenloopRamp(DriveConstants.kOpenRamp);
-      m_talonsrxright.configClosedloopRamp(DriveConstants.kClosedRamp);
-      m_talonsrxright.configOpenloopRamp(DriveConstants.kOpenRamp);
-
       /* Set Neutral Mode */
       m_talonsrxleft.setNeutralMode(NeutralMode.Brake);
       m_talonsrxright.setNeutralMode(NeutralMode.Brake);

@@ -121,7 +121,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
           DriveConstants.kDrivetrainPlant,
           DriveConstants.kDriveGearbox,
           DriveConstants.kDriveGearing,
-          DriveConstants.TRACK_WIDTH_METERS,
+          DriveConstants.kTrackWidthMeters,
           DriveConstants.kWheelDiameterMeters / 2.0,
           null);
 
@@ -417,7 +417,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    * @return meters
    */
   public static double stepsToMeters(int steps) {
-    return (DriveConstants.WHEEL_CIRCUMFERENCE_METERS / DriveConstants.SENSOR_UNITS_PER_ROTATION) * steps;
+    return (DriveConstants.kWheelCircumferenceMeters / DriveConstants.kEncoderCPR) * steps;
   }
 
   /**
@@ -435,7 +435,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    * @return encoder units
    */
   public static int metersToSteps(double meters) {
-    return (int)(meters / DriveConstants.WHEEL_CIRCUMFERENCE_METERS * DriveConstants.SENSOR_UNITS_PER_ROTATION);
+    return (int)(meters / DriveConstants.kWheelCircumferenceMeters * DriveConstants.kEncoderCPR);
   }
 
   /**
@@ -458,7 +458,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   // Drives straight specified distance in inches
   public void drivestraight(double distance) {
-    target_sensorUnits = (distance * DriveConstants.SENSOR_UNITS_PER_ROTATION) / DriveConstants.WHEEL_CIRCUMFERENCE_INCHES ;
+    target_sensorUnits = (distance * DriveConstants.kEncoderCPR) / DriveConstants.kWheelCircumferenceInches ;
     m_talonsrxright.set(ControlMode.Position, target_sensorUnits, DemandType.AuxPID, m_talonsrxright.getSelectedSensorPosition(1));
 		m_talonsrxleft.follow(m_talonsrxright, FollowerType.AuxOutput1);
   }
@@ -538,7 +538,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   public void drivePositionGyro(double distanceInches, double heading) {
     var sensorposition = heading * 10;
     distancesetup();
-    target_sensorUnits = (distanceInches * DriveConstants.SENSOR_UNITS_PER_ROTATION) / DriveConstants.WHEEL_CIRCUMFERENCE_INCHES ;
+    target_sensorUnits = (distanceInches * DriveConstants.kEncoderCPR) / DriveConstants.kWheelCircumferenceInches;
     m_talonsrxright.set(ControlMode.Position, target_sensorUnits, DemandType.AuxPID, sensorposition);
   }
 

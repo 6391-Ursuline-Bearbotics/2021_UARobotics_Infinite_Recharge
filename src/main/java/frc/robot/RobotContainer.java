@@ -190,14 +190,16 @@ public class RobotContainer {
       .whenReleased(new InstantCommand(m_conveyor::turnOff, m_conveyor));
     
     // TEST when start is pressed follow trajectory
-    drv.StartButton.whenPressed(() -> m_robotDrive.createCommandForTrajectory(m_robotDrive.loadTrajectoryFromFile("LS to CP"), true).withTimeout(5).withName("Straight").schedule());
+    drv.StartButton.whenPressed(() -> m_robotDrive.createCommandForTrajectory(m_robotDrive.loadTrajectoryFromFile("Straight4m"), true).withTimeout(5).withName("Straight").schedule());
     //.whenPressed(new DriveDistanceProfiled(3, m_robotDrive).withTimeout(10));
 
     // Create "button" from POV Hat in up direction.  Use both of the angles to the left and right also.
-    drv.POVUp.whenActive(new RunCommand(() -> m_robotDrive.turnToAngle(90)).withTimeout(5));
+    //drv.POVUp.whenActive(new RunCommand(() -> m_robotDrive.turnToAngle(90)).withTimeout(5));
+    drv.POVUp.whenActive(() -> m_robotDrive.createCommandForTrajectory(m_robotDrive.loadTrajectoryFromFile("Curve3m"), true).withTimeout(5).withName("Curve").schedule());
     
     // Create "button" from POV Hat in down direction.  Use both of the angles to the left and right also.
-    drv.POVDown.whenActive(new RunCommand(() -> m_robotDrive.turnToAngle(-90)).withTimeout(5));
+    //drv.POVDown.whenActive(new RunCommand(() -> m_robotDrive.turnToAngle(-90)).withTimeout(5));
+    drv.POVDown.whenActive(() -> m_robotDrive.createCommandForTrajectory(m_robotDrive.loadTrajectoryFromFile("Straight4m"), true).withTimeout(5).withName("Straight").schedule());
 
     // POV Up Direction on Operator Controller relatively increases the current setpoint of the shooter
     op.POVUp.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() + 50);}));

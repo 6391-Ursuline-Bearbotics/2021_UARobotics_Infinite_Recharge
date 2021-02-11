@@ -46,15 +46,20 @@ public final class Constants {
         public static final DCMotor kDriveGearbox = DCMotor.getCIM(2);
         public static final double kDriveGearing = 10.71;
 
+        // Baseline values for a RAMSETE follower in units of meters and seconds
+        public static final double RAMSETE_B = 2;
+        public static final double RAMSETE_ZETA = 1;
+
         /** Voltage needed to overcome the motor’s static friction. kS */
-        public static final double kS = 0.112; // 1.01 pneumatic //.829
+        public static final double kS = 1.24; //0.112 // 1.01 pneumatic //.829
 
         /** Voltage needed to hold (or "cruise") at a given constant velocity. kV */
-        public static final double kV = 0.222; //2.93 pneumatic //3.04
+        public static final double kV = 2.92; //0.222; //2.93 pneumatic //3.04
 
         /** Voltage needed to induce a given acceleration in the motor shaft. kA */
-        public static final double kA = 0.00128; //0.761 pneumatic //.676
+        public static final double kA = 0.474; //0.00128; //0.761 pneumatic //.676
 
+        // Simulation Drivetrain stuff
         public static final double ksVolts = 0.22;
         public static final double kvVoltSecondsPerMeter = 1.98;
         public static final double kaVoltSecondsSquaredPerMeter = 0.2;
@@ -66,28 +71,21 @@ public final class Constants {
         public static final LinearSystem<N2, N2, N2> kDrivetrainPlant =
           LinearSystemId.identifyDrivetrainSystem(kvVoltSecondsPerMeter, kaVoltSecondsSquaredPerMeter,
                 kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian);
-
-        public static final boolean kLeftEncoderReversed = false;
-        public static final boolean kRightEncoderReversed = true;
-
-        public static final double kOpenRamp = 0;
-        public static final double kClosedRamp = 0;
         
-        public static final int SENSOR_UNITS_PER_ROTATION = 4096;
-        public static final double WHEEL_DIAMETER_INCHES = 8d;
-        public static final double WHEEL_CIRCUMFERENCE_INCHES = WHEEL_DIAMETER_INCHES * Math.PI;
-        public static final double WHEEL_CIRCUMFERENCE_METERS = Units.inchesToMeters(WHEEL_DIAMETER_INCHES) * Math.PI;
-
-        public static final double TRACK_WIDTH_METERS = 0.69;
-        public static final DifferentialDriveKinematics kDriveKinematics =
-            new DifferentialDriveKinematics(TRACK_WIDTH_METERS);
-
         public static final int kEncoderCPR = 4096;
-        public static final double kWheelDiameterMeters = 0.15;
+        public static final double kWheelDiameterInches = 8d;
+        public static final double kWheelDiameterMeters = Units.inchesToMeters(kWheelDiameterInches);
+        public static final double kWheelCircumferenceInches = kWheelDiameterInches * Math.PI;
+        public static final double kWheelCircumferenceMeters = Units.inchesToMeters(kWheelDiameterInches) * Math.PI;
+
+        public static final double kTrackWidthMeters = 1.00639; // 0.69;
+        public static final DifferentialDriveKinematics kDriveKinematics =
+            new DifferentialDriveKinematics(kTrackWidthMeters);
+
         public static final double kEncoderDistancePerPulse =
             // Assumes the encoders are directly mounted on the wheel shafts
-            (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
-        public static final double kGyroPID = .01;
+            kWheelCircumferenceMeters / (double) kEncoderCPR;
+
         /**
          * This is a property of the Pigeon IMU, and should not be changed.
          */
@@ -113,7 +111,7 @@ public final class Constants {
          * 	                                    			  kP   kI   kD   kF               Iz    PeakOut */
         public final static Gains kGains_Distanc = new Gains( 0.5, 0.0,  0.0, 0.0,            100,  0.50 );
         public final static Gains kGains_Turning = new Gains( 2.0, 0.0,  4.0, 0.0,            200,  1.00 );
-        public final static Gains kGains_Velocit = new Gains( 0.2, 0.0, 0.0, 1023.0/6800.0,  300,  1.00 ); // .00712
+        public final static Gains kGains_Velocit = new Gains( 2.29, 0.0, 0.0, 1023.0/6800.0,  300,  1.00 ); //0.2 // .00712
         public final static Gains kGains_MotProf = new Gains( 1.0, 0.0,  0.0, 1023.0/6800.0,  400,  1.00 );
         
         /** ---- Flat constants, you should not need to change these ---- */
@@ -134,9 +132,7 @@ public final class Constants {
         public final static int kSlot_Velocit = SLOT_2;
         public final static int kSlot_MotProf = SLOT_3;
 
-        // Example value only - as above, this must be tuned for your drive!
-        public static final double kPDriveVel = 8.5;       
-
+        // Everything below is for either Absolute or Relative Turns
         public static final double kMaxTurnRateDegPerS = 100;
         public static final double kMaxTurnAccelerationDegPerSSquared = 300;
 
@@ -153,10 +149,6 @@ public final class Constants {
 
         public static final double kRelTurnToleranceDeg = 1;
         public static final double kRelTurnRateToleranceDegPerS = 3; // degrees per second
-
-        // Baseline values for a RAMSETE follower in units of meters and seconds
-        public static final double RAMSETE_B = 2;
-        public static final double RAMSETE_ZETA = 1;
 
         // Turn angle constraints
         public static final double kMaxSpeedMetersPerSecond = 3;

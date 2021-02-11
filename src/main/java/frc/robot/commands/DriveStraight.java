@@ -30,7 +30,7 @@ public class DriveStraight extends CommandBase implements Loggable{
     m_robotDrive = robotDrive;
     distance = distanceIn;
     m_talonsrxright = m_robotDrive.getRightMaster();
-    target_sensorUnits = (distanceIn * DriveConstants.SENSOR_UNITS_PER_ROTATION) / DriveConstants.WHEEL_CIRCUMFERENCE_INCHES;
+    target_sensorUnits = (distanceIn * DriveConstants.kEncoderCPR) / DriveConstants.kWheelCircumferenceInches;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_robotDrive);
   }
