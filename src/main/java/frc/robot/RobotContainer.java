@@ -28,6 +28,7 @@ import io.github.oblarg.oblog.annotations.Log;
 import frc.robot.commands.AutoAim;
 import frc.robot.commands.Barrel;
 import frc.robot.commands.GalacticSearch;
+import frc.robot.commands.GenericAuto;
 import frc.robot.commands.NextClimbPosition;
 import frc.robot.commands.Slalom;
 import frc.robot.commands.TrenchAuto;
@@ -190,16 +191,16 @@ public class RobotContainer {
       .whenReleased(new InstantCommand(m_conveyor::turnOff, m_conveyor));
     
     // TEST when start is pressed follow trajectory
-    drv.StartButton.whenPressed(() -> m_robotDrive.createCommandForTrajectory(m_robotDrive.loadTrajectoryFromFile("Straight4m"), true).withTimeout(5).withName("Straight").schedule());
+    drv.StartButton.whenPressed(new GenericAuto(m_robotDrive, "Straight4m"));
     //.whenPressed(new DriveDistanceProfiled(3, m_robotDrive).withTimeout(10));
 
     // Create "button" from POV Hat in up direction.  Use both of the angles to the left and right also.
     //drv.POVUp.whenActive(new RunCommand(() -> m_robotDrive.turnToAngle(90)).withTimeout(5));
-    drv.POVUp.whenActive(() -> m_robotDrive.createCommandForTrajectory(m_robotDrive.loadTrajectoryFromFile("Curve3m"), true).withTimeout(5).withName("Curve").schedule());
+    drv.POVUp.whenActive(new GenericAuto(m_robotDrive, "Curve3m"));
     
     // Create "button" from POV Hat in down direction.  Use both of the angles to the left and right also.
     //drv.POVDown.whenActive(new RunCommand(() -> m_robotDrive.turnToAngle(-90)).withTimeout(5));
-    drv.POVDown.whenActive(() -> m_robotDrive.createCommandForTrajectory(m_robotDrive.loadTrajectoryFromFile("Straight4m"), true).withTimeout(5).withName("Straight").schedule());
+    drv.POVDown.whenActive(new GenericAuto(m_robotDrive, "LS to CP"));
 
     // POV Up Direction on Operator Controller relatively increases the current setpoint of the shooter
     op.POVUp.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() + 50);}));

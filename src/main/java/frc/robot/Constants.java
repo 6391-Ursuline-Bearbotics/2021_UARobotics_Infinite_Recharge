@@ -84,7 +84,7 @@ public final class Constants {
 
         public static final double kEncoderDistancePerPulse =
             // Assumes the encoders are directly mounted on the wheel shafts
-            kWheelCircumferenceMeters / (double) kEncoderCPR;
+            kWheelCircumferenceMeters / (double) kEncoderCPR; // .00015585
 
         /**
          * This is a property of the Pigeon IMU, and should not be changed.

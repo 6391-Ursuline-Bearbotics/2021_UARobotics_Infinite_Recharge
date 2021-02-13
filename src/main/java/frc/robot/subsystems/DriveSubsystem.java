@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.Constraints;
@@ -34,6 +35,7 @@ import java.nio.file.Paths;
 import java.io.IOException;
 
 import frc.robot.UA6391.DifferentialDrive6391;
+import frc.robot.UA6391.Trajectory6391;
 import frc.robot.Constants.DriveConstants;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
@@ -227,13 +229,24 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     return m_drivetrainSimulator.getCurrentDrawAmps();
   }
 
+  @Log
+  public double getLeftPower() {
+    return m_talonsrxleft.getMotorOutputPercent();
+  }
+
+  @Log
+  public double getRightPower() {
+    return m_talonsrxright.getMotorOutputPercent();
+  }
+
   /**
    * Returns the current left wheel speed of the robot.
    *
    * @return The current left wheel speed.
    */
   public double getLeftWheelSpeed() {
-    return m_talonsrxleft.getSelectedSensorVelocity() * DriveConstants.kEncoderDistancePerPulse;
+    // Native units per 100ms so * 10 = native per second
+    return stepsPerDecisecToMetersPerSec((int)m_talonsrxleft.getSelectedSensorVelocity());
   }
 
   /**
@@ -242,7 +255,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    * @return The current right wheel speed.
    */
   public double getRightWheelSpeed() {
-    return m_talonsrxright.getSelectedSensorVelocity() * DriveConstants.kEncoderDistancePerPulse;
+    // Native units per 100ms so * 10 = native per second
+    return stepsPerDecisecToMetersPerSec((int)m_talonsrxright.getSelectedSensorVelocity());
   }
 
   /**
@@ -358,8 +372,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   // This is the closed loop velocity control method we use trajectory following.
   public void tankDriveVelocity(double leftVelocity, double rightVelocity) {
-    var leftAccel = (leftVelocity - stepsPerDecisecToMetersPerSec((int)m_talonsrxleft.getSelectedSensorVelocity())) / 20;
-    var rightAccel = (rightVelocity - stepsPerDecisecToMetersPerSec((int)m_talonsrxright.getSelectedSensorVelocity())) / 20;
+    var leftAccel = (leftVelocity - stepsPerDecisecToMetersPerSec((int)m_talonsrxleft.getSelectedSensorVelocity()));
+    var rightAccel = (rightVelocity - stepsPerDecisecToMetersPerSec((int)m_talonsrxright.getSelectedSensorVelocity()));
     
     var leftFeedForwardVolts = m_driveFeedforward.calculate(leftVelocity, leftAccel);
     var rightFeedForwardVolts = m_driveFeedforward.calculate(rightVelocity, rightAccel);
@@ -410,6 +424,15 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     }
   }
 
+  public Trajectory generateTrajectoryFromFile(String filename) {
+    try {
+      return generateTrajectory(filename);
+    } catch (IOException e) {
+      DriverStation.reportError("Failed to load auto trajectory: " + filename, false);
+      return new Trajectory();
+    }
+  }
+
     /**
    * Converts from encoder steps to meters.
    * 
@@ -417,7 +440,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    * @return meters
    */
   public static double stepsToMeters(int steps) {
-    return (DriveConstants.kWheelCircumferenceMeters / DriveConstants.kEncoderCPR) * steps;
+    return DriveConstants.kEncoderDistancePerPulse * steps;
   }
 
   /**
@@ -454,6 +477,12 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   protected static Trajectory loadTrajectory(String trajectoryName) throws IOException {
     return TrajectoryUtil.fromPathweaverJson(
         Filesystem.getDeployDirectory().toPath().resolve(Paths.get("paths", trajectoryName + ".wpilib.json")));
+  }
+
+  protected static Trajectory generateTrajectory(String trajectoryName) throws IOException {
+    var filepath = Filesystem.getDeployDirectory().toPath().resolve(Paths.get("waypoints", trajectoryName));
+    var config = new TrajectoryConfig(1, 3);
+    return Trajectory6391.fromWaypoints(filepath, config);
   }
 
   // Drives straight specified distance in inches
