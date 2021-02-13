@@ -7,13 +7,13 @@ import frc.robot.subsystems.DriveSubsystem;
 
 public class Slalom extends SequentialCommandGroup {
   public Slalom(DriveSubsystem m_robotDrive) {        
-      Trajectory trajectory1 = m_robotDrive.loadTrajectoryFromFile("Slalom1");
+      Trajectory trajectory1 = m_robotDrive.loadTrajectoryFromFile("SlalomStart");
       
       addCommands(
           new InstantCommand(() -> {
               m_robotDrive.resetOdometry(trajectory1.getInitialPose());
           }),
-          m_robotDrive.createCommandForTrajectory(trajectory1, false).withTimeout(15).withName("Slalom1")
+          m_robotDrive.createCommandForTrajectory(trajectory1, false).withTimeout(50).withName("Slalom1")
       );
   }
 }

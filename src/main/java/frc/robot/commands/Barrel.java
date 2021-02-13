@@ -13,7 +13,7 @@ public class Barrel extends SequentialCommandGroup {
           new InstantCommand(() -> {
               m_robotDrive.resetOdometry(trajectory1.getInitialPose());
           }),
-          m_robotDrive.createCommandForTrajectory(trajectory1, false).withTimeout(15).withName("Barrel1")
+          m_robotDrive.createCommandForTrajectory(trajectory1, false).withTimeout(50).withName("Barrel1")
       );
   }
 }
