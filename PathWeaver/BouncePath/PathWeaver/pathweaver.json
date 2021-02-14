@@ -1,9 +1,9 @@
 {
   "lengthUnit": "Meter",
   "exportUnit": "Always Meters",
-  "maxVelocity": 4.0,
-  "maxAcceleration": 4.0,
-  "wheelBase": 0.69,
+  "maxVelocity": 1.5,
+  "maxAcceleration": 3.0,
+  "wheelBase": 1.0,
   "gameName": "Bounce Path",
-  "outputDir": ""
+  "outputDir": "../../../../../FRC/2021_UARobotics_Infinite_Recharge"
 }
