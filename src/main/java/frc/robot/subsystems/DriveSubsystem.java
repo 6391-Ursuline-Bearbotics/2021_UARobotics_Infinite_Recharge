@@ -244,6 +244,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    *
    * @return The current left wheel speed.
    */
+  @Log
   public double getLeftWheelSpeed() {
     // Native units per 100ms so * 10 = native per second
     return stepsPerDecisecToMetersPerSec((int)m_talonsrxleft.getSelectedSensorVelocity());
@@ -254,6 +255,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    *
    * @return The current right wheel speed.
    */
+  @Log
   public double getRightWheelSpeed() {
     // Native units per 100ms so * 10 = native per second
     return stepsPerDecisecToMetersPerSec((int)m_talonsrxright.getSelectedSensorVelocity());
@@ -388,10 +390,11 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
         metersPerSecToStepsPerDecisec(rightVelocity),
         DemandType.ArbitraryFeedForward,
         rightFeedForwardVolts / 12);
+
+    m_drive.feed();
+
     SmartDashboard.putNumber("left setpoint", leftVelocity);
-    SmartDashboard.putNumber("left speed", getLeftWheelSpeed());
     SmartDashboard.putNumber("right setpoint", rightVelocity);
-    SmartDashboard.putNumber("right speed", getRightWheelSpeed());
   }
 
   /**

@@ -59,3 +59,39 @@ public class Trajectory6391 {
       return new Translation2d(Double.parseDouble(arrOfStr[0]), Double.parseDouble(arrOfStr[1]));
    }
 }
+
+/* public final class WaypointUtil {
+   private static final Logger LOGGER = Logger.getLogger(WaypointUtil.class.getName());
+ 
+   private WaypointUtil() {
+     throw new UnsupportedOperationException("This is a utility class!");
+   }
+ 
+   
+   public static boolean export(String fileLocation, String filename, Double yoffset) {
+     CsvMapper csvMapper = new CsvMapper();
+     CsvSchema schema = CsvSchema.emptySchema().withHeader();
+     WaypointCSV waypoint = new WaypointCSV();
+ 
+     try (
+         BufferedWriter writer = Files.newBufferedWriter(java.nio.file.Path.of(fileLocation + filename));
+ 
+         FileInputStream fs = new FileInputStream (new File(filename));
+         
+         MappingIterator<Map<Double, Double, Double, Double, Boolean, Boolean, String>> it = csvMapper.readerFor(Map).with(schema).readValues(fs);
+     ) {
+       while (it.hasNext()) {
+         double xPos = wp.getX();
+         double yPos = wp.getY() + yoffset;
+         double tangentX = wp.getTangentX();
+         double tangentY = wp.getTangentY();
+         String name = wp.getName();
+         csvPrinter.printRecord(xPos, yPos, tangentX, tangentY, wp.isLockTangent(), wp.isReversed(), name);
+       }
+       csvPrinter.flush();
+     } catch (IOException except) {
+       LOGGER.log(Level.WARNING, "Could not save Path file", except);
+       return false;
+     }
+     return true;
+ */
