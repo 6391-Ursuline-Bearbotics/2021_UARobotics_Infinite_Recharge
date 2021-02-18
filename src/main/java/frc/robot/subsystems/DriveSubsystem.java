@@ -467,7 +467,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    * @return encoder units
    */
   public static int metersToSteps(double meters) {
-    return (int)(meters / DriveConstants.kWheelCircumferenceMeters * DriveConstants.kEncoderCPR);
+    return (int)(meters / DriveConstants.kEncoderDistancePerPulse);
   }
 
   /**
@@ -500,7 +500,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   // Drives straight specified distance in inches
   public void drivestraight(double distance) {
-    target_sensorUnits = (distance * DriveConstants.kEncoderCPR) / DriveConstants.kWheelCircumferenceInches ;
+    target_sensorUnits = (distance / DriveConstants.kEncoderDistancePerPulse);
     m_talonsrxright.set(ControlMode.Position, target_sensorUnits, DemandType.AuxPID, m_talonsrxright.getSelectedSensorPosition(1));
 		m_talonsrxleft.follow(m_talonsrxright, FollowerType.AuxOutput1);
   }
@@ -580,7 +580,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   public void drivePositionGyro(double distanceInches, double heading) {
     var sensorposition = heading * 10;
     distancesetup();
-    target_sensorUnits = (distanceInches * DriveConstants.kEncoderCPR) / DriveConstants.kWheelCircumferenceInches;
+    target_sensorUnits = (distanceInches / DriveConstants.kEncoderDistancePerPulse);
     m_talonsrxright.set(ControlMode.Position, target_sensorUnits, DemandType.AuxPID, sensorposition);
   }
 
