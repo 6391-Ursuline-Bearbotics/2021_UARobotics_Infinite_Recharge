@@ -69,13 +69,13 @@ public class GalacticSearch extends SequentialCommandGroup {
                m_robotDrive.createCommandForTrajectory(trajectory1R, true).withTimeout(50).withName("GalacticSearch1R")),
             Map.entry("1B", 
                // Reset robot pose to the beginning of 1B and Run it
-               m_robotDrive.createCommandForTrajectory(trajectory1R, true).withTimeout(50).withName("GalacticSearch1B")),
+               m_robotDrive.createCommandForTrajectory(trajectory1B, true).withTimeout(50).withName("GalacticSearch1B")),
             Map.entry("2R", 
                // Reset robot pose to the beginning of 2R and Run it
-               m_robotDrive.createCommandForTrajectory(trajectory1R, true).withTimeout(50).withName("GalacticSearch2R")),
+               m_robotDrive.createCommandForTrajectory(trajectory2R, true).withTimeout(50).withName("GalacticSearch2R")),
             Map.entry("2B", 
                // Reset robot pose to the beginning of 2B and Run it
-               m_robotDrive.createCommandForTrajectory(trajectory1R, true).withTimeout(50).withName("GalacticSearch2B"))),
+               m_robotDrive.createCommandForTrajectory(trajectory2B, true).withTimeout(50).withName("GalacticSearch2B"))),
          i)
       );
    }
