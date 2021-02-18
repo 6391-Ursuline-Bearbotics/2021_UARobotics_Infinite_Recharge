@@ -50,13 +50,13 @@ public class Trajectory6391 {
    private static Pose2d createPoseWaypoint(String input) {
       String[] arrOfStr = input.split(",", 0);
       // 8.21m is the Height of the field PathWeaver and traj use different starting points
-      return new Pose2d(new Translation2d(Double.parseDouble(arrOfStr[0]), 8.21 + Double.parseDouble(arrOfStr[1])),
+      return new Pose2d(new Translation2d(Double.parseDouble(arrOfStr[0]), 4.572 + Double.parseDouble(arrOfStr[1])), //8.21 field height & 4.572 challenge height
          new Rotation2d(Double.parseDouble(arrOfStr[2]), Double.parseDouble(arrOfStr[3])));
    }
 
    private static Translation2d createTranslationWaypoint(String input) {
       String[] arrOfStr = input.split(",", 0);
-      return new Translation2d(Double.parseDouble(arrOfStr[0]), Double.parseDouble(arrOfStr[1]));
+      return new Translation2d(Double.parseDouble(arrOfStr[0]), 4.572 + Double.parseDouble(arrOfStr[1]));
    }
 }
 

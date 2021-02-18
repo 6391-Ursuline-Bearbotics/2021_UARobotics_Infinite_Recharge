@@ -69,8 +69,10 @@ public final class Constants {
         public static final double kaVoltSecondsSquaredPerRadian = 0.3;
 
         public static final LinearSystem<N2, N2, N2> kDrivetrainPlant =
-          LinearSystemId.identifyDrivetrainSystem(kvVoltSecondsPerMeter, kaVoltSecondsSquaredPerMeter,
-                kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian);
+            LinearSystemId.identifyDrivetrainSystem(kV, kA, kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian);
+        
+        /* LinearSystemId.identifyDrivetrainSystem(kvVoltSecondsPerMeter, kaVoltSecondsSquaredPerMeter,
+                kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian); */
         
         public static final int kEncoderCPR = 4096;
         public static final double kWheelDiameterInches = 8d;
@@ -111,7 +113,7 @@ public final class Constants {
          * 	                                    			  kP   kI   kD   kF               Iz    PeakOut */
         public final static Gains kGains_Distanc = new Gains( 0.5, 0.0,  0.0, 0.0,            100,  0.50 );
         public final static Gains kGains_Turning = new Gains( 2.0, 0.0,  4.0, 0.0,            200,  1.00 );
-        public final static Gains kGains_Velocit = new Gains( 0.2, 0.0, 0.0, 1023.0/6800.0,  300,  1.00 ); //0.2 // .00712
+        public final static Gains kGains_Velocit = new Gains( 0, 0.0, 0, 1023.0/6800.0,  300,  1.00 ); //0.2 // .00712
         public final static Gains kGains_MotProf = new Gains( 1.0, 0.0,  0.0, 1023.0/6800.0,  400,  1.00 );
         
         /** ---- Flat constants, you should not need to change these ---- */

@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 
 import java.nio.file.Paths;
 import java.io.IOException;
@@ -90,6 +91,10 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   private Pose2d savedPose;
   @Log
   double target_sensorUnits;
+  double m_time = 0;
+  double m_lastTime = Timer.getFPGATimestamp() - 0.02;
+  double m_lastLeftSetpoint = 0;
+  double m_lastRightSetpoint = 0;
 
   // Turn PIDControllers
   Constraints turnconstraints = new TrapezoidProfile.Constraints(DriveConstants.kMaxSpeedMetersPerSecond,
@@ -374,8 +379,13 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   // This is the closed loop velocity control method we use trajectory following.
   public void tankDriveVelocity(double leftVelocity, double rightVelocity) {
-    var leftAccel = (leftVelocity - stepsPerDecisecToMetersPerSec((int)m_talonsrxleft.getSelectedSensorVelocity()));
-    var rightAccel = (rightVelocity - stepsPerDecisecToMetersPerSec((int)m_talonsrxright.getSelectedSensorVelocity()));
+    m_time = Timer.getFPGATimestamp();
+    double dt = m_time - m_lastTime;
+    var leftAccel = (leftVelocity - m_lastLeftSetpoint) / dt;
+    var rightAccel = (rightVelocity - m_lastRightSetpoint) / dt;
+    m_lastTime = m_time;
+    m_lastLeftSetpoint = leftVelocity;
+    m_lastRightSetpoint = rightVelocity;
     
     var leftFeedForwardVolts = m_driveFeedforward.calculate(leftVelocity, leftAccel);
     var rightFeedForwardVolts = m_driveFeedforward.calculate(rightVelocity, rightAccel);
@@ -428,12 +438,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   }
 
   public Trajectory generateTrajectoryFromFile(String filename) {
-    try {
-      return generateTrajectory(filename);
-    } catch (IOException e) {
-      DriverStation.reportError("Failed to load auto trajectory: " + filename, false);
-      return new Trajectory();
-    }
+      var config = new TrajectoryConfig(1, 3);
+      return generateTrajectory(filename, config);
   }
 
     /**
@@ -482,10 +488,14 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
         Filesystem.getDeployDirectory().toPath().resolve(Paths.get("paths", trajectoryName + ".wpilib.json")));
   }
 
-  protected static Trajectory generateTrajectory(String trajectoryName) throws IOException {
-    var filepath = Filesystem.getDeployDirectory().toPath().resolve(Paths.get("waypoints", trajectoryName));
-    var config = new TrajectoryConfig(1, 3);
-    return Trajectory6391.fromWaypoints(filepath, config);
+  public Trajectory generateTrajectory(String trajectoryName, TrajectoryConfig config) {
+    try {
+      var filepath = Filesystem.getDeployDirectory().toPath().resolve(Paths.get("waypoints", trajectoryName));
+      return Trajectory6391.fromWaypoints(filepath, config);
+    } catch (IOException e) {
+      DriverStation.reportError("Failed to load auto trajectory: " + trajectoryName, false);
+      return new Trajectory();
+    }
   }
 
   // Drives straight specified distance in inches
