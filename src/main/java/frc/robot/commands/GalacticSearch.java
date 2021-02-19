@@ -6,12 +6,14 @@ import java.util.function.Supplier;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPipelineResult;
 
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 
@@ -24,6 +26,7 @@ public class GalacticSearch extends SequentialCommandGroup {
 
       // Set up camera & get PhotonVision result
       String selectedPath = "";
+      final String path;
       PhotonCamera m_photon = new PhotonCamera("HD3000");
       m_photon.takeOutputSnapshot();
       PhotonPipelineResult result = m_photon.getLatestResult();
@@ -56,13 +59,18 @@ public class GalacticSearch extends SequentialCommandGroup {
       }
 
       SmartDashboard.putString("GalacticSearch", selectedPath);
-      final String path = selectedPath;
+      if (RobotBase.isSimulation()) { // If our robot is simulated
+         path = "1R";
+      }
+      else {
+         path = selectedPath;
+      }
       Supplier<Object> i  = ()-> path;
       
       addCommands(
          // Deploy intake
-         new InstantCommand(() -> m_intake.toggleIntakeWheels(true))
-            .andThen(new InstantCommand(() -> m_intake.toggleIntakePosition(true))),
+         new InstantCommand(() -> m_intake.setOutput(IntakeConstants.kIntakeMotorSpeed))
+            .andThen(new InstantCommand(() -> m_intake.extendIntake(true))),
 
          // Select Command based on selectedPath from above
          new SelectCommand(Map.ofEntries(

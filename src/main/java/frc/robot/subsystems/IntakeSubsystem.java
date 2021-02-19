@@ -5,8 +5,8 @@ import io.github.oblarg.oblog.annotations.Config;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import com.ctre.phoenix.motorcontrol.VictorSPXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import frc.robot.Constants.IntakeConstants;
@@ -19,6 +19,8 @@ public class IntakeSubsystem extends SubsystemBase implements Loggable{
     private final DoubleSolenoid m_intakeSolenoid1 = new DoubleSolenoid(IntakeConstants.kSolenoid1ControllerPort, IntakeConstants.kSolenoid2ControllerPort);
     @Config
     private final DoubleSolenoid m_intakeSolenoid2 = new DoubleSolenoid(IntakeConstants.kSolenoid3ControllerPort, IntakeConstants.kSolenoid4ControllerPort);
+
+    VictorSPXSimCollection m_IntakeMotorSim = new VictorSPXSimCollection(m_IntakeMotor);
 
     StallDetector intakeStall;
     // Since we are using DoubleSolenoids they must be initially set so when they are toggled they 
@@ -37,6 +39,18 @@ public class IntakeSubsystem extends SubsystemBase implements Loggable{
     }
 
     @Config
+    public void extendIntake(boolean extend) {
+        if (extend) {
+            m_intakeSolenoid1.set(Value.kForward);
+            m_intakeSolenoid2.set(Value.kForward);
+        }
+        else {
+            m_intakeSolenoid1.set(Value.kReverse);
+            m_intakeSolenoid2.set(Value.kReverse);
+        }
+    }
+
+    @Config
     public void toggleIntakePosition(boolean enabled) {
         m_intakeSolenoid1.toggle();
         m_intakeSolenoid2.toggle();        
@@ -46,15 +60,14 @@ public class IntakeSubsystem extends SubsystemBase implements Loggable{
     public void toggleIntakeWheels(boolean enabled) {
         // Only turn it on if intake is down and it is currently off
         if(m_IntakeMotor.get() == 0 && m_intakeSolenoid1.get() == DoubleSolenoid.Value.kReverse) {
-            m_IntakeMotor.set(IntakeConstants.kIntakeMotorSpeed);
+            setOutput(IntakeConstants.kIntakeMotorSpeed);
         }
         else{
-            m_IntakeMotor.set(0);
+            setOutput(0);
         }
     }
 
     public void checkStall() {
-        double current = intakeStall.updateStallStatus();
         if (intakeStall.getStallStatus().isStalled) {
             setOutput(0);
         }
