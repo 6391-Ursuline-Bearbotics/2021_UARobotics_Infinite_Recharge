@@ -413,10 +413,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    * @return command that will run the trajectory
    */
   public Command createCommandForTrajectory(Trajectory trajectory, Boolean initPose) {
-    if (initPose) {
-      new InstantCommand(() -> {resetOdometry(trajectory.getInitialPose());});
-    }
-
     velocitysetup();
     RamseteCommand ramseteCommand =  new RamseteCommand(
             trajectory,
@@ -425,7 +421,13 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
             DriveConstants.kDriveKinematics,
             this::tankDriveVelocity,
             this);
-    return ramseteCommand.andThen(() -> this.tankDriveVolts(0, 0));
+    if (initPose) {
+      var reset =  new InstantCommand(() -> this.resetOdometry(trajectory.getInitialPose()));
+      return reset.andThen(ramseteCommand.andThen(() -> this.tankDriveVolts(0, 0)));
+    }
+    else {
+      return ramseteCommand.andThen(() -> this.tankDriveVolts(0, 0));
+    }
   }
 
   public Trajectory loadTrajectoryFromFile(String filename) {
@@ -485,7 +487,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   protected static Trajectory loadTrajectory(String trajectoryName) throws IOException {
     return TrajectoryUtil.fromPathweaverJson(
-        Filesystem.getDeployDirectory().toPath().resolve(Paths.get("paths", trajectoryName + ".wpilib.json")));
+        Filesystem.getDeployDirectory().toPath().resolve(Paths.get("output", trajectoryName + ".wpilib.json")));
   }
 
   public Trajectory generateTrajectory(String trajectoryName, TrajectoryConfig config) {
