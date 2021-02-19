@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPipelineResult;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
@@ -30,7 +31,7 @@ public class GalacticSearch extends SequentialCommandGroup {
       // Make sure there are targets (if not something is really wrong)
       if (result.hasTargets()) {
          // Check if there is 2 (Path A) or 3 (Path B) balls in the picture
-         if (result.getTargets().size() == 2) {
+         if (result.getTargets().size() != 3) {
             // Check if the closest ball is really close (Red) or not (Blue)
             if (result.getBestTarget().getArea() > AutoConstants.kBallArea) {
                // Run path 1R
@@ -54,6 +55,7 @@ public class GalacticSearch extends SequentialCommandGroup {
          }
       }
 
+      SmartDashboard.putString("GalacticSearch", selectedPath);
       final String path = selectedPath;
       Supplier<Object> i  = ()-> path;
       

@@ -235,7 +235,7 @@ public final class Constants {
         public static final double kRamseteZeta = 0.7;
 
         // %of Picutre the Ball should fill if Red 0-100
-        public static final double kBallArea = 80;
+        public static final double kBallArea = 0.5;
     }
 
     public static final class LEDConstants {
