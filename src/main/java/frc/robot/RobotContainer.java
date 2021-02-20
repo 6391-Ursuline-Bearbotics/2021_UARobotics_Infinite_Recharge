@@ -28,6 +28,7 @@ import io.github.oblarg.oblog.annotations.Log;
 import frc.robot.commands.AutoAim;
 import frc.robot.commands.Barrel;
 import frc.robot.commands.GalacticSearch;
+import frc.robot.commands.GalacticSearchAuto;
 import frc.robot.commands.GenericAuto;
 import frc.robot.commands.NextClimbPosition;
 import frc.robot.commands.Slalom;
@@ -121,7 +122,7 @@ public class RobotContainer {
     // Sets the LEDs to start up with a rainbow config
     //m_LED.rainbow();
 
-    autoChooser.addOption("GalacticSearch", new GalacticSearch(m_robotDrive, m_intake));
+    autoChooser.addOption("GalacticSearch", new GalacticSearchAuto(m_robotDrive, m_intake));
     autoChooser.addOption("Slalom", new Slalom(m_robotDrive));
     autoChooser.addOption("Bounce", new Bounce(m_robotDrive));
     autoChooser.addOption("Barrel", new Barrel(m_robotDrive));

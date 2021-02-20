@@ -61,7 +61,7 @@ public class GalacticSearch extends SequentialCommandGroup {
          path = "1R";
       }
       else {
-         path = selectedPath;
+         path = "1R"; //selectedPath;
       }
       Supplier<Object> i  = ()-> path;
       

@@ -8,9 +8,9 @@ import frc.robot.subsystems.DriveSubsystem;
 
 public class Barrel extends SequentialCommandGroup {
   public Barrel(DriveSubsystem m_robotDrive) {        
-      TrajectoryConfig config = new TrajectoryConfig(2, 3);
+      TrajectoryConfig config = new TrajectoryConfig(1.8, 3);
       
-      Trajectory trajectory1 = m_robotDrive.generateTrajectory("Barrel1", config);
+      Trajectory trajectory1 = m_robotDrive.loadTrajectoryFromFile("Barrel1");
       
       addCommands(
 /*           new InstantCommand(() -> {
