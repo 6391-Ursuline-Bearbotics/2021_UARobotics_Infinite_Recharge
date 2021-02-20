@@ -88,11 +88,6 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
-    // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
-    }
-
     m_robotContainer.m_intake.setOutput(0);
     m_robotContainer.m_intake.extendIntake(false);
     m_robotContainer.m_conveyor.turnOff();
@@ -102,7 +97,13 @@ public class Robot extends TimedRobot {
     m_robotContainer.m_climb.resetEnc(true);
     m_robotContainer.m_shooter.setSetpoint(0);
     m_robotContainer.m_shooter.disable();
-    NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
+    // NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
+    NetworkTableInstance.getDefault().getTable("photonvision").getEntry("ledMode").setNumber(0);
+
+    // schedule the autonomous command (example)
+    if (m_autonomousCommand != null) {
+      m_autonomousCommand.schedule();
+    }
   }
 
   /**
@@ -123,6 +124,7 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
     m_robotContainer.m_intake.setOutput(0);
+    m_robotContainer.m_intake.extendIntake(false);
     m_robotContainer.m_conveyor.turnOff();
     m_robotContainer.m_climb.invertclimber(false);
     m_robotContainer.m_climb.setOutput(0, 0);
@@ -130,7 +132,8 @@ public class Robot extends TimedRobot {
     m_robotContainer.m_climb.resetEnc(true);
     m_robotContainer.m_shooter.setSetpoint(0);
     m_robotContainer.m_shooter.disable();
-    NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
+    // NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
+    NetworkTableInstance.getDefault().getTable("photonvision").getEntry("ledMode").setNumber(0);
   }
 
   /**
