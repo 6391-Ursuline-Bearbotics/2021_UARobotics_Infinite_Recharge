@@ -305,4 +305,10 @@ public final class Constants {
         public static final int kLimePipe = 0;
         public static final int kHD3000Pipe = 0;
     }
+
+    public static final class MaintainHeadingConstants {
+        public static final double kP = 1.2;
+        public static final double kI = 0;
+        public static final double kD = 0;
+    }
 }

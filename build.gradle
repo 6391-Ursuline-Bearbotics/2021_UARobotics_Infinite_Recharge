@@ -52,13 +52,8 @@ dependencies {
     nativeZip wpi.deps.vendor.jni(wpi.platforms.roborio)
     nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
 
-    //testImplementation 'junit:junit:4.12'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.4.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
+    testImplementation 'junit:junit:4.12'
     
-    testCompile "org.mockito:mockito-core:2.+"
-
     implementation "com.github.Oblarg.Oblog:lib:3.1.2"
 
     // Enable simulation gui support. Must check the box in vscode to enable support
@@ -85,6 +80,5 @@ repositories {
 }
 
 test {
-    useJUnitPlatform()
-    systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
+    useJUnit()
 }

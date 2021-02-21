@@ -1,33 +1,43 @@
 package frc.robot.subsystems;
 
+import static org.junit.Assert.*;
+import org.junit.*;
+
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.DoubleSolenoid.*;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.subsystems.ClimbSubsystem;
 
-import org.junit.jupiter.api.Test;
-
-import static org.mockito.Mockito.*;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.TalonSRXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 public class ClimbSubsystemTest {
-    /* static {
-        HLUsageReporting.SetImplementation(new HLUsageReporting.Null()); // CCB: Magic bits to turn off wpi usage reporting...nonsense dependency
-    } */
+    ClimbSubsystem m_climber;
+    TalonSRXSimCollection m_climberLeftSim;
+    TalonSRXSimCollection m_climberRightSim;
+
+    @Before // this method will run before each test
+    public void setup() {
+        assert HAL.initialize(500, 0); // initialize the HAL, crash if failed
+        m_climber = new ClimbSubsystem(); // create our climber
+        m_climberLeftSim = m_climber.getLeftSim();
+        m_climberRightSim = m_climber.getRightSim();
+    }
+
+    @After // this method will run after each test
+    public void shutdown() throws Exception {
+        m_climber.close(); // destroy our intake object
+    }
+
     @Test
     public void itShouldExtendClimber()
     {
-        // Assemble
-        WPI_TalonSRX leftmock = mock(WPI_TalonSRX.class);
-        WPI_TalonSRX rightmock = mock(WPI_TalonSRX.class);
-        ClimbSubsystem climb = new ClimbSubsystem(leftmock, rightmock);
-
         // Act
-        climb.nextClimbStage(true);
+        m_climber.nextClimbStage(true);
 
         // Assert
-        verify(leftmock).set(ControlMode.Position, ClimbConstants.kFullUpEncoderCount);
+        m_climberLeftSim.
     }
 }

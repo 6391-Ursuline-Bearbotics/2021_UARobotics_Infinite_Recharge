@@ -27,7 +27,6 @@ import io.github.oblarg.oblog.annotations.Log;
 // Command Imports
 import frc.robot.commands.AutoAim;
 import frc.robot.commands.Barrel;
-import frc.robot.commands.GalacticSearch;
 import frc.robot.commands.GalacticSearchAuto;
 import frc.robot.commands.GenericAuto;
 import frc.robot.commands.NextClimbPosition;
@@ -71,7 +70,7 @@ public class RobotContainer {
   @Log
   public final ConveyorSubsystem m_conveyor = new ConveyorSubsystem();
   @Log
-  public final ClimbSubsystem m_climb = ClimbSubsystem.Create();
+  public final ClimbSubsystem m_climb = new ClimbSubsystem();
 
   public final Limelight m_Limelight = new Limelight();
 
@@ -122,6 +121,8 @@ public class RobotContainer {
     // Sets the LEDs to start up with a rainbow config
     //m_LED.rainbow();
 
+    autoChooser.setDefaultOption("Straight4m", new GenericAuto(m_robotDrive, "Straight4m"));
+    autoChooser.addOption("Curve3m", new GenericAuto(m_robotDrive, "Curve3m"));
     autoChooser.addOption("GalacticSearch", new GalacticSearchAuto(m_robotDrive, m_intake));
     autoChooser.addOption("Slalom", new Slalom(m_robotDrive));
     autoChooser.addOption("Bounce", new Bounce(m_robotDrive));
@@ -158,13 +159,13 @@ public class RobotContainer {
       }, m_shooter));
     
     // When driver presses the Y button Auto Aim to the goal
-    drv.YButton.whenPressed(new InstantCommand(() -> m_Limelight.beforeTurnToTarget()))
-      .whileHeld(new InstantCommand(() -> m_Limelight.turnToTargetVolts(m_robotDrive,m_shooter), m_robotDrive))
-      .whenReleased(new InstantCommand(() -> m_Limelight.afterTurnToTarget()));
-    //.whenPressed(new AutoAim(m_robotDrive));
+    drv.YButton.whenActive(new InstantCommand(() -> m_Limelight.beforeTurnToTarget()))
+      .whileActiveContinuous(new InstantCommand(() -> m_Limelight.turnToTargetVolts(m_robotDrive,m_shooter), m_robotDrive))
+      .whenInactive(new InstantCommand(() -> m_Limelight.afterTurnToTarget()));
+    //.whenActive(new AutoAim(m_robotDrive));
 
     // When Y button is pressed on operators controller deploy the intake but do not spin the wheels
-    op.YButton.whenPressed(new InstantCommand(() -> m_intake.toggleIntakePosition(true)));
+    op.YButton.whenActive(new InstantCommand(() -> m_intake.toggleIntakePosition(true)));
 
     // Turn on the conveyor when:
     // the A button is pressed (either controller) and either the top sensor is not blocked or the shooter is up to speed
@@ -180,20 +181,15 @@ public class RobotContainer {
     drv.BumperR.or(op.BumperR).whenActive(new InstantCommand(() -> m_intake.toggleIntakeWheels(true))
       .andThen(new InstantCommand(() -> m_intake.toggleIntakePosition(true))));
     
-    // When the left bumper is pressed on either controller go to the next climber stage
-    drv.BumperL.or(op.BumperL).whileActiveOnce(new WaitCommand(1).andThen(new NextClimbPosition(m_climb).withTimeout(5)));
-     // new PerpetualCommand(new InstantCommand(() -> m_climb.nextClimbStage(true))
-     // .withInterrupt(() -> m_climb.atposition())));
-     // .whenActive(new InstantCommand(() -> m_climb.nextClimbStage(true))
-     //   .perpetually().withInterrupt(() -> m_climb.atposition()));
+    // When the driver left bumper is pressed maintain the current heading (the right joystick will be ignored)
+    drv.BumperL.MaintainHeading(drv, m_robotDrive);
 
     // When the back button is pressed run the conveyor backwards until released
-    drv.BackButton.whenPressed(new InstantCommand(m_conveyor::turnBackwards, m_conveyor))
-      .whenReleased(new InstantCommand(m_conveyor::turnOff, m_conveyor));
+    drv.BackButton.whenActive(new InstantCommand(m_conveyor::turnBackwards, m_conveyor))
+      .whenInactive(new InstantCommand(m_conveyor::turnOff, m_conveyor));
     
-    // TEST when start is pressed follow trajectory
-    drv.StartButton.whenPressed(new GenericAuto(m_robotDrive, "Straight4m"));
-    //.whenPressed(new DriveDistanceProfiled(3, m_robotDrive).withTimeout(10));
+    // When Start is pressed for at least 1 second go to the next climber stage
+    drv.StartButton.or(op.StartButton).whileActiveOnce(new WaitCommand(1).andThen(new NextClimbPosition(m_climb).withTimeout(10)));
 
     // Create "button" from POV Hat in up direction.  Use both of the angles to the left and right also.
     //drv.POVUp.whenActive(new RunCommand(() -> m_robotDrive.turnToAngle(90)).withTimeout(5));

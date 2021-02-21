@@ -6,15 +6,19 @@ import io.github.oblarg.oblog.annotations.Log;
 import frc.robot.Constants.ClimbConstants;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.TalonSRXSimCollection;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-public class ClimbSubsystem extends SubsystemBase implements Loggable{
-    @Config(name="ClimbMotorLeft")
+public class ClimbSubsystem extends SubsystemBase implements Loggable,AutoCloseable{
     private WPI_TalonSRX m_LeftClimbMotor;
     
-    @Config(name="ClimbMotorRight")
     private WPI_TalonSRX m_RightClimbMotor;
+
+    private TalonSRXSimCollection m_LeftClimbMotorSim;
+    
+    private TalonSRXSimCollection m_RightClimbMotorSim;
 
     @Log
     private int climbinvert = 1;
@@ -25,9 +29,12 @@ public class ClimbSubsystem extends SubsystemBase implements Loggable{
     @Log
     public int setpoint = 4200;
 
-    public ClimbSubsystem(WPI_TalonSRX m_LeftClimbMotor, WPI_TalonSRX m_RightClimbMotor) {
-        this.m_LeftClimbMotor = m_LeftClimbMotor;
-        this.m_RightClimbMotor = m_RightClimbMotor;
+    public ClimbSubsystem() {
+        m_LeftClimbMotor = new WPI_TalonSRX(ClimbConstants.kClimbLeftControllerPort);
+        m_RightClimbMotor = new WPI_TalonSRX(ClimbConstants.kClimbRightControllerPort);
+
+        m_LeftClimbMotorSim = new TalonSRXSimCollection(m_LeftClimbMotor);
+        m_RightClimbMotorSim = new TalonSRXSimCollection(m_RightClimbMotor);
 
         setOutput(0,0);
         m_LeftClimbMotor.setInverted(true);
@@ -38,12 +45,6 @@ public class ClimbSubsystem extends SubsystemBase implements Loggable{
         m_RightClimbMotor.config_kP(0, ClimbConstants.kClimbP);
         m_LeftClimbMotor.configPeakOutputReverse(0);
         m_RightClimbMotor.configPeakOutputReverse(0);
-    }
-
-    public static ClimbSubsystem Create() {
-        WPI_TalonSRX m_LeftClimbMotor = new WPI_TalonSRX(ClimbConstants.kClimbLeftControllerPort);
-        WPI_TalonSRX m_RightClimbMotor = new WPI_TalonSRX(ClimbConstants.kClimbRightControllerPort);
-        return new ClimbSubsystem(m_LeftClimbMotor, m_RightClimbMotor);
     }
 
     // This is the open loop control of the climber when the "triggers" are used to manually control it
@@ -135,5 +136,19 @@ public class ClimbSubsystem extends SubsystemBase implements Loggable{
         }else{
             return true;
         }
+    }
+
+    @Override
+    public void close() throws Exception {
+        m_LeftClimbMotor.DestroyObject();
+        m_RightClimbMotor.DestroyObject();
+    }
+
+    public TalonSRXSimCollection getLeftSim() {
+        return m_LeftClimbMotorSim;
+    }
+
+    public TalonSRXSimCollection getRightSim() {
+        return m_RightClimbMotorSim;
     }
 }
