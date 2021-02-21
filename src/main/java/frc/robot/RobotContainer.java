@@ -29,6 +29,7 @@ import frc.robot.commands.AutoAim;
 import frc.robot.commands.Barrel;
 import frc.robot.commands.GalacticSearchAuto;
 import frc.robot.commands.GenericAuto;
+import frc.robot.commands.MaintainHeading;
 import frc.robot.commands.NextClimbPosition;
 import frc.robot.commands.Slalom;
 import frc.robot.commands.TrenchAuto;
@@ -182,7 +183,7 @@ public class RobotContainer {
       .andThen(new InstantCommand(() -> m_intake.toggleIntakePosition(true))));
     
     // When the driver left bumper is pressed maintain the current heading (the right joystick will be ignored)
-    drv.BumperL.MaintainHeading(drv, m_robotDrive);
+    drv.BumperL.whileActiveOnce(new MaintainHeading(drv, m_robotDrive));
 
     // When the back button is pressed run the conveyor backwards until released
     drv.BackButton.whenActive(new InstantCommand(m_conveyor::turnBackwards, m_conveyor))

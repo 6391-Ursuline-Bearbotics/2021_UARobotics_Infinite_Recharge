@@ -38,6 +38,5 @@ public class ClimbSubsystemTest {
         m_climber.nextClimbStage(true);
 
         // Assert
-        m_climberLeftSim.
     }
 }
