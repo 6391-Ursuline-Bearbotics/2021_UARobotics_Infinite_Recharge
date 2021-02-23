@@ -56,13 +56,13 @@ public class GalacticSearch extends SequentialCommandGroup {
          }
       }
 
-      SmartDashboard.putString("GalacticSearch", selectedPath);
       if (RobotBase.isSimulation()) { // If our robot is simulated
          path = "1R";
       }
       else {
-         path = "1R"; //selectedPath;
+         path = selectedPath;
       }
+      SmartDashboard.putString("GalacticSearch", path);
       Supplier<Object> i  = ()-> path;
       
       addCommands(

@@ -21,13 +21,11 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import io.github.oblarg.oblog.annotations.Log;
 
 // Command Imports
 import frc.robot.commands.AutoAim;
 import frc.robot.commands.Barrel;
-import frc.robot.commands.GalacticSearch;
 import frc.robot.commands.GalacticSearchAuto;
 import frc.robot.commands.GenericAuto;
 import frc.robot.commands.NextClimbPosition;
@@ -74,9 +72,6 @@ public class RobotContainer {
   public final ClimbSubsystem m_climb = ClimbSubsystem.Create();
 
   public final Limelight m_Limelight = new Limelight();
-
-  @Log.PDP
-  PowerDistributionPanel m_PDP = new PowerDistributionPanel(0);
   
   @Log(tabName = "DriveSubsystem")
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();

@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import io.github.oblarg.oblog.Logger;
@@ -88,12 +89,6 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
-    // schedule the autonomous command (example)
-    //move this down
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
-    }
-
     m_robotContainer.m_intake.setOutput(0);
     m_robotContainer.m_intake.extendIntake(false);
     m_robotContainer.m_conveyor.turnOff();
@@ -103,7 +98,14 @@ public class Robot extends TimedRobot {
     m_robotContainer.m_climb.resetEnc(true);
     m_robotContainer.m_shooter.setSetpoint(0);
     m_robotContainer.m_shooter.disable();
-    NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
+    NetworkTableInstance.getDefault().getTable("photonvision").getEntry("ledMode").setNumber(0);
+    SmartDashboard.putString("GalacticSearch", "");
+
+    // schedule the autonomous command (example)
+    //move this down
+    if (m_autonomousCommand != null) {
+      m_autonomousCommand.schedule();
+    }
   }
 
   /**
@@ -131,7 +133,7 @@ public class Robot extends TimedRobot {
     m_robotContainer.m_climb.resetEnc(true);
     m_robotContainer.m_shooter.setSetpoint(0);
     m_robotContainer.m_shooter.disable();
-    NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
+    NetworkTableInstance.getDefault().getTable("photonvision").getEntry("ledMode").setNumber(0);
   }
 
   /**
