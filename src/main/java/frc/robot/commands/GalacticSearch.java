@@ -60,7 +60,7 @@ public class GalacticSearch extends SequentialCommandGroup {
          path = "1R";
       }
       else {
-         path = selectedPath;
+         path = "2R";
       }
       SmartDashboard.putString("GalacticSearch", path);
       Supplier<Object> i  = ()-> path;

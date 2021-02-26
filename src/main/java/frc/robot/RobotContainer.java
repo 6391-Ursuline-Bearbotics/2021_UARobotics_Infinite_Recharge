@@ -118,6 +118,7 @@ public class RobotContainer {
     //m_LED.rainbow();
 
     autoChooser.addOption("GalacticSearch", new GalacticSearchAuto(m_robotDrive, m_intake));
+    autoChooser.addOption("2R", new GenericAuto(m_robotDrive, "GalacticSearch2R"));
     autoChooser.addOption("Slalom", new Slalom(m_robotDrive));
     autoChooser.addOption("Bounce", new Bounce(m_robotDrive));
     autoChooser.addOption("Barrel", new Barrel(m_robotDrive));

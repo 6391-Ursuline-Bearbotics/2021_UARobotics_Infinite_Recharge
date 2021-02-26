@@ -13,7 +13,7 @@ public class GalacticSearchAuto extends SequentialCommandGroup {
          // Deploy intake
          new InstantCommand(() -> m_intake.setOutput(IntakeConstants.kIntakeMotorSpeed))
          .andThen(new InstantCommand(() -> m_intake.extendIntake(true))),
-         new WaitCommand(0.2), // need to wait for intake to drop so not obstructing the camera
+         //new WaitCommand(0.2), // need to wait for intake to drop so not obstructing the camera
          new GalacticSearch(m_robotDrive, m_intake)
       );
    }

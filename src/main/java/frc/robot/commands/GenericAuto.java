@@ -7,7 +7,7 @@ import frc.robot.subsystems.DriveSubsystem;
 
 public class GenericAuto extends SequentialCommandGroup {
   public GenericAuto(DriveSubsystem m_robotDrive, String filename) {        
-      Trajectory trajectory1 = m_robotDrive.generateTrajectoryFromFile(filename);
+      Trajectory trajectory1 = m_robotDrive.loadTrajectoryFromFile(filename);
       
       addCommands(
           new InstantCommand(() -> {
