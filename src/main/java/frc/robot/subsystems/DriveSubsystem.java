@@ -7,6 +7,8 @@ import com.ctre.phoenix.motorcontrol.TalonSRXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.ctre.phoenix.sensors.PigeonIMU;
+import com.ctre.phoenix.sensors.PigeonIMUSimCollection;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
-import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
@@ -26,6 +27,7 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -66,6 +68,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   // Pigeon is plugged into the second talon on the left side
   private final PigeonIMU m_pigeon = new PigeonIMU(m_talonsrxright2);
+  PigeonIMUSimCollection m_pigeonSim = m_pigeon.getSimCollection();
 	
 	// Odometry class for tracking robot pose
   private final DifferentialDriveOdometry m_odometry;
@@ -82,9 +85,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   // The Field2d class simulates the field in the sim GUI. Note that we can have only one
   // instance!
   private Field2d m_fieldSim;
-
-  // The pidgeon is currently supported so we create this analog gyro that doesn't exist to replace it.
-  private AnalogGyroSim m_gyroSim;
 
   /** Tracking variables */
 	boolean _firstCall = false;
@@ -138,9 +138,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
           DriveConstants.kTrackWidthMeters,
           DriveConstants.kWheelDiameterMeters / 2.0,
           null);
-
-      // This doesn't exist but Pidgeon isn't supported yet.
-      m_gyroSim = new AnalogGyroSim(1);
 
       // the Field2d class lets us visualize our robot in the simulation GUI.
       m_fieldSim = new Field2d();
@@ -232,7 +229,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     m_leftDriveSim.setBusVoltage(RobotController.getBatteryVoltage());
     m_rightDriveSim.setBusVoltage(RobotController.getBatteryVoltage());
 
-    m_gyroSim.setAngle(-m_drivetrainSimulator.getHeading().getDegrees());
+    m_pigeonSim.setRawHeading(m_drivetrainSimulator.getHeading().getDegrees());
 
     m_fieldSim.setRobotPose(getCurrentPose());
   }
@@ -333,14 +330,9 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   /** Zero all sensors used. */
   @Config.ToggleButton
   void zeroHeading(boolean enabled) {
-    if (RobotBase.isSimulation()) {
-      m_gyroSim.setAngle(0);
-    }
-    else {
-      m_pigeon.setYaw(0, DriveConstants.kTimeoutMs);
-      m_pigeon.setAccumZAngle(0, DriveConstants.kTimeoutMs);
-      System.out.println("[Pigeon] All sensors are zeroed.\n");
-    }
+    m_pigeon.setYaw(0, DriveConstants.kTimeoutMs);
+    m_pigeon.setAccumZAngle(0, DriveConstants.kTimeoutMs);
+    System.out.println("[Pigeon] All sensors are zeroed.\n");
   }
 
   public Pose2d getCurrentPose() {
@@ -362,26 +354,16 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    */
   @Log
   public double getHeading() {
-    if (RobotBase.isSimulation()) { // If our robot is simulated
-      return -m_gyroSim.getAngle();
-    }
-    else {
-      final double[] ypr = new double[3];
-		  m_pigeon.getYawPitchRoll(ypr);
-      return Math.IEEEremainder(ypr[0], 360);
-    }
+    final double[] ypr = new double[3];
+    m_pigeon.getYawPitchRoll(ypr);
+    return Math.IEEEremainder(ypr[0], 360);
   }
 
   @Log
   public double getTurnRate() {
-    if (RobotBase.isSimulation()) {
-      return m_gyroSim.getRate();
-    }
-    else {
-      final double[] xyz = new double[3];
-      m_pigeon.getRawGyro(xyz);
-      return xyz[0];
-    }
+    final double[] xyz = new double[3];
+    m_pigeon.getRawGyro(xyz);
+    return xyz[2];
   }
 
   // This is the closed loop velocity control method we use trajectory following.
@@ -602,13 +584,13 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   public void drivePositionGyro(double distanceInches, double heading) {
     var sensorposition = heading * 10;
     distancesetup();
-    target_sensorUnits = (distanceInches / DriveConstants.kEncoderDistancePerPulse);
+    target_sensorUnits = Units.inchesToMeters(distanceInches) / DriveConstants.kEncoderDistancePerPulse;
     m_talonsrxright.set(ControlMode.Position, target_sensorUnits, DemandType.AuxPID, sensorposition);
   }
 
   @Config.ToggleButton
   public void drivePositionGyroTest(boolean enabled) {
-    new RunCommand(() -> drivePositionGyro(120, getHeading())).withInterrupt(() -> atSetpoint()).withTimeout(5).schedule();
+    new RunCommand(() -> drivePositionGyro(120, getHeading())).withInterrupt(() -> atSetpoint()).schedule();
   }
 
   @Config.ToggleButton
