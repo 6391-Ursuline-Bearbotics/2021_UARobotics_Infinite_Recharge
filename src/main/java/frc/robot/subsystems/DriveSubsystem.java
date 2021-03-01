@@ -33,6 +33,9 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.DoubleSupplier;
 import java.io.IOException;
 
 import frc.robot.UA6391.DifferentialDrive6391;
@@ -102,6 +105,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   ProfiledPIDController turnangle = new ProfiledPIDController(DriveConstants.kTurnP, DriveConstants.kTurnI, DriveConstants.kTurnD, turnconstraints);
 
+  ProfiledPIDController driveStraightPID = new ProfiledPIDController(DriveConstants.kTurnP, DriveConstants.kTurnI, DriveConstants.kTurnD, turnconstraints);
+
   Constraints velocityconstraints = new TrapezoidProfile.Constraints(DriveConstants.kVelocityMaxSpeedMetersPerSecond,
                                              DriveConstants.kVelocityMaxAccelerationMetersPerSecondSquared);
 
@@ -120,6 +125,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     m_drive.setRamp(DriveConstants.kRampForward, DriveConstants.kRampRotation);
     m_drive.setDriveStraight(DriveConstants.kDriveStraightLeft, DriveConstants.kDriveStraightRight);
     m_drive.setRightSideInverted(false);
+
+    driveStraightPID.enableContinuousInput(-180, 180);
 
     // Simulation Setup
     if (RobotBase.isSimulation()) { // If our robot is simulated
@@ -423,10 +430,10 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
             this);
     if (initPose) {
       var reset =  new InstantCommand(() -> this.resetOdometry(trajectory.getInitialPose()));
-      return reset.andThen(ramseteCommand.andThen(() -> this.tankDriveVolts(0, 0)));
+      return reset.andThen(ramseteCommand.andThen(() -> stopmotors()));
     }
     else {
-      return ramseteCommand.andThen(() -> this.tankDriveVolts(0, 0));
+      return ramseteCommand.andThen(() -> stopmotors());
     }
   }
 
@@ -500,6 +507,16 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     }
   }
 
+  public List<Double> getEventTimes(String trajectoryName, Trajectory trajectory, List<Integer> eventWaypoints) {
+    try {
+      var filepath = Filesystem.getDeployDirectory().toPath().resolve(Paths.get("waypoints", trajectoryName));
+      return Trajectory6391.getEventsFromWaypoints(trajectory, filepath, eventWaypoints);
+    } catch (IOException e) {
+      DriverStation.reportError("Failed to load auto trajectory: " + trajectoryName, false);
+      return Collections.emptyList();
+    }
+  }
+
   // Drives straight specified distance in inches
   public void drivestraight(double distance) {
     target_sensorUnits = (distance / DriveConstants.kEncoderDistancePerPulse);
@@ -558,16 +575,14 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     }
   }
 
-  public void stopmotors(boolean enabled) {
+  public void stopmotors() {
     m_talonsrxright.set(0);
     m_talonsrxleft.set(0);
   }
 
-  @Log
   public void tankDriveVolts(final double leftVolts, final double rightVolts) {
     m_talonsrxleft.setVoltage(leftVolts);
     m_talonsrxright.setVoltage(rightVolts);
-    //m_drive.feed();
   }
 
   // Drives for a specified time at a specified speed.
@@ -578,7 +593,12 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
       .andThen(() -> {m_talonsrxleft.set(0);m_talonsrxright.set(0);});
   }
 
-  @Config
+  // Maintains the heading and uses the input to control forward speed
+  public Command driveStraight(DoubleSupplier joystickY) {
+    var lockedheading = getHeading();
+    return new RunCommand(() -> m_drive.arcadeDrive(joystickY.getAsDouble(), driveStraightPID.calculate(getHeading(), lockedheading), false));
+  }
+
   public void drivePositionGyro(double distanceInches, double heading) {
     var sensorposition = heading * 10;
     distancesetup();

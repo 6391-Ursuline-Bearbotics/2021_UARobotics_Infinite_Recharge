@@ -16,7 +16,6 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 import frc.robot.commands.Shoot;
-import frc.robot.commands.DriveStraight;
 
 import frc.robot.Constants.AutoConstants;
 
@@ -59,8 +58,6 @@ public class TrenchAuto extends SequentialCommandGroup implements Loggable{
         m_intake.toggleIntakeWheels(true);}, m_intake),
 
       //drive forward distance of three balls (x feet)
-      new DriveStraight(AutoConstants.kTrenchAutoBallPickup, m_robotDrive),
-      //new RunCommand(() -> m_robotDrive.driveTime(4, 0.5)),
 
       // Retract intake
       new InstantCommand(() -> {m_intake.toggleIntakePosition(true);
@@ -70,7 +67,6 @@ public class TrenchAuto extends SequentialCommandGroup implements Loggable{
       new RunCommand(() -> m_robotDrive.turnToAngle(0)),
 
       //drive forward back to the line
-      new DriveStraight(AutoConstants.kTrenchAutoBallPickup, m_robotDrive),
       
       // Probably need to do a Limelight based AutoAim here but need to get it working first
 

@@ -1,8 +1,11 @@
 package frc.robot.commands;
 
+import java.util.Arrays;
+
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.UA6391.Trajectory6391;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class Barrel extends SequentialCommandGroup {
@@ -14,6 +17,7 @@ public class Barrel extends SequentialCommandGroup {
       
       Trajectory trajectory1 = m_robotDrive.loadTrajectoryFromFile("Barrel1"); //, config);
       Trajectory trajectory2 = m_robotDrive.generateTrajectory("Barrel2", config2);
+      var events = m_robotDrive.getEventTimes("Barrel2", trajectory2, Arrays.asList(1));
       
       addCommands(
           m_robotDrive.createCommandForTrajectory(trajectory1, true).withTimeout(50).withName("Barrel1"),

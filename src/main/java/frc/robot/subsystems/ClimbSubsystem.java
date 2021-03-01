@@ -10,10 +10,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class ClimbSubsystem extends SubsystemBase implements Loggable{
-    @Config(name="ClimbMotorLeft")
     private WPI_TalonSRX m_LeftClimbMotor;
     
-    @Config(name="ClimbMotorRight")
     private WPI_TalonSRX m_RightClimbMotor;
 
     @Log

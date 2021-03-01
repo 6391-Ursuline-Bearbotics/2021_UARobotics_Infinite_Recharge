@@ -177,27 +177,23 @@ public class RobotContainer {
       .andThen(new InstantCommand(() -> m_intake.toggleIntakePosition(true))));
     
     // When the left bumper is pressed on either controller go to the next climber stage
-    drv.BumperL.or(op.BumperL).whileActiveOnce(new WaitCommand(1).andThen(new NextClimbPosition(m_climb).withTimeout(5)));
-     // new PerpetualCommand(new InstantCommand(() -> m_climb.nextClimbStage(true))
-     // .withInterrupt(() -> m_climb.atposition())));
-     // .whenActive(new InstantCommand(() -> m_climb.nextClimbStage(true))
-     //   .perpetually().withInterrupt(() -> m_climb.atposition()));
+    drv.BumperL.whileActiveOnce(m_robotDrive.driveStraight(() -> -drv.JoystickLY()));
 
     // When the back button is pressed run the conveyor backwards until released
     drv.BackButton.whenPressed(new InstantCommand(m_conveyor::turnBackwards, m_conveyor))
       .whenReleased(new InstantCommand(m_conveyor::turnOff, m_conveyor));
     
-    // TEST when start is pressed follow trajectory
-    drv.StartButton.whenPressed(new GenericAuto(m_robotDrive, "Straight4m"));
+    // When start button is pressed for at least a second advance to the next climb stage
+    drv.StartButton.or(op.StartButton).whileActiveOnce(new WaitCommand(1).andThen(new NextClimbPosition(m_climb).withTimeout(5)));
     //.whenPressed(new DriveDistanceProfiled(3, m_robotDrive).withTimeout(10));
 
     // Create "button" from POV Hat in up direction.  Use both of the angles to the left and right also.
     //drv.POVUp.whenActive(new RunCommand(() -> m_robotDrive.turnToAngle(90)).withTimeout(5));
-    drv.POVUp.whenActive(new GenericAuto(m_robotDrive, "Curve3m"));
+    //drv.POVUp.whenActive(new PowerPortForward(m_robotDrive));
     
     // Create "button" from POV Hat in down direction.  Use both of the angles to the left and right also.
     //drv.POVDown.whenActive(new RunCommand(() -> m_robotDrive.turnToAngle(-90)).withTimeout(5));
-    drv.POVDown.whenActive(new GenericAuto(m_robotDrive, "LS to CP"));
+    //drv.POVDown.whenActive(new PowerPortReverse(m_robotDrive));
 
     // POV Up Direction on Operator Controller relatively increases the current setpoint of the shooter
     op.POVUp.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() + 50);}));

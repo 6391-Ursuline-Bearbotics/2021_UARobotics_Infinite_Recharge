@@ -13,11 +13,8 @@ import frc.robot.Constants.IntakeConstants;
 import frc.robot.UA6391.StallDetector;
 
 public class IntakeSubsystem extends SubsystemBase implements Loggable{
-    @Config
     private final WPI_VictorSPX m_IntakeMotor = new WPI_VictorSPX(IntakeConstants.kIntakeControllerPort);
-    @Config
     private final DoubleSolenoid m_intakeSolenoid1 = new DoubleSolenoid(IntakeConstants.kSolenoid1ControllerPort, IntakeConstants.kSolenoid2ControllerPort);
-    @Config
     private final DoubleSolenoid m_intakeSolenoid2 = new DoubleSolenoid(IntakeConstants.kSolenoid3ControllerPort, IntakeConstants.kSolenoid4ControllerPort);
 
     VictorSPXSimCollection m_IntakeMotorSim = new VictorSPXSimCollection(m_IntakeMotor);

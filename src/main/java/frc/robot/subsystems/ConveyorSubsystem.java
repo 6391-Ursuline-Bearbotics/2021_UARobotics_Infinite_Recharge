@@ -13,9 +13,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import frc.robot.Constants.ConveyorConstants;
 
 public class ConveyorSubsystem extends SubsystemBase implements Loggable{
-    @Config
     private final WPI_VictorSPX m_ConveyorMotor1 = new WPI_VictorSPX(ConveyorConstants.kConveyor1ControllerPort);
-    @Config
     private final WPI_VictorSPX m_ConveyorMotor2 = new WPI_VictorSPX(ConveyorConstants.kConveyor2ControllerPort);
 
     PowerDistributionPanel m_PDP = new PowerDistributionPanel(0);

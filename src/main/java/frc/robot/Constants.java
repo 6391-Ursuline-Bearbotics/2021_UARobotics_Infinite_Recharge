@@ -161,6 +161,11 @@ public final class Constants {
         public static final double kTurnI = 0;
         public static final double kTurnD = 0.15;
 
+        // Drive Straight PID
+        public static final double kStraightP = .1;
+        public static final double kStraightI = 0;
+        public static final double kStraightD = 0;
+
         // Turn Velocity constraints
         public static final double kVelocityMaxSpeedMetersPerSecond = 3;
         public static final double kVelocityMaxAccelerationMetersPerSecondSquared = 2;

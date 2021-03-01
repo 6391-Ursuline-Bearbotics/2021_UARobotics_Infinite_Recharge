@@ -41,7 +41,6 @@ public class ShooterSubsystem extends PIDSubsystem implements Loggable {
   private final SimpleMotorFeedforward m_shooterFeedforward = new SimpleMotorFeedforward(ShooterConstants.kSVolts,
       ShooterConstants.kVVoltSecondsPerRotation, ShooterConstants.kA);
 
-  @Config
   private final PIDController shooterPID;
 
   @Log

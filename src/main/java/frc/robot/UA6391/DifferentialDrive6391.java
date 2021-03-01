@@ -181,37 +181,37 @@ public class DifferentialDrive6391 extends RobotDriveBase6391 implements Sendabl
    * @param squareInputs If set, decreases the input sensitivity at low speeds.
    */
   @SuppressWarnings("ParameterName")
-  public void arcadeDrive(double xSpeed, double zRotation, boolean squareInputs) {
+  public void arcadeDrive(double xSpeed, double zRotation, boolean enableModifications) {
     if (!m_reported) {
       HAL.report(
           tResourceType.kResourceType_RobotDrive, tInstances.kRobotDrive2_DifferentialArcade, 2);
       m_reported = true;
     }
 
-    xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
-    xSpeed = applyDeadband(xSpeed, m_deadbandForward);
+    if (enableModifications) {
+      xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
+      xSpeed = applyDeadband(xSpeed, m_deadbandForward);
 
-    zRotation = MathUtil.clamp(zRotation, -1.0, 1.0);
-    zRotation = applyDeadband(zRotation, m_deadbandRotation);
+      zRotation = MathUtil.clamp(zRotation, -1.0, 1.0);
+      zRotation = applyDeadband(zRotation, m_deadbandRotation);
 
-    xSpeed = MathUtil.clamp(forwardRamp.calculate(xSpeed), -1.0, 1.0);
-    zRotation = MathUtil.clamp(rotationRamp.calculate(zRotation), -1.0, 1.0);
+      xSpeed = MathUtil.clamp(forwardRamp.calculate(xSpeed), -1.0, 1.0);
+      zRotation = MathUtil.clamp(rotationRamp.calculate(zRotation), -1.0, 1.0);
 
-    // Square the inputs (while preserving the sign) to increase fine control
-    // while permitting full power.
-    if (squareInputs) {
+      // Square the inputs (while preserving the sign) to increase fine control
+      // while permitting full power.
       xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed);
       zRotation = Math.copySign(zRotation * zRotation, zRotation);
-    }
 
-    xSpeed = xSpeed * (m_maxOutputForward - m_minOutputForward);
-    zRotation = zRotation * (m_maxOutputRotation - m_minOutputRotation);
+      xSpeed = xSpeed * (m_maxOutputForward - m_minOutputForward);
+      zRotation = zRotation * (m_maxOutputRotation - m_minOutputRotation);
 
-    if (xSpeed != 0) {
-      xSpeed = Math.copySign(Math.abs(xSpeed) + m_minOutputForward, xSpeed);
-    }
-    if (zRotation != 0) {
-      zRotation = Math.copySign(Math.abs(zRotation) + m_minOutputRotation, zRotation);
+      if (xSpeed != 0) {
+        xSpeed = Math.copySign(Math.abs(xSpeed) + m_minOutputForward, xSpeed);
+      }
+      if (zRotation != 0) {
+        zRotation = Math.copySign(Math.abs(zRotation) + m_minOutputRotation, zRotation);
+      }
     }
 
     double leftMotorOutput;
@@ -239,8 +239,13 @@ public class DifferentialDrive6391 extends RobotDriveBase6391 implements Sendabl
       }
     }
 
-    m_leftMotor.set(MathUtil.clamp(leftMotorOutput, -1.0, 1.0) * m_driveStraightLeft);
-    m_rightMotor.set(MathUtil.clamp(rightMotorOutput, -1.0, 1.0) * m_rightSideInvertMultiplier * m_driveStraightRight);
+    if (enableModifications) {
+      m_leftMotor.set(MathUtil.clamp(leftMotorOutput, -1.0, 1.0) * m_driveStraightLeft);
+      m_rightMotor.set(MathUtil.clamp(rightMotorOutput, -1.0, 1.0) * m_rightSideInvertMultiplier * m_driveStraightRight);
+    } else {
+      m_leftMotor.set(MathUtil.clamp(leftMotorOutput, -1.0, 1.0));
+      m_rightMotor.set(MathUtil.clamp(rightMotorOutput, -1.0, 1.0) * m_rightSideInvertMultiplier);
+    }
 
     feed();
   }

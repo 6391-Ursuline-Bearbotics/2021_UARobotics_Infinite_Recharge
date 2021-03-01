@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -92,5 +93,39 @@ public class Trajectory6391 {
       double[] x = new double[] {Double.parseDouble(arrOfStr[0]), Double.parseDouble(arrOfStr[2])};
       double[] y = new double[] {Double.parseDouble(arrOfStr[1]), Double.parseDouble(arrOfStr[3])};
       return new ControlVector(x, y);
+   }
+
+   public static List<Double> getEventsFromWaypoints(Trajectory trajectory, Path waypointpath, List<Integer> eventWaypoints) throws IOException {
+      try (BufferedReader reader = Files.newBufferedReader(waypointpath)) {
+         int loop = 0;
+         int eventIndex = 0;
+         String line;
+         List<Double> eventTimes = new ArrayList<>();
+
+         while ((line = reader.readLine()) != null) {
+            if (loop != 0) {
+               // skip the header
+               if (eventWaypoints.get(eventIndex) == loop - 1) {
+                  // we need the time at this waypoint
+                  eventTimes.add(searchTranslation(trajectory, createTranslationWaypoint(line)));
+                  eventIndex++;
+                  if (eventIndex == eventWaypoints.size()) {
+                     break;
+                  }
+               }
+            }
+            loop++;
+         }
+         return eventTimes;
+      }
+   }
+
+   public static Double searchTranslation(Trajectory trajectory, Translation2d searchTranslation) {
+      for (var state : trajectory.getStates()) {
+         if (state.poseMeters.getTranslation().getDistance(searchTranslation) < .01) {
+            return state.timeSeconds;
+         }
+      }
+      return -1.0; // It didn't find the translation in that trajectory
    }
 }
