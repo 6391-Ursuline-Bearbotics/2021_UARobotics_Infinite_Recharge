@@ -584,13 +584,14 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   public void drivePositionGyro(double distanceInches, double heading) {
     var sensorposition = heading * 10;
     target_sensorUnits = Units.inchesToMeters(distanceInches) / DriveConstants.kEncoderDistancePerPulse;
-    m_talonsrxright.set(ControlMode.Position, target_sensorUnits); //, DemandType.AuxPID, sensorposition);
+    m_talonsrxright.set(ControlMode.Position, target_sensorUnits, DemandType.AuxPID, sensorposition);
+    m_drive.feed();
   }
 
   @Config.ToggleButton
   public void drivePositionGyroTest(boolean enabled) {
-    new InstantCommand(() -> distancesetup());
-    new RunCommand(() -> drivePositionGyro(1120, getHeading()), this).withInterrupt(() -> atSetpoint()).schedule();
+    new InstantCommand(() -> distancesetup(), this).schedule();;
+    new RunCommand(() -> drivePositionGyro(120, getHeading()), this).withInterrupt(() -> atSetpoint()).schedule();
   }
 
   @Config.ToggleButton
