@@ -92,7 +92,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 	double _targetAngle = 0;
   int _printCount = 0;
   private Pose2d savedPose;
-  @Log
   double target_sensorUnits;
   double m_time = 0;
   double m_lastTime = Timer.getFPGATimestamp() - 0.02;
@@ -582,13 +581,13 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   }
 
   public Command drivePositionGyro(double distanceInches, double heading) {
-    var sensorposition = heading * 10;
-    distancesetup();
-    target_sensorUnits = Units.inchesToMeters(distanceInches) / DriveConstants.kEncoderDistancePerPulse;
-    return new RunCommand(() -> {
-      m_talonsrxright.set(ControlMode.Position, target_sensorUnits, DemandType.AuxPID, sensorposition);
-      m_drive.feed();
-    }, this).withInterrupt(() -> atSetpoint());
+    return new InstantCommand(() -> distancesetup(), this).andThen(
+      new RunCommand(() -> {
+        m_talonsrxright.set(ControlMode.Position, Units.inchesToMeters(distanceInches) / DriveConstants.kEncoderDistancePerPulse
+            , DemandType.AuxPID, heading * 10);
+        m_drive.feed();
+      }, this).withInterrupt(() -> atSetpoint())
+    );
   }
 
   @Config.ToggleButton

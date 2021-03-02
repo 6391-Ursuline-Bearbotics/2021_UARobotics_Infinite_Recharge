@@ -189,11 +189,11 @@ public class RobotContainer {
 
     // Create "button" from POV Hat in up direction.  Use both of the angles to the left and right also.
     //drv.POVUp.whenActive(new RunCommand(() -> m_robotDrive.turnToAngle(90)).withTimeout(5));
-    //drv.POVUp.whenActive(new PowerPortForward(m_robotDrive));
+    drv.POVUp.whileActiveOnce(m_robotDrive.drivePositionGyro(126, 0));
     
     // Create "button" from POV Hat in down direction.  Use both of the angles to the left and right also.
     //drv.POVDown.whenActive(new RunCommand(() -> m_robotDrive.turnToAngle(-90)).withTimeout(5));
-    //drv.POVDown.whenActive(new PowerPortReverse(m_robotDrive));
+    drv.POVDown.whileActiveOnce(m_robotDrive.drivePositionGyro(-126, 0));
 
     // POV Up Direction on Operator Controller relatively increases the current setpoint of the shooter
     op.POVUp.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() + 50);}));

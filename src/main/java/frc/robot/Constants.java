@@ -33,7 +33,7 @@ public final class Constants {
     
         // Differential Drive setup parameters.  These control how the drivers input translates to motor power.
         public static final double kMaxOutputForward = 1; // % motor ouput
-        public static final double kMaxOutputRotation = 0.6; // % motor ouput
+        public static final double kMaxOutputRotation = 0.4; // % motor ouput
         public static final double kDeadbandForward = 0.05; // % motor ouput
         public static final double kDeadbandRotation = 0.05; // % motor ouput
         public static final double kRampForward = 0.2; // Seconds to go from min to max motor %
@@ -112,7 +112,7 @@ public final class Constants {
          * 
          * 	                                    			  kP   kI   kD   kF               Iz    PeakOut */
         public final static Gains kGains_Distanc = new Gains( 0.5, 0.0,  0.0, 0.0,            100,  0.50 );
-        public final static Gains kGains_Turning = new Gains( 2.0, 0.0,  4.0, 0.0,            200,  1.00 );
+        public final static Gains kGains_Turning = new Gains( 0.1, 0.0,  4.0, 0.0,            200,  0.4 );
         public final static Gains kGains_Velocit = new Gains( 1.2, 0.0, 0, 1023.0/6800.0,  300,  1.00 ); //0.2 // .00712
         public final static Gains kGains_MotProf = new Gains( 1.0, 0.0,  0.0, 1023.0/6800.0,  400,  1.00 );
         
