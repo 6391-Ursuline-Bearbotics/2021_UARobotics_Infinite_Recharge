@@ -101,6 +101,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   double m_lastRightSetpoint = 0;
   @Log
   double lockedheading = 0;
+  double currentEncoder = 0;
 
   // Turn PIDControllers
   Constraints turnconstraints = new TrapezoidProfile.Constraints(DriveConstants.kMaxSpeedMetersPerSecond,
@@ -521,11 +522,12 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   }
 
   // Sets up the talons to drive straightDistance with aux pid from Pigeon 
-  public void distancesetup() {			
+  public double distancesetup() {			
     /* Determine which slot affects which PID */
     m_talonsrxright.selectProfileSlot(DriveConstants.kSlot_Distanc, DriveConstants.PID_PRIMARY);
     m_talonsrxright.selectProfileSlot(DriveConstants.kSlot_Turning, DriveConstants.PID_TURN);
     m_talonsrxleft.follow(m_talonsrxright, FollowerType.AuxOutput1);
+    return m_talonsrxright.getSelectedSensorPosition();
   }
 
   public void velocitysetup() {
@@ -585,13 +587,13 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   }
 
   public Command drivePositionGyro(double distanceInches, double heading) {
-    var sensorposition = heading * 10;
-    distancesetup();
-    target_sensorUnits = Units.inchesToMeters(distanceInches) / DriveConstants.kEncoderDistancePerPulse;
-    return new RunCommand(() -> {
-      m_talonsrxright.set(ControlMode.Position, target_sensorUnits, DemandType.AuxPID, sensorposition);
-      m_drive.feed();
-    }, this).withInterrupt(() -> atSetpoint());
+    return new InstantCommand(() -> currentEncoder = distancesetup(), this).andThen(
+      new RunCommand(() -> {
+        m_talonsrxright.set(ControlMode.Position, currentEncoder + Units.inchesToMeters(distanceInches) / DriveConstants.kEncoderDistancePerPulse
+            , DemandType.AuxPID, heading * 10);
+        m_drive.feed();
+      }, this).withInterrupt(() -> atSetpoint())
+    );
   }
 
   @Config.ToggleButton
