@@ -581,17 +581,19 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     return new RunCommand(() -> m_drive.arcadeDrive(joystickY.getAsDouble(), driveStraightPID.calculate(getHeading(), lockedheading), false));
   }
 
-  public void drivePositionGyro(double distanceInches, double heading) {
+  public Command drivePositionGyro(double distanceInches, double heading) {
     var sensorposition = heading * 10;
+    distancesetup();
     target_sensorUnits = Units.inchesToMeters(distanceInches) / DriveConstants.kEncoderDistancePerPulse;
-    m_talonsrxright.set(ControlMode.Position, target_sensorUnits, DemandType.AuxPID, sensorposition);
-    m_drive.feed();
+    return new RunCommand(() -> {
+      m_talonsrxright.set(ControlMode.Position, target_sensorUnits, DemandType.AuxPID, sensorposition);
+      m_drive.feed();
+    }, this).withInterrupt(() -> atSetpoint());
   }
 
   @Config.ToggleButton
   public void drivePositionGyroTest(boolean enabled) {
-    new InstantCommand(() -> distancesetup(), this).schedule();;
-    new RunCommand(() -> drivePositionGyro(120, getHeading()), this).withInterrupt(() -> atSetpoint()).schedule();
+    drivePositionGyro(120, getHeading()).schedule();
   }
 
   @Config.ToggleButton
