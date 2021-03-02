@@ -38,6 +38,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 import java.io.IOException;
 
 import frc.robot.UA6391.DifferentialDrive6391;
@@ -98,6 +99,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   double m_lastTime = Timer.getFPGATimestamp() - 0.02;
   double m_lastLeftSetpoint = 0;
   double m_lastRightSetpoint = 0;
+  @Log
+  double lockedheading = 0;
 
   // Turn PIDControllers
   Constraints turnconstraints = new TrapezoidProfile.Constraints(DriveConstants.kMaxSpeedMetersPerSecond,
@@ -518,9 +521,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   }
 
   // Sets up the talons to drive straightDistance with aux pid from Pigeon 
-  public void distancesetup() {
-    resetEncoders();
-				
+  public void distancesetup() {			
     /* Determine which slot affects which PID */
     m_talonsrxright.selectProfileSlot(DriveConstants.kSlot_Distanc, DriveConstants.PID_PRIMARY);
     m_talonsrxright.selectProfileSlot(DriveConstants.kSlot_Turning, DriveConstants.PID_TURN);
@@ -577,8 +578,10 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   // Maintains the heading and uses the input to control forward speed
   public Command driveStraight(DoubleSupplier joystickY) {
-    var lockedheading = getHeading();
-    return new RunCommand(() -> m_drive.arcadeDrive(joystickY.getAsDouble(), driveStraightPID.calculate(getHeading(), lockedheading), false));
+    return new RunCommand(() -> {
+        m_talonsrxright.set(ControlMode.PercentOutput, joystickY.getAsDouble(), DemandType.AuxPID, lockedheading * 10); 
+        m_drive.feed();
+      }, this).beforeStarting(() -> {lockedheading = getHeading(); distancesetup();}, this);
   }
 
   public Command drivePositionGyro(double distanceInches, double heading) {
