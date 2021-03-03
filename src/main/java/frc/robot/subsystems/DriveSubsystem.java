@@ -578,12 +578,20 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
       .andThen(() -> {m_talonsrxleft.set(0);m_talonsrxright.set(0);});
   }
 
-  // Maintains the heading and uses the input to control forward speed
+  // Locks the heading and uses the input to control forward speed
   public Command driveStraight(DoubleSupplier joystickY) {
     return new RunCommand(() -> {
         m_talonsrxright.set(ControlMode.PercentOutput, joystickY.getAsDouble(), DemandType.AuxPID, lockedheading * 10); 
         m_drive.feed();
-      }, this).beforeStarting(() -> {lockedheading = getHeading(); distancesetup();}, this);
+      }, this).beforeStarting(() -> {lockedheading = getHeading(); distancesetup();}, this).andThen(() -> m_drive.stopMotor());
+  }
+
+  // Uses the input to control forward speed to the specified heading
+  public Command driveToAngle(DoubleSupplier joystickY, Double heading) {
+    return new InstantCommand(() -> {
+        m_talonsrxright.set(ControlMode.PercentOutput, joystickY.getAsDouble(), DemandType.AuxPID, heading * 10); 
+        m_drive.feed();
+      }, this);
   }
 
   public Command drivePositionGyro(double distanceInches, double heading) {
