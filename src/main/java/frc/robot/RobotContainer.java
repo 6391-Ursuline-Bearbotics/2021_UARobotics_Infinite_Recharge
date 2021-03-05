@@ -42,7 +42,7 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ConveyorSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.Limelight;
-
+import frc.robot.subsystems.PhotonVision;
 // Constant Imports
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.OIConstants;
@@ -72,6 +72,8 @@ public class RobotContainer {
   public final ClimbSubsystem m_climb = ClimbSubsystem.Create();
 
   public final Limelight m_Limelight = new Limelight();
+
+  public final PhotonVision m_PhotonVision = new PhotonVision();
   
   @Log(tabName = "DriveSubsystem")
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -117,7 +119,7 @@ public class RobotContainer {
     // Sets the LEDs to start up with a rainbow config
     //m_LED.rainbow();
 
-    autoChooser.addOption("GalacticSearch", new GalacticSearchAuto(m_robotDrive, m_intake));
+    autoChooser.addOption("GalacticSearch", new GalacticSearchAuto(m_robotDrive, m_intake, m_PhotonVision));
     autoChooser.addOption("2R", new GenericAuto(m_robotDrive, "GalacticSearch2R"));
     autoChooser.addOption("Slalom", new Slalom(m_robotDrive));
     autoChooser.addOption("Bounce", new Bounce(m_robotDrive));
@@ -153,10 +155,10 @@ public class RobotContainer {
         m_shooter.disable();
       }, m_shooter));
     
-    // When driver presses the Y button Auto Aim to the goal
-    drv.YButton.whenPressed(new InstantCommand(() -> m_Limelight.beforeTurnToTarget()))
-      .whileHeld(new InstantCommand(() -> m_Limelight.turnToTargetVolts(m_robotDrive,m_shooter), m_robotDrive))
-      .whenReleased(new InstantCommand(() -> m_Limelight.afterTurnToTarget()));
+    // While driver holds the Y button Auto Aim to the goal using the left stick for distance control
+    drv.YButton.whenPressed(new InstantCommand(() -> m_PhotonVision.beforeTurnToTarget()))
+      .whileHeld(new InstantCommand(() -> m_PhotonVision.turnToTarget(m_robotDrive, () -> -drv.JoystickLY())))
+      .whenReleased(new InstantCommand(() -> m_PhotonVision.afterTurnToTarget()));
     //.whenPressed(new AutoAim(m_robotDrive));
 
     // When Y button is pressed on operators controller deploy the intake but do not spin the wheels
@@ -189,11 +191,11 @@ public class RobotContainer {
 
     // Create "button" from POV Hat in up direction.  Use both of the angles to the left and right also.
     //drv.POVUp.whenActive(new RunCommand(() -> m_robotDrive.turnToAngle(90)).withTimeout(5));
-    drv.POVUp.whileActiveOnce(m_robotDrive.drivePositionGyro(126, 0));
+    drv.POVUp.whileActiveOnce(m_robotDrive.drivePositionGyro(96, 0));
     
     // Create "button" from POV Hat in down direction.  Use both of the angles to the left and right also.
     //drv.POVDown.whenActive(new RunCommand(() -> m_robotDrive.turnToAngle(-90)).withTimeout(5));
-    drv.POVDown.whileActiveOnce(m_robotDrive.drivePositionGyro(-126, 0));
+    drv.POVDown.whileActiveOnce(m_robotDrive.drivePositionGyro(-96, 0));
 
     // POV Up Direction on Operator Controller relatively increases the current setpoint of the shooter
     op.POVUp.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() + 50);}));
@@ -201,16 +203,6 @@ public class RobotContainer {
     // POV Down Direction on Operator Controller relatively increases the current setpoint of the shooter
     op.POVDown.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() - 50);}));
   }
-  
-/*   public void LimelightCamera() {
-    // Activate an HttpCamera for the Limelight
-    m_limelightFeed = new HttpCamera("Limelight Camera", "http://10.63.91.11:5800/stream.mjpg", HttpCamera.HttpCameraKind.kMJPGStreamer);
-  }
-
-  @Log.CameraStream(name = "Limelight Camera", tabName = "Dashboard")
-  public HttpCamera getLimelightFeed() {
-    return m_limelightFeed;
-  } */
 
   public DriveSubsystem getRobotDrive() {
     return m_robotDrive;

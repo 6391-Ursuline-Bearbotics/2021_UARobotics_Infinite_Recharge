@@ -38,6 +38,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 import java.io.IOException;
 
 import frc.robot.UA6391.DifferentialDrive6391;
@@ -97,6 +98,9 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   double m_lastTime = Timer.getFPGATimestamp() - 0.02;
   double m_lastLeftSetpoint = 0;
   double m_lastRightSetpoint = 0;
+  @Log
+  double lockedheading = 0;
+  double currentEncoder = 0;
 
   // Turn PIDControllers
   Constraints turnconstraints = new TrapezoidProfile.Constraints(DriveConstants.kMaxSpeedMetersPerSecond,
@@ -498,13 +502,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     }
   }
 
-  // Drives straight specified distance in inches
-  public void drivestraight(double distance) {
-    target_sensorUnits = (distance / DriveConstants.kEncoderDistancePerPulse);
-    m_talonsrxright.set(ControlMode.Position, target_sensorUnits, DemandType.AuxPID, m_talonsrxright.getSelectedSensorPosition(1));
-		m_talonsrxleft.follow(m_talonsrxright, FollowerType.AuxOutput1);
-  }
-
   // Turns to a specified angle using the cascading PID
   public void turnToAngle(double angle) {
     Double angleVelocity = turnangle.calculate(getHeading(), angle);
@@ -517,13 +514,12 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   }
 
   // Sets up the talons to drive straightDistance with aux pid from Pigeon 
-  public void distancesetup() {
-    resetEncoders();
-				
+  public double distancesetup() {			
     /* Determine which slot affects which PID */
     m_talonsrxright.selectProfileSlot(DriveConstants.kSlot_Distanc, DriveConstants.PID_PRIMARY);
     m_talonsrxright.selectProfileSlot(DriveConstants.kSlot_Turning, DriveConstants.PID_TURN);
     m_talonsrxleft.follow(m_talonsrxright, FollowerType.AuxOutput1);
+    return m_talonsrxright.getSelectedSensorPosition();
   }
 
   public void velocitysetup() {
@@ -549,7 +545,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   @Log
   public boolean atSetpoint() {
-    if (m_talonsrxright.getClosedLoopError() < 1000 && m_talonsrxright.getClosedLoopError() > 0){
+    if (m_talonsrxright.getClosedLoopError() < 600 && Math.abs(m_talonsrxright.getClosedLoopError()) > 0){
       return true;
     } else {
       return false;
@@ -574,16 +570,27 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
       .andThen(() -> {m_talonsrxleft.set(0);m_talonsrxright.set(0);});
   }
 
-  // Maintains the heading and uses the input to control forward speed
+  // Locks the heading and uses the input to control forward speed
   public Command driveStraight(DoubleSupplier joystickY) {
-    var lockedheading = getHeading();
-    return new RunCommand(() -> m_drive.arcadeDrive(joystickY.getAsDouble(), driveStraightPID.calculate(getHeading(), lockedheading), false));
+    return new RunCommand(() -> {
+        m_talonsrxright.set(ControlMode.PercentOutput, joystickY.getAsDouble(), DemandType.AuxPID, lockedheading * 10); 
+        m_drive.feed();
+      }, this).beforeStarting(() -> {lockedheading = getHeading(); distancesetup();}, this);
   }
 
+  // Uses the input to control forward speed to the specified heading
+  public Command driveToAngle(DoubleSupplier joystickY, Double heading) {
+    return new InstantCommand(() -> {
+        m_talonsrxright.set(ControlMode.PercentOutput, joystickY.getAsDouble(), DemandType.AuxPID, heading * 10); 
+        m_drive.feed();
+      }, this);
+  }
+
+  // Drives a specified distance to a specified heading.
   public Command drivePositionGyro(double distanceInches, double heading) {
-    return new InstantCommand(() -> distancesetup(), this).andThen(
+    return new InstantCommand(() -> currentEncoder = distancesetup(), this).andThen(
       new RunCommand(() -> {
-        m_talonsrxright.set(ControlMode.Position, Units.inchesToMeters(distanceInches) / DriveConstants.kEncoderDistancePerPulse
+        m_talonsrxright.set(ControlMode.Position, currentEncoder + Units.inchesToMeters(distanceInches) / DriveConstants.kEncoderDistancePerPulse
             , DemandType.AuxPID, heading * 10);
         m_drive.feed();
       }, this).withInterrupt(() -> atSetpoint())
