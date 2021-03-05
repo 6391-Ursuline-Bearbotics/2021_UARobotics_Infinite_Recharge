@@ -503,13 +503,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     }
   }
 
-  // Drives straight specified distance in inches
-  public void drivestraight(double distance) {
-    target_sensorUnits = (distance / DriveConstants.kEncoderDistancePerPulse);
-    m_talonsrxright.set(ControlMode.Position, target_sensorUnits, DemandType.AuxPID, m_talonsrxright.getSelectedSensorPosition(1));
-		m_talonsrxleft.follow(m_talonsrxright, FollowerType.AuxOutput1);
-  }
-
   // Turns to a specified angle using the cascading PID
   public void turnToAngle(double angle) {
     Double angleVelocity = turnangle.calculate(getHeading(), angle);
@@ -553,7 +546,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   @Log
   public boolean atSetpoint() {
-    if (m_talonsrxright.getClosedLoopError() < 1000 && m_talonsrxright.getClosedLoopError() > 0){
+    if (m_talonsrxright.getClosedLoopError() < 600 && Math.abs(m_talonsrxright.getClosedLoopError()) > 0){
       return true;
     } else {
       return false;
@@ -583,7 +576,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     return new RunCommand(() -> {
         m_talonsrxright.set(ControlMode.PercentOutput, joystickY.getAsDouble(), DemandType.AuxPID, lockedheading * 10); 
         m_drive.feed();
-      }, this).beforeStarting(() -> {lockedheading = getHeading(); distancesetup();}, this).andThen(() -> m_drive.stopMotor());
+      }, this).beforeStarting(() -> {lockedheading = getHeading(); distancesetup();}, this);
   }
 
   // Uses the input to control forward speed to the specified heading
@@ -594,6 +587,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
       }, this);
   }
 
+  // Drives a specified distance to a specified heading.
   public Command drivePositionGyro(double distanceInches, double heading) {
     return new InstantCommand(() -> currentEncoder = distancesetup(), this).andThen(
       new RunCommand(() -> {

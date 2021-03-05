@@ -155,7 +155,7 @@ public class RobotContainer {
         m_shooter.disable();
       }, m_shooter));
     
-    // When driver presses the Y button Auto Aim to the goal
+    // While driver holds the Y button Auto Aim to the goal using the left stick for distance control
     drv.YButton.whenPressed(new InstantCommand(() -> m_PhotonVision.beforeTurnToTarget()))
       .whileHeld(new InstantCommand(() -> m_PhotonVision.turnToTarget(m_robotDrive, () -> -drv.JoystickLY())))
       .whenReleased(new InstantCommand(() -> m_PhotonVision.afterTurnToTarget()));
