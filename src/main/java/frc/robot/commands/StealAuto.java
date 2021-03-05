@@ -16,7 +16,6 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 import frc.robot.commands.Shoot;
-import frc.robot.commands.DriveStraight;
 
 import frc.robot.Constants.AutoConstants;
 
@@ -66,10 +65,7 @@ public class StealAuto extends SequentialCommandGroup implements Loggable{
       }, m_shooter),
 
       //turn (-45) to pick up more balls
-      new RunCommand(() -> m_robotDrive.turnToAngle(AutoConstants.kTrenchAutoShootAngle)),
-
-      // Drive some more down field
-      new DriveStraight(AutoConstants.kTrenchAutoDriveCenter, m_robotDrive)
+      new RunCommand(() -> m_robotDrive.turnToAngle(AutoConstants.kTrenchAutoShootAngle))
     );
   }
 }

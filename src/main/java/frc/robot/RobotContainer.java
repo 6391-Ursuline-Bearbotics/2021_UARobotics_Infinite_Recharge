@@ -21,13 +21,12 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import io.github.oblarg.oblog.annotations.Log;
 
 // Command Imports
 import frc.robot.commands.AutoAim;
 import frc.robot.commands.Barrel;
-import frc.robot.commands.GalacticSearch;
+import frc.robot.commands.GalacticSearchAuto;
 import frc.robot.commands.GenericAuto;
 import frc.robot.commands.NextClimbPosition;
 import frc.robot.commands.Slalom;
@@ -43,7 +42,7 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ConveyorSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.Limelight;
-
+import frc.robot.subsystems.PhotonVision;
 // Constant Imports
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.OIConstants;
@@ -74,8 +73,7 @@ public class RobotContainer {
 
   public final Limelight m_Limelight = new Limelight();
 
-  @Log.PDP
-  PowerDistributionPanel m_PDP = new PowerDistributionPanel(0);
+  public final PhotonVision m_PhotonVision = new PhotonVision();
   
   @Log(tabName = "DriveSubsystem")
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -121,7 +119,8 @@ public class RobotContainer {
     // Sets the LEDs to start up with a rainbow config
     //m_LED.rainbow();
 
-    autoChooser.addOption("GalacticSearch", new GalacticSearch(m_robotDrive, m_intake));
+    autoChooser.addOption("GalacticSearch", new GalacticSearchAuto(m_robotDrive, m_intake, m_PhotonVision));
+    autoChooser.addOption("2R", new GenericAuto(m_robotDrive, "GalacticSearch2R"));
     autoChooser.addOption("Slalom", new Slalom(m_robotDrive));
     autoChooser.addOption("Bounce", new Bounce(m_robotDrive));
     autoChooser.addOption("Barrel", new Barrel(m_robotDrive));
@@ -156,10 +155,10 @@ public class RobotContainer {
         m_shooter.disable();
       }, m_shooter));
     
-    // When driver presses the Y button Auto Aim to the goal
-    drv.YButton.whenPressed(new InstantCommand(() -> m_Limelight.beforeTurnToTarget()))
-      .whileHeld(new InstantCommand(() -> m_Limelight.turnToTargetVolts(m_robotDrive,m_shooter), m_robotDrive))
-      .whenReleased(new InstantCommand(() -> m_Limelight.afterTurnToTarget()));
+    // While driver holds the Y button Auto Aim to the goal using the left stick for distance control
+    drv.YButton.whenPressed(new InstantCommand(() -> m_PhotonVision.beforeTurnToTarget()))
+      .whileHeld(new InstantCommand(() -> m_PhotonVision.turnToTarget(m_robotDrive, () -> -drv.JoystickLY())))
+      .whenReleased(new InstantCommand(() -> m_PhotonVision.afterTurnToTarget()));
     //.whenPressed(new AutoAim(m_robotDrive));
 
     // When Y button is pressed on operators controller deploy the intake but do not spin the wheels
@@ -180,27 +179,14 @@ public class RobotContainer {
       .andThen(new InstantCommand(() -> m_intake.toggleIntakePosition(true))));
     
     // When the left bumper is pressed on either controller go to the next climber stage
-    drv.BumperL.or(op.BumperL).whileActiveOnce(new WaitCommand(1).andThen(new NextClimbPosition(m_climb).withTimeout(5)));
-     // new PerpetualCommand(new InstantCommand(() -> m_climb.nextClimbStage(true))
-     // .withInterrupt(() -> m_climb.atposition())));
-     // .whenActive(new InstantCommand(() -> m_climb.nextClimbStage(true))
-     //   .perpetually().withInterrupt(() -> m_climb.atposition()));
+    drv.BumperL.whileActiveOnce(m_robotDrive.driveStraight(() -> -drv.JoystickLY()));
 
     // When the back button is pressed run the conveyor backwards until released
     drv.BackButton.whenPressed(new InstantCommand(m_conveyor::turnBackwards, m_conveyor))
       .whenReleased(new InstantCommand(m_conveyor::turnOff, m_conveyor));
     
-    // TEST when start is pressed follow trajectory
-    drv.StartButton.whenPressed(new GenericAuto(m_robotDrive, "Straight4m"));
-    //.whenPressed(new DriveDistanceProfiled(3, m_robotDrive).withTimeout(10));
-
-    // Create "button" from POV Hat in up direction.  Use both of the angles to the left and right also.
-    //drv.POVUp.whenActive(new RunCommand(() -> m_robotDrive.turnToAngle(90)).withTimeout(5));
-    drv.POVUp.whenActive(new GenericAuto(m_robotDrive, "Curve3m"));
-    
-    // Create "button" from POV Hat in down direction.  Use both of the angles to the left and right also.
-    //drv.POVDown.whenActive(new RunCommand(() -> m_robotDrive.turnToAngle(-90)).withTimeout(5));
-    drv.POVDown.whenActive(new GenericAuto(m_robotDrive, "LS to CP"));
+    // When start button is pressed for at least a second advance to the next climb stage
+    drv.StartButton.or(op.StartButton).whileActiveOnce(new WaitCommand(1).andThen(new NextClimbPosition(m_climb).withTimeout(5)));
 
     // POV Up Direction on Operator Controller relatively increases the current setpoint of the shooter
     op.POVUp.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() + 50);}));
@@ -208,16 +194,6 @@ public class RobotContainer {
     // POV Down Direction on Operator Controller relatively increases the current setpoint of the shooter
     op.POVDown.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() - 50);}));
   }
-  
-/*   public void LimelightCamera() {
-    // Activate an HttpCamera for the Limelight
-    m_limelightFeed = new HttpCamera("Limelight Camera", "http://10.63.91.11:5800/stream.mjpg", HttpCamera.HttpCameraKind.kMJPGStreamer);
-  }
-
-  @Log.CameraStream(name = "Limelight Camera", tabName = "Dashboard")
-  public HttpCamera getLimelightFeed() {
-    return m_limelightFeed;
-  } */
 
   public DriveSubsystem getRobotDrive() {
     return m_robotDrive;

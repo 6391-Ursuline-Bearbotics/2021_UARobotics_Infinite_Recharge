@@ -16,10 +16,10 @@ public class Bounce extends SequentialCommandGroup {
           new InstantCommand(() -> {
               m_robotDrive.resetOdometry(trajectory1.getInitialPose());
           }),
-          m_robotDrive.createCommandForTrajectory(trajectory1, false).withTimeout(5).withName("Bounce1"),
-          m_robotDrive.createCommandForTrajectory(trajectory2, false).withTimeout(5).withName("Bounce2"),
-          m_robotDrive.createCommandForTrajectory(trajectory3, false).withTimeout(5).withName("Bounce3"),
-          m_robotDrive.createCommandForTrajectory(trajectory4, false).withTimeout(5).withName("Bounce4")
+          m_robotDrive.createCommandForTrajectory(trajectory1, false).withTimeout(50).withName("Bounce1"),
+          m_robotDrive.createCommandForTrajectory(trajectory2, false).withTimeout(50).withName("Bounce2"),
+          m_robotDrive.createCommandForTrajectory(trajectory3, false).withTimeout(50).withName("Bounce3"),
+          m_robotDrive.createCommandForTrajectory(trajectory4, false).withTimeout(50).withName("Bounce4")
       );
   }
 }

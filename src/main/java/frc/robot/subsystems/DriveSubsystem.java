@@ -7,6 +7,8 @@ import com.ctre.phoenix.motorcontrol.TalonSRXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.ctre.phoenix.sensors.PigeonIMU;
+import com.ctre.phoenix.sensors.PigeonIMUSimCollection;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
-import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
@@ -26,12 +27,18 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 import java.io.IOException;
 
 import frc.robot.UA6391.DifferentialDrive6391;
@@ -62,6 +69,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   // Pigeon is plugged into the second talon on the left side
   private final PigeonIMU m_pigeon = new PigeonIMU(m_talonsrxright2);
+  PigeonIMUSimCollection m_pigeonSim = m_pigeon.getSimCollection();
 	
 	// Odometry class for tracking robot pose
   private final DifferentialDriveOdometry m_odometry;
@@ -79,9 +87,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   // instance!
   private Field2d m_fieldSim;
 
-  // The pidgeon is currently supported so we create this analog gyro that doesn't exist to replace it.
-  private AnalogGyroSim m_gyroSim;
-
   /** Tracking variables */
 	boolean _firstCall = false;
 	boolean _state = false;
@@ -90,12 +95,21 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   private Pose2d savedPose;
   @Log
   double target_sensorUnits;
+  double m_time = 0;
+  double m_lastTime = Timer.getFPGATimestamp() - 0.02;
+  double m_lastLeftSetpoint = 0;
+  double m_lastRightSetpoint = 0;
+  @Log
+  double lockedheading = 0;
+  double currentEncoder = 0;
 
   // Turn PIDControllers
   Constraints turnconstraints = new TrapezoidProfile.Constraints(DriveConstants.kMaxSpeedMetersPerSecond,
                                              DriveConstants.kMaxAccelerationMetersPerSecondSquared);
 
   ProfiledPIDController turnangle = new ProfiledPIDController(DriveConstants.kTurnP, DriveConstants.kTurnI, DriveConstants.kTurnD, turnconstraints);
+
+  ProfiledPIDController driveStraightPID = new ProfiledPIDController(DriveConstants.kTurnP, DriveConstants.kTurnI, DriveConstants.kTurnD, turnconstraints);
 
   Constraints velocityconstraints = new TrapezoidProfile.Constraints(DriveConstants.kVelocityMaxSpeedMetersPerSecond,
                                              DriveConstants.kVelocityMaxAccelerationMetersPerSecondSquared);
@@ -116,6 +130,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     m_drive.setDriveStraight(DriveConstants.kDriveStraightLeft, DriveConstants.kDriveStraightRight);
     m_drive.setRightSideInverted(false);
 
+    driveStraightPID.enableContinuousInput(-180, 180);
+
     // Simulation Setup
     if (RobotBase.isSimulation()) { // If our robot is simulated
       // This class simulates our drivetrain's motion around the field.
@@ -126,9 +142,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
           DriveConstants.kTrackWidthMeters,
           DriveConstants.kWheelDiameterMeters / 2.0,
           null);
-
-      // This doesn't exist but Pidgeon isn't supported yet.
-      m_gyroSim = new AnalogGyroSim(1);
 
       // the Field2d class lets us visualize our robot in the simulation GUI.
       m_fieldSim = new Field2d();
@@ -220,7 +233,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     m_leftDriveSim.setBusVoltage(RobotController.getBatteryVoltage());
     m_rightDriveSim.setBusVoltage(RobotController.getBatteryVoltage());
 
-    m_gyroSim.setAngle(-m_drivetrainSimulator.getHeading().getDegrees());
+    m_pigeonSim.setRawHeading(m_drivetrainSimulator.getHeading().getDegrees());
 
     m_fieldSim.setRobotPose(getCurrentPose());
   }
@@ -244,6 +257,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    *
    * @return The current left wheel speed.
    */
+  @Log
   public double getLeftWheelSpeed() {
     // Native units per 100ms so * 10 = native per second
     return stepsPerDecisecToMetersPerSec((int)m_talonsrxleft.getSelectedSensorVelocity());
@@ -254,6 +268,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    *
    * @return The current right wheel speed.
    */
+  @Log
   public double getRightWheelSpeed() {
     // Native units per 100ms so * 10 = native per second
     return stepsPerDecisecToMetersPerSec((int)m_talonsrxright.getSelectedSensorVelocity());
@@ -319,14 +334,9 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   /** Zero all sensors used. */
   @Config.ToggleButton
   void zeroHeading(boolean enabled) {
-    if (RobotBase.isSimulation()) {
-      m_gyroSim.setAngle(0);
-    }
-    else {
-      m_pigeon.setYaw(0, DriveConstants.kTimeoutMs);
-      m_pigeon.setAccumZAngle(0, DriveConstants.kTimeoutMs);
-      System.out.println("[Pigeon] All sensors are zeroed.\n");
-    }
+    m_pigeon.setYaw(0, DriveConstants.kTimeoutMs);
+    m_pigeon.setAccumZAngle(0, DriveConstants.kTimeoutMs);
+    System.out.println("[Pigeon] All sensors are zeroed.\n");
   }
 
   public Pose2d getCurrentPose() {
@@ -348,32 +358,27 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    */
   @Log
   public double getHeading() {
-    if (RobotBase.isSimulation()) { // If our robot is simulated
-      return -m_gyroSim.getAngle();
-    }
-    else {
-      final double[] ypr = new double[3];
-		  m_pigeon.getYawPitchRoll(ypr);
-      return Math.IEEEremainder(ypr[0], 360);
-    }
+    final double[] ypr = new double[3];
+    m_pigeon.getYawPitchRoll(ypr);
+    return Math.IEEEremainder(ypr[0], 360);
   }
 
   @Log
   public double getTurnRate() {
-    if (RobotBase.isSimulation()) {
-      return m_gyroSim.getRate();
-    }
-    else {
-      final double[] xyz = new double[3];
-      m_pigeon.getRawGyro(xyz);
-      return xyz[0];
-    }
+    final double[] xyz = new double[3];
+    m_pigeon.getRawGyro(xyz);
+    return xyz[2];
   }
 
   // This is the closed loop velocity control method we use trajectory following.
   public void tankDriveVelocity(double leftVelocity, double rightVelocity) {
-    var leftAccel = (leftVelocity - stepsPerDecisecToMetersPerSec((int)m_talonsrxleft.getSelectedSensorVelocity()));
-    var rightAccel = (rightVelocity - stepsPerDecisecToMetersPerSec((int)m_talonsrxright.getSelectedSensorVelocity()));
+    m_time = Timer.getFPGATimestamp();
+    double dt = m_time - m_lastTime;
+    var leftAccel = (leftVelocity - m_lastLeftSetpoint) / dt;
+    var rightAccel = (rightVelocity - m_lastRightSetpoint) / dt;
+    m_lastTime = m_time;
+    m_lastLeftSetpoint = leftVelocity;
+    m_lastRightSetpoint = rightVelocity;
     
     var leftFeedForwardVolts = m_driveFeedforward.calculate(leftVelocity, leftAccel);
     var rightFeedForwardVolts = m_driveFeedforward.calculate(rightVelocity, rightAccel);
@@ -388,10 +393,11 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
         metersPerSecToStepsPerDecisec(rightVelocity),
         DemandType.ArbitraryFeedForward,
         rightFeedForwardVolts / 12);
+
+    m_drive.feed();
+
     SmartDashboard.putNumber("left setpoint", leftVelocity);
-    SmartDashboard.putNumber("left speed", getLeftWheelSpeed());
     SmartDashboard.putNumber("right setpoint", rightVelocity);
-    SmartDashboard.putNumber("right speed", getRightWheelSpeed());
   }
 
   /**
@@ -400,10 +406,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    * @return command that will run the trajectory
    */
   public Command createCommandForTrajectory(Trajectory trajectory, Boolean initPose) {
-    if (initPose) {
-      new InstantCommand(() -> {resetOdometry(trajectory.getInitialPose());});
-    }
-
     velocitysetup();
     RamseteCommand ramseteCommand =  new RamseteCommand(
             trajectory,
@@ -412,7 +414,13 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
             DriveConstants.kDriveKinematics,
             this::tankDriveVelocity,
             this);
-    return ramseteCommand.andThen(() -> this.tankDriveVolts(0, 0));
+    if (initPose) {
+      var reset =  new InstantCommand(() -> this.resetOdometry(trajectory.getInitialPose()));
+      return reset.andThen(ramseteCommand.andThen(() -> stopmotors()));
+    }
+    else {
+      return ramseteCommand.andThen(() -> stopmotors());
+    }
   }
 
   public Trajectory loadTrajectoryFromFile(String filename) {
@@ -425,12 +433,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   }
 
   public Trajectory generateTrajectoryFromFile(String filename) {
-    try {
-      return generateTrajectory(filename);
-    } catch (IOException e) {
-      DriverStation.reportError("Failed to load auto trajectory: " + filename, false);
-      return new Trajectory();
-    }
+      var config = new TrajectoryConfig(1, 3);
+      return generateTrajectory(filename, config);
   }
 
     /**
@@ -458,7 +462,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
    * @return encoder units
    */
   public static int metersToSteps(double meters) {
-    return (int)(meters / DriveConstants.kWheelCircumferenceMeters * DriveConstants.kEncoderCPR);
+    return (int)(meters / DriveConstants.kEncoderDistancePerPulse);
   }
 
   /**
@@ -476,20 +480,27 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   protected static Trajectory loadTrajectory(String trajectoryName) throws IOException {
     return TrajectoryUtil.fromPathweaverJson(
-        Filesystem.getDeployDirectory().toPath().resolve(Paths.get("paths", trajectoryName + ".wpilib.json")));
+        Filesystem.getDeployDirectory().toPath().resolve(Paths.get("output", trajectoryName + ".wpilib.json")));
   }
 
-  protected static Trajectory generateTrajectory(String trajectoryName) throws IOException {
-    var filepath = Filesystem.getDeployDirectory().toPath().resolve(Paths.get("waypoints", trajectoryName));
-    var config = new TrajectoryConfig(1, 3);
-    return Trajectory6391.fromWaypoints(filepath, config);
+  public Trajectory generateTrajectory(String trajectoryName, TrajectoryConfig config) {
+    try {
+      var filepath = Filesystem.getDeployDirectory().toPath().resolve(Paths.get("waypoints", trajectoryName));
+      return Trajectory6391.fromWaypoints(filepath, config);
+    } catch (IOException e) {
+      DriverStation.reportError("Failed to load auto trajectory: " + trajectoryName, false);
+      return new Trajectory();
+    }
   }
 
-  // Drives straight specified distance in inches
-  public void drivestraight(double distance) {
-    target_sensorUnits = (distance * DriveConstants.kEncoderCPR) / DriveConstants.kWheelCircumferenceInches ;
-    m_talonsrxright.set(ControlMode.Position, target_sensorUnits, DemandType.AuxPID, m_talonsrxright.getSelectedSensorPosition(1));
-		m_talonsrxleft.follow(m_talonsrxright, FollowerType.AuxOutput1);
+  public List<Double> getEventTimes(String trajectoryName, Trajectory trajectory, List<Integer> eventWaypoints) {
+    try {
+      var filepath = Filesystem.getDeployDirectory().toPath().resolve(Paths.get("waypoints", trajectoryName));
+      return Trajectory6391.getEventsFromWaypoints(trajectory, filepath, eventWaypoints);
+    } catch (IOException e) {
+      DriverStation.reportError("Failed to load auto trajectory: " + trajectoryName, false);
+      return Collections.emptyList();
+    }
   }
 
   // Turns to a specified angle using the cascading PID
@@ -504,13 +515,12 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   }
 
   // Sets up the talons to drive straightDistance with aux pid from Pigeon 
-  public void distancesetup() {
-    resetEncoders();
-				
+  public double distancesetup() {			
     /* Determine which slot affects which PID */
     m_talonsrxright.selectProfileSlot(DriveConstants.kSlot_Distanc, DriveConstants.PID_PRIMARY);
     m_talonsrxright.selectProfileSlot(DriveConstants.kSlot_Turning, DriveConstants.PID_TURN);
     m_talonsrxleft.follow(m_talonsrxright, FollowerType.AuxOutput1);
+    return m_talonsrxright.getSelectedSensorPosition();
   }
 
   public void velocitysetup() {
@@ -536,23 +546,21 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   @Log
   public boolean atSetpoint() {
-    if (m_talonsrxright.getClosedLoopError() < 1000 && m_talonsrxright.getClosedLoopError() > 0){
+    if (m_talonsrxright.getClosedLoopError() < 600 && Math.abs(m_talonsrxright.getClosedLoopError()) > 0){
       return true;
     } else {
       return false;
     }
   }
 
-  public void stopmotors(boolean enabled) {
+  public void stopmotors() {
     m_talonsrxright.set(0);
     m_talonsrxleft.set(0);
   }
 
-  @Log
   public void tankDriveVolts(final double leftVolts, final double rightVolts) {
     m_talonsrxleft.setVoltage(leftVolts);
     m_talonsrxright.setVoltage(rightVolts);
-    //m_drive.feed();
   }
 
   // Drives for a specified time at a specified speed.
@@ -563,22 +571,41 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
       .andThen(() -> {m_talonsrxleft.set(0);m_talonsrxright.set(0);});
   }
 
-  @Config
-  public void drivePositionGyro(double distanceInches, double heading) {
-    var sensorposition = heading * 10;
-    distancesetup();
-    target_sensorUnits = (distanceInches * DriveConstants.kEncoderCPR) / DriveConstants.kWheelCircumferenceInches;
-    m_talonsrxright.set(ControlMode.Position, target_sensorUnits, DemandType.AuxPID, sensorposition);
+  // Locks the heading and uses the input to control forward speed
+  public Command driveStraight(DoubleSupplier joystickY) {
+    return new RunCommand(() -> {
+        m_talonsrxright.set(ControlMode.PercentOutput, joystickY.getAsDouble(), DemandType.AuxPID, lockedheading * 10); 
+        m_drive.feed();
+      }, this).beforeStarting(() -> {lockedheading = getHeading(); distancesetup();}, this);
+  }
+
+  // Uses the input to control forward speed to the specified heading
+  public Command driveToAngle(DoubleSupplier joystickY, Double heading) {
+    return new InstantCommand(() -> {
+        m_talonsrxright.set(ControlMode.PercentOutput, joystickY.getAsDouble(), DemandType.AuxPID, heading * 10); 
+        m_drive.feed();
+      }, this);
+  }
+
+  // Drives a specified distance to a specified heading.
+  public Command drivePositionGyro(double distanceInches, double heading) {
+    return new InstantCommand(() -> currentEncoder = distancesetup(), this).andThen(
+      new RunCommand(() -> {
+        m_talonsrxright.set(ControlMode.Position, currentEncoder + Units.inchesToMeters(distanceInches) / DriveConstants.kEncoderDistancePerPulse
+            , DemandType.AuxPID, heading * 10);
+        m_drive.feed();
+      }, this).withInterrupt(() -> atSetpoint())
+    );
   }
 
   @Config.ToggleButton
   public void drivePositionGyroTest(boolean enabled) {
-    new RunCommand(() -> drivePositionGyro(120, getHeading())).withInterrupt(() -> atSetpoint()).withTimeout(5).schedule();
+    drivePositionGyro(120, getHeading()).schedule();
   }
 
   @Config.ToggleButton
   public void driveVelocityTest(boolean enabled) {
     velocitysetup();
-    new RunCommand(() -> tankDriveVelocity(1, 1)).withTimeout(5).schedule();
+    new RunCommand(() -> tankDriveVelocity(1, 1), this).withTimeout(5).schedule();
   }
 }

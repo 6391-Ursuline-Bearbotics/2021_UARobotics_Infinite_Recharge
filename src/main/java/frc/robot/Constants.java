@@ -48,7 +48,7 @@ public final class Constants {
 
         // Baseline values for a RAMSETE follower in units of meters and seconds
         public static final double RAMSETE_B = 2;
-        public static final double RAMSETE_ZETA = 1;
+        public static final double RAMSETE_ZETA = 0.7;
 
         /** Voltage needed to overcome the motor’s static friction. kS */
         public static final double kS = 1.24; //0.112 // 1.01 pneumatic //.829
@@ -69,8 +69,10 @@ public final class Constants {
         public static final double kaVoltSecondsSquaredPerRadian = 0.3;
 
         public static final LinearSystem<N2, N2, N2> kDrivetrainPlant =
-          LinearSystemId.identifyDrivetrainSystem(kvVoltSecondsPerMeter, kaVoltSecondsSquaredPerMeter,
-                kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian);
+            LinearSystemId.identifyDrivetrainSystem(kV, kA, kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian);
+        
+        /* LinearSystemId.identifyDrivetrainSystem(kvVoltSecondsPerMeter, kaVoltSecondsSquaredPerMeter,
+                kvVoltSecondsPerRadian, kaVoltSecondsSquaredPerRadian); */
         
         public static final int kEncoderCPR = 4096;
         public static final double kWheelDiameterInches = 8d;
@@ -111,7 +113,7 @@ public final class Constants {
          * 	                                    			  kP   kI   kD   kF               Iz    PeakOut */
         public final static Gains kGains_Distanc = new Gains( 0.5, 0.0,  0.0, 0.0,            100,  0.50 );
         public final static Gains kGains_Turning = new Gains( 2.0, 0.0,  4.0, 0.0,            200,  1.00 );
-        public final static Gains kGains_Velocit = new Gains( 2.29, 0.0, 0.0, 1023.0/6800.0,  300,  1.00 ); //0.2 // .00712
+        public final static Gains kGains_Velocit = new Gains( 1.2, 0.0, 0, 1023.0/6800.0,  300,  1.00 ); //0.2 // .00712
         public final static Gains kGains_MotProf = new Gains( 1.0, 0.0,  0.0, 1023.0/6800.0,  400,  1.00 );
         
         /** ---- Flat constants, you should not need to change these ---- */
@@ -158,6 +160,11 @@ public final class Constants {
         public static final double kTurnP = .1;
         public static final double kTurnI = 0;
         public static final double kTurnD = 0.15;
+
+        // Drive Straight PID
+        public static final double kStraightP = .1;
+        public static final double kStraightI = 0;
+        public static final double kStraightD = 0;
 
         // Turn Velocity constraints
         public static final double kVelocityMaxSpeedMetersPerSecond = 3;
@@ -233,7 +240,7 @@ public final class Constants {
         public static final double kRamseteZeta = 0.7;
 
         // %of Picutre the Ball should fill if Red 0-100
-        public static final double kBallArea = 80;
+        public static final double kBallArea = 0.5;
     }
 
     public static final class LEDConstants {
