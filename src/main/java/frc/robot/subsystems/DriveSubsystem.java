@@ -545,7 +545,10 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   @Log
   public boolean atSetpoint() {
-    if (m_talonsrxright.getClosedLoopError() < 600 && Math.abs(m_talonsrxright.getClosedLoopError()) > 0){
+    if (Math.abs(m_talonsrxright.getClosedLoopError()) < 600 &&
+        Math.abs(m_talonsrxright.getClosedLoopError()) > 0 &&
+        Math.abs(getRightWheelSpeed()) < .25 &&
+        Math.abs(getRightWheelSpeed()) > 0){
       return true;
     } else {
       return false;
