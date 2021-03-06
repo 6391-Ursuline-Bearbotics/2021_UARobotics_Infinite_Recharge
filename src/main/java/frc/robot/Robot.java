@@ -83,6 +83,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
+    NetworkTableInstance.getDefault().getTable("photonvision").getEntry("ledMode").setNumber(0);
   }
 
   /**
@@ -156,7 +157,7 @@ public class Robot extends TimedRobot {
         .andThen(new WaitCommand(.15)
         .andThen(new InstantCommand(m_robotContainer.m_conveyor::turnOff)
         .andThen(new InstantCommand(() -> {
-          m_robotContainer.m_shooter.setSetpoint(ShooterConstants.kShooterFarTrenchRPM);
+          m_robotContainer.m_shooter.setSetpoint(ShooterConstants.kShooterFarTrenchRPS);
           m_robotContainer.m_shooter.enable();
       }, m_robotContainer.m_shooter)))).schedule();
 

@@ -185,10 +185,11 @@ public final class Constants {
         public static final int kShooterMotorPort = 8;
         public static final int kShooterMotorPort2 = 9;
     
-        public static final double kShooterFarTrenchRPM = 7400/60;
-        public static final double kShooterNearTrenchRPM = 2000/60;
-        public static final double kShooterAutoLineRPM = 1000/60;
-        public static final double kShooterToleranceRPM = 200/60;
+        public static final double kShooterFarTrenchRPS = 7400/60;
+        public static final double kShooterNearTrenchRPS = 2000/60;
+        public static final double kShooterAutoLineRPS = 1000/60;
+        public static final double kShooterToleranceRPS = 200/60;
+        public static final double kShooterToleranceAccel = 3.0;
         
         public static final double kSpinupRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(500.0);
 
@@ -226,7 +227,7 @@ public final class Constants {
         public static final double kAutoTimeoutSeconds = 12;
         public static final double kAutoShootTimeSeconds = 7;
 
-        public static final double kTrenchAutoShootRPM = 7000/60;
+        public static final double kTrenchAutoShootRPS = 7000/60;
         public static final double kTrenchAutoBallPickup = 60;
         public static final double kTrenchAutoShootAngle = -160;
         public static final double kTrenchAutoCenterAngle = -45;

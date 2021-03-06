@@ -44,7 +44,7 @@ public class TrenchAuto extends SequentialCommandGroup implements Loggable{
       //placed to face trench
       //start shooter to speed we want
       new InstantCommand(() -> {
-        m_shooter.setSetpoint(AutoConstants.kTrenchAutoShootRPM);
+        m_shooter.setSetpoint(AutoConstants.kTrenchAutoShootRPS);
         m_shooter.enable();
       }, m_shooter),
 
@@ -72,7 +72,7 @@ public class TrenchAuto extends SequentialCommandGroup implements Loggable{
 
       //start shooter to speed we want
       new InstantCommand(() -> {
-        m_shooter.setSetpoint(AutoConstants.kTrenchAutoShootRPM);
+        m_shooter.setSetpoint(AutoConstants.kTrenchAutoShootRPS);
         m_shooter.enable();
       }, m_shooter),
 

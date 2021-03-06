@@ -144,7 +144,7 @@ public class RobotContainer {
         .andThen(new WaitCommand(.15)
         .andThen(new InstantCommand(m_conveyor::turnOff)
         .andThen(new InstantCommand(() -> {
-        m_shooter.setSetpoint(ShooterConstants.kShooterFarTrenchRPM);
+        m_shooter.setSetpoint(ShooterConstants.kShooterFarTrenchRPS);
         m_shooter.enable();
       }, m_shooter)))));
 
@@ -191,11 +191,11 @@ public class RobotContainer {
 
     // Create "button" from POV Hat in up direction.  Use both of the angles to the left and right also.
     //drv.POVUp.whenActive(new RunCommand(() -> m_robotDrive.turnToAngle(90)).withTimeout(5));
-    drv.POVUp.whileActiveOnce(m_robotDrive.drivePositionGyro(96, 0));
+    drv.POVUp.whileActiveOnce(m_robotDrive.drivePositionGyro(110, 0));
     
     // Create "button" from POV Hat in down direction.  Use both of the angles to the left and right also.
     //drv.POVDown.whenActive(new RunCommand(() -> m_robotDrive.turnToAngle(-90)).withTimeout(5));
-    drv.POVDown.whileActiveOnce(m_robotDrive.drivePositionGyro(-96, 0));
+    drv.POVDown.whileActiveOnce(m_robotDrive.drivePositionGyro(-110, 0));
 
     // POV Up Direction on Operator Controller relatively increases the current setpoint of the shooter
     op.POVUp.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() + 50);}));

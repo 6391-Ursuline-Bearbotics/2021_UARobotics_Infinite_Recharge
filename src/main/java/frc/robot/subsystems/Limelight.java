@@ -131,7 +131,7 @@ public class Limelight extends SubsystemBase implements Loggable{
     double min = 3.5;
     boolean check = hasTarget();
     /* if (hasTarget() && !shooter.atSetpoint()){
-      shooter.setSetpoint(ShooterConstants.kShooterFarTrenchRPM);
+      shooter.setSetpoint(ShooterConstants.kShooterFarTrenchRPS);
     } */
    // SmartDashboard.putString("Target ","" + check);
     //SmartDashboard.putString("Initial Tx","" + getAngleOfError());

@@ -68,7 +68,7 @@ public class ShooterSubsystem extends PIDSubsystem implements Loggable {
   public ShooterSubsystem() {
     super(new PIDController(ShooterConstants.kP, ShooterConstants.kI, ShooterConstants.kD));
     shooterPID = getController();
-    shooterPID.setTolerance(ShooterConstants.kShooterToleranceRPM);
+    shooterPID.setTolerance(ShooterConstants.kShooterToleranceRPS, ShooterConstants.kShooterToleranceAccel);
     m_shooterEncoder.setDistancePerPulse(ShooterConstants.kEncoderDistancePerPulse);
     m_shooterEncoder.setSamplesToAverage(1);
     m_shooterMotor2.follow(m_shooterMotor);
