@@ -76,6 +76,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     Shuffleboard.selectTab("Dashboard");
+    NetworkTableInstance.getDefault().getTable("photonvision").getEntry("ledMode").setNumber(0);
   }
 
   @Override
