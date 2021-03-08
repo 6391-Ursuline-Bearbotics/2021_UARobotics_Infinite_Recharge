@@ -125,8 +125,8 @@ public class RobotContainer {
     autoChooser.addOption("Bounce", new Bounce(m_robotDrive));
     autoChooser.addOption("Barrel", new Barrel(m_robotDrive));
     autoChooser.addOption("Auto Aim", new AutoAim(m_robotDrive));
-    autoChooser.addOption("Trench Auto", new TrenchAuto(m_shooter, m_robotDrive, m_intake, m_conveyor));
-    autoChooser.addOption("Center Auto", new CenterAuto(m_shooter, m_robotDrive, m_intake, m_conveyor));
+    autoChooser.addOption("Trench Auto", new TrenchAuto(m_robotDrive));//m_shooter, m_robotDrive, m_intake, m_conveyor));
+    autoChooser.addOption("Center Auto", new CenterAuto(m_robotDrive)); //m_shooter, m_robotDrive, m_intake, m_conveyor));
     autoChooser.addOption("Steal Auto", new StealAuto(m_shooter, m_robotDrive, m_intake, m_conveyor));
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
