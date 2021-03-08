@@ -93,7 +93,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 	double _targetAngle = 0;
   int _printCount = 0;
   private Pose2d savedPose;
-  @Log
   double target_sensorUnits;
   double m_time = 0;
   double m_lastTime = Timer.getFPGATimestamp() - 0.02;
@@ -546,7 +545,10 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   @Log
   public boolean atSetpoint() {
-    if (m_talonsrxright.getClosedLoopError() < 600 && Math.abs(m_talonsrxright.getClosedLoopError()) > 0){
+    if (Math.abs(m_talonsrxright.getClosedLoopError()) < 600 &&
+        Math.abs(m_talonsrxright.getClosedLoopError()) > 0 &&
+        Math.abs(getRightWheelSpeed()) < .25 &&
+        Math.abs(getRightWheelSpeed()) > 0){
       return true;
     } else {
       return false;

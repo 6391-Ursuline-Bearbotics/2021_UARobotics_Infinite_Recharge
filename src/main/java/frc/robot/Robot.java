@@ -14,6 +14,9 @@ import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.Constants.ShooterConstants;
 import io.github.oblarg.oblog.Logger;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
@@ -81,6 +84,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
+    NetworkTableInstance.getDefault().getTable("photonvision").getEntry("ledMode").setNumber(0);
   }
 
   /**
@@ -149,6 +153,15 @@ public class Robot extends TimedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+
+    new InstantCommand(m_robotContainer.m_conveyor::turnBackwards)
+        .andThen(new WaitCommand(.15)
+        .andThen(new InstantCommand(m_robotContainer.m_conveyor::turnOff)
+        .andThen(new InstantCommand(() -> {
+          m_robotContainer.m_shooter.setSetpoint(ShooterConstants.kShooterFarTrenchRPS);
+          m_robotContainer.m_shooter.enable();
+      }, m_robotContainer.m_shooter)))).schedule();
+
   }
 
   /**

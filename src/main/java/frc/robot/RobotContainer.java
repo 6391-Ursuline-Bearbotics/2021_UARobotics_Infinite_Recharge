@@ -144,7 +144,7 @@ public class RobotContainer {
         .andThen(new WaitCommand(.15)
         .andThen(new InstantCommand(m_conveyor::turnOff)
         .andThen(new InstantCommand(() -> {
-        m_shooter.setSetpoint(ShooterConstants.kShooterFarTrenchRPM);
+        m_shooter.setSetpoint(ShooterConstants.kShooterFarTrenchRPS);
         m_shooter.enable();
       }, m_shooter)))));
 
@@ -187,6 +187,15 @@ public class RobotContainer {
     
     // When start button is pressed for at least a second advance to the next climb stage
     drv.StartButton.or(op.StartButton).whileActiveOnce(new WaitCommand(1).andThen(new NextClimbPosition(m_climb).withTimeout(5)));
+    //.whenPressed(new DriveDistanceProfiled(3, m_robotDrive).withTimeout(10));
+
+    // Create "button" from POV Hat in up direction.  Use both of the angles to the left and right also.
+    //drv.POVUp.whenActive(new RunCommand(() -> m_robotDrive.turnToAngle(90)).withTimeout(5));
+    drv.POVUp.whileActiveOnce(m_robotDrive.drivePositionGyro(110, 0));
+    
+    // Create "button" from POV Hat in down direction.  Use both of the angles to the left and right also.
+    //drv.POVDown.whenActive(new RunCommand(() -> m_robotDrive.turnToAngle(-90)).withTimeout(5));
+    drv.POVDown.whileActiveOnce(m_robotDrive.drivePositionGyro(-110, 0));
 
     // POV Up Direction on Operator Controller relatively increases the current setpoint of the shooter
     op.POVUp.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() + 50);}));
