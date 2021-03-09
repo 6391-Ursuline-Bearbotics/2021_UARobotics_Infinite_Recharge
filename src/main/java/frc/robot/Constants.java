@@ -225,22 +225,15 @@ public final class Constants {
 
     public static final class AutoConstants {
         public static final double kAutoTimeoutSeconds = 12;
-        public static final double kAutoShootTimeSeconds = 7;
+        public static final double kAutoShoot3 = 4;
+        public static final double kAutoShoot5 = 6;
 
-        public static final double kTrenchAutoShootRPS = 7000/60;
-        public static final double kTrenchAutoBallPickup = 60;
-        public static final double kTrenchAutoShootAngle = -160;
-        public static final double kTrenchAutoCenterAngle = -45;
-        public static final double kTrenchAutoDriveCenter = 120;
-
+        public static final double kAutoShootRPS = 7000/60;
+        
         public static final double kMaxSpeedMetersPerSecond = 3;
         public static final double kMaxAccelerationMetersPerSecondSquared = 3;
 
-        // Reasonable baseline values for a RAMSETE follower in units of meters and seconds
-        public static final double kRamseteB = 2;
-        public static final double kRamseteZeta = 0.7;
-
-        // %of Picutre the Ball should fill if Red 0-100
+        // %of Picutre the Ball should fill if Red 0-100% = 0-1
         public static final double kBallArea = 0.5;
     }
 
