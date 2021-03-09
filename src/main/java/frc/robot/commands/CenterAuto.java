@@ -14,6 +14,7 @@ public class CenterAuto extends SequentialCommandGroup {
       Trajectory trajectory1 = m_robotDrive.loadTrajectoryFromFile("Center1");
       Trajectory trajectory2 = m_robotDrive.loadTrajectoryFromFile("Center2");
       Trajectory trajectory3 = m_robotDrive.loadTrajectoryFromFile("Center3");
+      Trajectory trajectory4 = m_robotDrive.loadTrajectoryFromFile("Center4");
       
       addCommands(
           new InstantCommand(() -> m_robotDrive.resetOdometry(trajectory1.getInitialPose())),
@@ -33,9 +34,14 @@ public class CenterAuto extends SequentialCommandGroup {
           //lower and spin intake
           new InstantCommand(() -> m_intake.deployIntake()),
 
-          //separate Center3 into two paths to raise intake before making sharp turn by pillar
-
+          // Pick up 3 balls in a line in the sheild generator, end near the pillar
           m_robotDrive.createCommandForTrajectory(trajectory3, false).withTimeout(50).withName("Center3"),
+
+          // Raise the intake to avoid hitting the pillar
+          new InstantCommand(() -> m_intake.retractIntake()),
+
+          // Turn right to avoid going over the bump and go back to our shooting spot.
+          m_robotDrive.createCommandForTrajectory(trajectory4, false).withTimeout(50).withName("Center4"),
 
           //shoot other balls
           new AutoShoot(m_shooter, m_conveyor, AutoConstants.kAutoShoot3)
