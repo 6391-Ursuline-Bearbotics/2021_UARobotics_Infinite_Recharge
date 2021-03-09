@@ -38,7 +38,6 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 import java.io.IOException;
 
 import frc.robot.UA6391.DifferentialDrive6391;

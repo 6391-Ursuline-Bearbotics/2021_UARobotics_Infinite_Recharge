@@ -19,7 +19,6 @@ public class Limelight extends SubsystemBase implements Loggable{
     private NetworkTableEntry ta = table.getEntry("ta");
     private NetworkTableEntry tv = table.getEntry("ta");
     private NetworkTableEntry ledMode = table.getEntry("ledMode");
-    private int loop;
     private boolean m_targeting = false;
 
 
@@ -37,7 +36,6 @@ public class Limelight extends SubsystemBase implements Loggable{
     this.ta = table.getEntry("ta");
     this.ta = table.getEntry("tv");
     this.ledMode = table.getEntry("ledMode");
-    this.loop = 0; 
     setPipeline(LimelightConstants.DRIVE_PIPELINE);
     setLedOn(false);
 
@@ -129,7 +127,6 @@ public class Limelight extends SubsystemBase implements Loggable{
     //SmartDashboard.putString("turnToTarget ","Started");
     double turn = 0;
     double min = 3.5;
-    boolean check = hasTarget();
     /* if (hasTarget() && !shooter.atSetpoint()){
       shooter.setSetpoint(ShooterConstants.kShooterFarTrenchRPS);
     } */

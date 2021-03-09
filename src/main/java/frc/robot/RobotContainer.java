@@ -9,7 +9,6 @@ package frc.robot;
 
 // WPI Imports
 import edu.wpi.cscore.HttpCamera;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -24,7 +23,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import io.github.oblarg.oblog.annotations.Log;
 
 // Command Imports
-import frc.robot.commands.AutoAim;
 import frc.robot.commands.Barrel;
 import frc.robot.commands.GalacticSearchAuto;
 import frc.robot.commands.GenericAuto;
@@ -101,10 +99,6 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
-    // Limelight Setup
-    NetworkTableInstance.getDefault().getTable("limelight").getEntry("stream").setNumber(1);
-    //LimelightCamera();
-
     // Configure default commands
     // Set the default drive command to split-stick arcade drive
     m_robotDrive.setDefaultCommand(
@@ -115,18 +109,14 @@ public class RobotContainer {
 
     // Constantly checks to see if the intake motor has stalled
     m_intake.setDefaultCommand(new RunCommand(m_intake::checkStall, m_intake));
-                         
-    // Sets the LEDs to start up with a rainbow config
-    //m_LED.rainbow();
 
     autoChooser.addOption("GalacticSearch", new GalacticSearchAuto(m_robotDrive, m_intake, m_PhotonVision));
     autoChooser.addOption("2R", new GenericAuto(m_robotDrive, "GalacticSearch2R"));
     autoChooser.addOption("Slalom", new Slalom(m_robotDrive));
     autoChooser.addOption("Bounce", new Bounce(m_robotDrive));
     autoChooser.addOption("Barrel", new Barrel(m_robotDrive));
-    autoChooser.addOption("Auto Aim", new AutoAim(m_robotDrive));
-    autoChooser.addOption("Trench Auto", new TrenchAuto(m_robotDrive));//m_shooter, m_robotDrive, m_intake, m_conveyor));
-    autoChooser.addOption("Center Auto", new CenterAuto(m_robotDrive)); //m_shooter, m_robotDrive, m_intake, m_conveyor));
+    autoChooser.addOption("Trench Auto", new TrenchAuto(m_shooter, m_robotDrive, m_intake, m_conveyor));
+    autoChooser.addOption("Center Auto", new CenterAuto(m_shooter, m_robotDrive, m_intake, m_conveyor));
     autoChooser.addOption("Steal Auto", new StealAuto(m_shooter, m_robotDrive, m_intake, m_conveyor));
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
@@ -159,7 +149,6 @@ public class RobotContainer {
     drv.YButton.whenPressed(new InstantCommand(() -> m_PhotonVision.beforeTurnToTarget()))
       .whileHeld(new InstantCommand(() -> m_PhotonVision.turnToTarget(m_robotDrive, () -> -drv.JoystickLY())))
       .whenReleased(new InstantCommand(() -> m_PhotonVision.afterTurnToTarget()));
-    //.whenPressed(new AutoAim(m_robotDrive));
 
     // When Y button is pressed on operators controller deploy the intake but do not spin the wheels
     op.YButton.whenPressed(new InstantCommand(() -> m_intake.toggleIntakePosition(true)));
@@ -187,15 +176,12 @@ public class RobotContainer {
     
     // When start button is pressed for at least a second advance to the next climb stage
     drv.StartButton.or(op.StartButton).whileActiveOnce(new WaitCommand(1).andThen(new NextClimbPosition(m_climb).withTimeout(5)));
-    //.whenPressed(new DriveDistanceProfiled(3, m_robotDrive).withTimeout(10));
 
     // Create "button" from POV Hat in up direction.  Use both of the angles to the left and right also.
-    //drv.POVUp.whenActive(new RunCommand(() -> m_robotDrive.turnToAngle(90)).withTimeout(5));
-    drv.POVUp.whileActiveOnce(m_robotDrive.drivePositionGyro(110, 0));
+
     
     // Create "button" from POV Hat in down direction.  Use both of the angles to the left and right also.
-    //drv.POVDown.whenActive(new RunCommand(() -> m_robotDrive.turnToAngle(-90)).withTimeout(5));
-    drv.POVDown.whileActiveOnce(m_robotDrive.drivePositionGyro(-110, 0));
+    
 
     // POV Up Direction on Operator Controller relatively increases the current setpoint of the shooter
     op.POVUp.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() + 50);}));
