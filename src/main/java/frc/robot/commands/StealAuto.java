@@ -29,7 +29,7 @@ public class StealAuto extends SequentialCommandGroup {
             m_robotDrive.createCommandForTrajectory(trajectory1, false).withTimeout(50).withName("Steal1"),
 
             // Shoot all 5 balls that we have collected (will probably be just 3 for other autos)
-            new AutoShoot(m_shooter, AutoConstants.kAutoShoot5)
+            new AutoShoot(m_shooter, m_conveyor, AutoConstants.kAutoShoot5)
         );
     }
 }
