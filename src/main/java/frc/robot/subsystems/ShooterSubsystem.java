@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.system.LinearSystem;
-import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import edu.wpi.first.wpiutil.math.MathUtil;
@@ -26,7 +25,6 @@ import edu.wpi.first.wpiutil.math.numbers.N2;
 import frc.robot.Constants.ShooterConstants;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
-import io.github.oblarg.oblog.annotations.Config;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 public class ShooterSubsystem extends PIDSubsystem implements Loggable {
@@ -50,7 +48,7 @@ public class ShooterSubsystem extends PIDSubsystem implements Loggable {
   LinearSystem<N2, N1, N1> m_flywheelPosition = LinearSystemId.identifyPositionSystem(ShooterConstants.kVVoltSecondsPerRotation, ShooterConstants.kA);
   LinearSystemSim<N2, N1, N1> m_flywheelPositionSim = new LinearSystemSim<>(m_flywheelPosition);
 
-  private final DCMotor m_flywheelGearbox = DCMotor.getVex775Pro(2);
+  //private final DCMotor m_flywheelGearbox = DCMotor.getVex775Pro(2);
   //private final FlywheelSim m_flywheelSim = new FlywheelSim(m_flywheelPositionSim, m_flywheelGearbox, 2);
   private final EncoderSim m_encoderSim = new EncoderSim(m_shooterEncoder);
 
@@ -68,9 +66,9 @@ public class ShooterSubsystem extends PIDSubsystem implements Loggable {
   public ShooterSubsystem() {
     super(new PIDController(ShooterConstants.kP, ShooterConstants.kI, ShooterConstants.kD));
     shooterPID = getController();
-    shooterPID.setTolerance(ShooterConstants.kShooterToleranceRPM);
+    shooterPID.setTolerance(ShooterConstants.kShooterToleranceRPS, ShooterConstants.kShooterToleranceAccel);
     m_shooterEncoder.setDistancePerPulse(ShooterConstants.kEncoderDistancePerPulse);
-    m_shooterEncoder.setSamplesToAverage(50);
+    m_shooterEncoder.setSamplesToAverage(1);
     m_shooterMotor2.follow(m_shooterMotor);
     m_shooterMotor.setInverted(false);
     m_shooterMotor2.setInverted(InvertType.OpposeMaster);

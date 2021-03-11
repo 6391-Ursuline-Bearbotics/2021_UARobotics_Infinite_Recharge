@@ -91,7 +91,7 @@ public class Trajectory6391 {
    private static ControlVector createControlVector(String input) {
       String[] arrOfStr = input.split(",", 0);
       double[] x = new double[] {Double.parseDouble(arrOfStr[0]), Double.parseDouble(arrOfStr[2])};
-      double[] y = new double[] {Double.parseDouble(arrOfStr[1]), Double.parseDouble(arrOfStr[3])};
+      double[] y = new double[] {Double.parseDouble(arrOfStr[1]) + 4.572, Double.parseDouble(arrOfStr[3])};
       return new ControlVector(x, y);
    }
 

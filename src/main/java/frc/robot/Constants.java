@@ -33,7 +33,7 @@ public final class Constants {
     
         // Differential Drive setup parameters.  These control how the drivers input translates to motor power.
         public static final double kMaxOutputForward = 1; // % motor ouput
-        public static final double kMaxOutputRotation = 0.6; // % motor ouput
+        public static final double kMaxOutputRotation = 0.3; // % motor ouput
         public static final double kDeadbandForward = 0.05; // % motor ouput
         public static final double kDeadbandRotation = 0.05; // % motor ouput
         public static final double kRampForward = 0.2; // Seconds to go from min to max motor %
@@ -112,7 +112,7 @@ public final class Constants {
          * 
          * 	                                    			  kP   kI   kD   kF               Iz    PeakOut */
         public final static Gains kGains_Distanc = new Gains( 0.5, 0.0,  0.0, 0.0,            100,  0.50 );
-        public final static Gains kGains_Turning = new Gains( 2.0, 0.0,  4.0, 0.0,            200,  1.00 );
+        public final static Gains kGains_Turning = new Gains( 0.1, 0.0,  4.0, 0.0,            200,  0.4 );
         public final static Gains kGains_Velocit = new Gains( 1.2, 0.0, 0, 1023.0/6800.0,  300,  1.00 ); //0.2 // .00712
         public final static Gains kGains_MotProf = new Gains( 1.0, 0.0,  0.0, 1023.0/6800.0,  400,  1.00 );
         
@@ -185,10 +185,11 @@ public final class Constants {
         public static final int kShooterMotorPort = 8;
         public static final int kShooterMotorPort2 = 9;
     
-        public static final double kShooterFarTrenchRPM = 7400/60;
-        public static final double kShooterNearTrenchRPM = 2000/60;
-        public static final double kShooterAutoLineRPM = 1000/60;
-        public static final double kShooterToleranceRPM = 200/60;
+        public static final double kShooterFarTrenchRPS = 7400/60;
+        public static final double kShooterNearTrenchRPS = 2000/60;
+        public static final double kShooterAutoLineRPS = 1000/60;
+        public static final double kShooterToleranceRPS = 200/60;
+        public static final double kShooterToleranceAccel = 3.0;
         
         public static final double kSpinupRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(500.0);
 
@@ -224,22 +225,15 @@ public final class Constants {
 
     public static final class AutoConstants {
         public static final double kAutoTimeoutSeconds = 12;
-        public static final double kAutoShootTimeSeconds = 7;
+        public static final double kAutoShoot3 = 4;
+        public static final double kAutoShoot5 = 6;
 
-        public static final double kTrenchAutoShootRPM = 7000/60;
-        public static final double kTrenchAutoBallPickup = 60;
-        public static final double kTrenchAutoShootAngle = -160;
-        public static final double kTrenchAutoCenterAngle = -45;
-        public static final double kTrenchAutoDriveCenter = 120;
-
+        public static final double kAutoShootRPS = 7000/60;
+        
         public static final double kMaxSpeedMetersPerSecond = 3;
         public static final double kMaxAccelerationMetersPerSecondSquared = 3;
 
-        // Reasonable baseline values for a RAMSETE follower in units of meters and seconds
-        public static final double kRamseteB = 2;
-        public static final double kRamseteZeta = 0.7;
-
-        // %of Picutre the Ball should fill if Red 0-100
+        // %of Picutre the Ball should fill if Red 0-100% = 0-1
         public static final double kBallArea = 0.5;
     }
 

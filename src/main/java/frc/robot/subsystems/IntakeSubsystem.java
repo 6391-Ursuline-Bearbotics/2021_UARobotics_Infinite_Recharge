@@ -69,4 +69,14 @@ public class IntakeSubsystem extends SubsystemBase implements Loggable{
             setOutput(0);
         }
     }
+
+    public void deployIntake() {
+        setOutput(IntakeConstants.kIntakeMotorSpeed);
+        extendIntake(true);
+    }
+
+    public void retractIntake() {
+        extendIntake(false);
+        setOutput(0);
+    }
 }

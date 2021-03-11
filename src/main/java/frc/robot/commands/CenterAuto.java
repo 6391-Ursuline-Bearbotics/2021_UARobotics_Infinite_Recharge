@@ -1,84 +1,54 @@
 package frc.robot.commands;
 
-import frc.robot.subsystems.ConveyorSubsystem;
-import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.IntakeSubsystem;
-import io.github.oblarg.oblog.annotations.Log;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.networktables.*;
-import edu.wpi.first.wpilibj.controller.PIDController;
-import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Config;
-import io.github.oblarg.oblog.annotations.Log;
-import frc.robot.commands.Shoot;
-
 import frc.robot.Constants.AutoConstants;
+import frc.robot.subsystems.ConveyorSubsystem;
+import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.PhotonVision;
+import frc.robot.subsystems.ShooterSubsystem;
 
-public class CenterAuto extends SequentialCommandGroup implements Loggable{
-  private final ShooterSubsystem m_shooter;
-  private final DriveSubsystem m_robotDrive;
-  private final IntakeSubsystem m_intake;
-  private final ConveyorSubsystem m_conveyor;
-  /**
-   * Creates a new TrenchAuto.
-   * @param shooter
-   * @param robotDrive
-   * @param intake
-   * @param conveyor
-   */
-  public CenterAuto(ShooterSubsystem shooter, DriveSubsystem robotDrive, IntakeSubsystem intake, ConveyorSubsystem conveyor) {
-    m_shooter = shooter;
-    m_robotDrive = robotDrive;
-    m_intake = intake;
-    m_conveyor = conveyor;
-    // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(m_shooter, m_robotDrive, m_intake, m_conveyor);
-
-    // Commands to be run in the order they should be run in
-    addCommands(
-      new InstantCommand(() -> {m_intake.toggleIntakeWheels(true);
-        m_intake.toggleIntakePosition(true);}, m_intake),
-      m_robotDrive.driveTime(5, .25) 
-/*       //placed to face shield generator
-      //start shooter to speed we want
-      new InstantCommand(() -> {
-        m_shooter.setSetpoint(AutoConstants.kTrenchAutoShootRPM);
-        m_shooter.enable();
-      }, m_shooter),
-
-      //lower intake and spin intake
-      new InstantCommand(() -> {m_intake.toggleIntakePosition(true);
-        m_intake.toggleIntakeWheels(true);}, m_intake),
-
-      //drive forward distance of two balls (x feet)
-      new DriveStraight(AutoConstants.kTrenchAutoBallPickup, m_robotDrive),
+public class CenterAuto extends SequentialCommandGroup {
+  public CenterAuto(ShooterSubsystem m_shooter, DriveSubsystem m_robotDrive, IntakeSubsystem m_intake, ConveyorSubsystem m_conveyor, PhotonVision m_PhotonVision) {        
+      Trajectory trajectory1 = m_robotDrive.loadTrajectoryFromFile("Center1");
+      Trajectory trajectory2 = m_robotDrive.loadTrajectoryFromFile("Center2");
+      Trajectory trajectory3 = m_robotDrive.loadTrajectoryFromFile("Center3");
+      Trajectory trajectory4 = m_robotDrive.loadTrajectoryFromFile("Center4");
       
-      // Retract intake
-      new InstantCommand(() -> {m_intake.toggleIntakePosition(true);
-        m_intake.toggleIntakeWheels(true);}, m_intake),
+      addCommands(
+          new InstantCommand(() -> m_robotDrive.resetOdometry(trajectory1.getInitialPose())),
 
-      //turn around to face goal (-160)
-      new TurnToAngle(AutoConstants.kTrenchAutoShootAngle, m_robotDrive),
-      
-      // Probably need to do a Limelight based AutoAim here but need to get it working first
+          //turn shooter on to get up to speed
+          new InstantCommand(() -> m_shooter.setSetpoint(AutoConstants.kAutoShootRPS)),
 
-      //run conveyor when shooter is at speed (stop moving conveyor when not at speed)
-      new Shoot(AutoConstants.kAutoShootTimeSeconds, m_shooter, m_conveyor),
-      
-      // Stop shooter
-      new InstantCommand(() -> {
-        m_shooter.setSetpoint(0);
-        m_shooter.disable();
-      }, m_shooter),
+          //back up 1 meter
+          m_robotDrive.createCommandForTrajectory(trajectory1, false).withTimeout(50).withName("Center1"),
 
-      //turn (-45) to pick up more balls
-      new TurnToAngle(AutoConstants.kTrenchAutoShootAngle, m_robotDrive),
+          // shoot 3 balls
+          new AutoShoot(m_shooter, m_conveyor, AutoConstants.kAutoShoot3),
 
-      // Drive some more down field
-      new DriveStraight(AutoConstants.kTrenchAutoDriveCenter, m_robotDrive) */
-    );
+          //back up into rendevouz
+          m_robotDrive.createCommandForTrajectory(trajectory2, false).withTimeout(50).withName("Center2"),
+
+          //lower and spin intake
+          new InstantCommand(() -> m_intake.deployIntake()),
+
+          // Pick up 3 balls in a line in the sheild generator, end near the pillar
+          m_robotDrive.createCommandForTrajectory(trajectory3, false).withTimeout(50).withName("Center3"),
+
+          // Raise the intake to avoid hitting the pillar
+          new InstantCommand(() -> m_intake.retractIntake()),
+
+          // Turn right to avoid going over the bump and go back to our shooting spot.
+          m_robotDrive.createCommandForTrajectory(trajectory4, false).withTimeout(50).withName("Center4"),
+
+          // AutoAim to make sure we are pointed directly at the target
+          new AutoAim(m_robotDrive, m_PhotonVision),
+
+          //shoot other balls
+          new AutoShoot(m_shooter, m_conveyor, AutoConstants.kAutoShoot3)
+      );
   }
 }

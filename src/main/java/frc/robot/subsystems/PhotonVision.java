@@ -17,11 +17,11 @@ public class PhotonVision {
       m_HD3000.setPipelineIndex(PhotonConstants.kHD3000Pipe);
    }
 
-   public void beforeTurnToTarget() {
+   public void lightsOn() {
       m_limePhoton.setLED(LEDMode.kOn);
    }
 
-   public void afterTurnToTarget() {
+   public void lightsOff() {
       m_limePhoton.setLED(LEDMode.kOff);
    }
 

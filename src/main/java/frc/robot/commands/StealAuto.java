@@ -1,71 +1,38 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.subsystems.ConveyorSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
-import io.github.oblarg.oblog.annotations.Log;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.networktables.*;
-import edu.wpi.first.wpilibj.controller.PIDController;
-import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Config;
-import io.github.oblarg.oblog.annotations.Log;
-import frc.robot.commands.Shoot;
+import frc.robot.subsystems.PhotonVision;
+import frc.robot.subsystems.ShooterSubsystem;
 
-import frc.robot.Constants.AutoConstants;
+public class StealAuto extends SequentialCommandGroup {
+    public StealAuto(ShooterSubsystem m_shooter, DriveSubsystem m_robotDrive, IntakeSubsystem m_intake, ConveyorSubsystem m_conveyor, PhotonVision m_PhotonVision) {        
+        // Loads all of the trajectories we will need.  This happens on init so we get it out of the way before actually running.
+        Trajectory trajectory1 = m_robotDrive.loadTrajectoryFromFile("Steal1");
+        
+        addCommands(
+            // Resets odometery which is what defines where the robot is.  This isn't generally nessecary for a match auto because the
+            // robot will start on the field at the right spot (hopefully) but it is useful for testing / simulation.    
+            new InstantCommand(() -> m_robotDrive.resetOdometry(trajectory1.getInitialPose())),
 
-public class StealAuto extends SequentialCommandGroup implements Loggable{
-  private final ShooterSubsystem m_shooter;
-  private final DriveSubsystem m_robotDrive;
-  private final IntakeSubsystem m_intake;
-  private final ConveyorSubsystem m_conveyor;
-  /**
-   * Creates a new TrenchAuto.
-   * @param shooter
-   * @param robotDrive
-   * @param intake
-   * @param conveyor
-   */
-  public StealAuto(ShooterSubsystem shooter, DriveSubsystem robotDrive, IntakeSubsystem intake, ConveyorSubsystem conveyor) {
-    m_shooter = shooter;
-    m_robotDrive = robotDrive;
-    m_intake = intake;
-    m_conveyor = conveyor;
-    // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(m_shooter, m_robotDrive, m_intake, m_conveyor);
+            // Turn the shooter on and give it time to get up to speed.
+            new InstantCommand(() -> m_shooter.setSetpoint(AutoConstants.kAutoShootRPS)),
+            
+            // Lowers the intake and turns the wheels on
+            new InstantCommand(() -> m_intake.deployIntake()),
 
-    // Commands to be run in the order they should be run in
-    addCommands(
-            //placed to face trench
-      //start shooter to speed we want
-      new InstantCommand(() -> {
-        m_shooter.setSetpoint(AutoConstants.kTrenchAutoShootRPM);
-        m_shooter.enable();
-      }, m_shooter),
+            // Runs the Steal1 trajectory that grabs 2 balls in their trench and then goes across the field to our shooting spot.
+            m_robotDrive.createCommandForTrajectory(trajectory1, false).withTimeout(50).withName("Steal1"),
 
-      //drive forward distance of two balls (x feet)
-      //new DriveStraight(AutoConstants.kTrenchAutoBallPickup, m_robotDrive),
-      new RunCommand(() -> m_robotDrive.driveTime(4, 0.5)),
+            new AutoAim(m_robotDrive, m_PhotonVision),
 
-      // Probably need to do a Limelight based AutoAim here but need to get it working first
-      new TimedAutoAim(2, m_robotDrive),
-
-      //run conveyor when shooter is at speed (stop moving conveyor when not at speed)
-      new Shoot(AutoConstants.kAutoShootTimeSeconds, m_shooter, m_conveyor),
-      
-      // Stop shooter
-      new InstantCommand(() -> {
-        m_shooter.setSetpoint(0);
-        m_shooter.disable();
-      }, m_shooter),
-
-      //turn (-45) to pick up more balls
-      new RunCommand(() -> m_robotDrive.turnToAngle(AutoConstants.kTrenchAutoShootAngle))
-    );
-  }
+            // Shoot all 5 balls that we have collected (will probably be just 3 for other autos)
+            new AutoShoot(m_shooter, m_conveyor, AutoConstants.kAutoShoot5)
+        );
+    }
 }
