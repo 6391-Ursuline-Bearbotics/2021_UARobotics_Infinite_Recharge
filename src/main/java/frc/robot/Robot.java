@@ -79,12 +79,12 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     Shuffleboard.selectTab("Dashboard");
-    NetworkTableInstance.getDefault().getTable("photonvision").getEntry("ledMode").setNumber(0);
+    m_robotContainer.m_PhotonVision.lightsOff();
   }
 
   @Override
   public void disabledPeriodic() {
-    NetworkTableInstance.getDefault().getTable("photonvision").getEntry("ledMode").setNumber(0);
+    m_robotContainer.m_PhotonVision.lightsOff();
   }
 
   /**
@@ -103,7 +103,7 @@ public class Robot extends TimedRobot {
     m_robotContainer.m_climb.resetEnc(true);
     m_robotContainer.m_shooter.setSetpoint(0);
     m_robotContainer.m_shooter.disable();
-    NetworkTableInstance.getDefault().getTable("photonvision").getEntry("ledMode").setNumber(0);
+    m_robotContainer.m_PhotonVision.lightsOff();
     SmartDashboard.putString("GalacticSearch", "");
 
     // schedule the autonomous command (example)
@@ -139,7 +139,7 @@ public class Robot extends TimedRobot {
     m_robotContainer.m_climb.resetEnc(true);
     m_robotContainer.m_shooter.setSetpoint(0);
     m_robotContainer.m_shooter.disable();
-    NetworkTableInstance.getDefault().getTable("photonvision").getEntry("ledMode").setNumber(0);
+    m_robotContainer.m_PhotonVision.lightsOff();
   }
 
   /**

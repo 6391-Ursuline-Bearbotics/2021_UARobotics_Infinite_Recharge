@@ -7,10 +7,11 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.subsystems.ConveyorSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.PhotonVision;
 import frc.robot.subsystems.ShooterSubsystem;
 
 public class StealAuto extends SequentialCommandGroup {
-    public StealAuto(ShooterSubsystem m_shooter, DriveSubsystem m_robotDrive, IntakeSubsystem m_intake, ConveyorSubsystem m_conveyor) {        
+    public StealAuto(ShooterSubsystem m_shooter, DriveSubsystem m_robotDrive, IntakeSubsystem m_intake, ConveyorSubsystem m_conveyor, PhotonVision m_PhotonVision) {        
         // Loads all of the trajectories we will need.  This happens on init so we get it out of the way before actually running.
         Trajectory trajectory1 = m_robotDrive.loadTrajectoryFromFile("Steal1");
         
@@ -27,6 +28,8 @@ public class StealAuto extends SequentialCommandGroup {
 
             // Runs the Steal1 trajectory that grabs 2 balls in their trench and then goes across the field to our shooting spot.
             m_robotDrive.createCommandForTrajectory(trajectory1, false).withTimeout(50).withName("Steal1"),
+
+            new AutoAim(m_robotDrive, m_PhotonVision),
 
             // Shoot all 5 balls that we have collected (will probably be just 3 for other autos)
             new AutoShoot(m_shooter, m_conveyor, AutoConstants.kAutoShoot5)

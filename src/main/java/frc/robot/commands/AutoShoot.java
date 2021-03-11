@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.subsystems.ConveyorSubsystem;
@@ -15,6 +16,7 @@ public class AutoShoot extends CommandBase {
   ShooterSubsystem m_shooter;
   ConveyorSubsystem m_conveyor;
   Double timeout;
+  Double startTime;
 
   public AutoShoot(ShooterSubsystem shooter, ConveyorSubsystem conveyor, Double timeoutSeconds) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -27,13 +29,11 @@ public class AutoShoot extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    startTime = Timer.getFPGATimestamp();
     // Make sure the shooter is spinning start it if not
     if (m_shooter.getSetpoint() == 0) {
       m_shooter.setSetpoint(AutoConstants.kAutoShootRPS);
     }
-
-    // Turn on the lights
-    NetworkTableInstance.getDefault().getTable("photonvision").getEntry("ledMode").setNumber(1);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -49,14 +49,11 @@ public class AutoShoot extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    // Turn off the lights when done
-    NetworkTableInstance.getDefault().getTable("photonvision").getEntry("ledMode").setNumber(0);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return (Timer.getFPGATimestamp() - startTime) > timeout;
   }
 }

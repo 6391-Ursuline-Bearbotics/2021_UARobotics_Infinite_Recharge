@@ -6,10 +6,11 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.ConveyorSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.PhotonVision;
 import frc.robot.subsystems.ShooterSubsystem;
 
 public class TrenchAuto extends SequentialCommandGroup {
-    public TrenchAuto(ShooterSubsystem m_shooter, DriveSubsystem m_robotDrive, IntakeSubsystem m_intake, ConveyorSubsystem m_conveyor) {        
+    public TrenchAuto(ShooterSubsystem m_shooter, DriveSubsystem m_robotDrive, IntakeSubsystem m_intake, ConveyorSubsystem m_conveyor, PhotonVision mPhotonVision) {        
         // Loads all of the trajectories we will need.  This happens on init so we get it out of the way before actually running.
         Trajectory trajectory1 = m_robotDrive.loadTrajectoryFromFile("Center1");
         Trajectory trajectory2 = m_robotDrive.loadTrajectoryFromFile("Trench2");

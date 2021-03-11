@@ -115,9 +115,9 @@ public class RobotContainer {
     autoChooser.addOption("Slalom", new Slalom(m_robotDrive));
     autoChooser.addOption("Bounce", new Bounce(m_robotDrive));
     autoChooser.addOption("Barrel", new Barrel(m_robotDrive));
-    autoChooser.addOption("Trench Auto", new TrenchAuto(m_shooter, m_robotDrive, m_intake, m_conveyor));
-    autoChooser.addOption("Center Auto", new CenterAuto(m_shooter, m_robotDrive, m_intake, m_conveyor));
-    autoChooser.addOption("Steal Auto", new StealAuto(m_shooter, m_robotDrive, m_intake, m_conveyor));
+    autoChooser.addOption("Trench Auto", new TrenchAuto(m_shooter, m_robotDrive, m_intake, m_conveyor, m_PhotonVision));
+    autoChooser.addOption("Center Auto", new CenterAuto(m_shooter, m_robotDrive, m_intake, m_conveyor, m_PhotonVision));
+    autoChooser.addOption("Steal Auto", new StealAuto(m_shooter, m_robotDrive, m_intake, m_conveyor, m_PhotonVision));
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
@@ -146,9 +146,9 @@ public class RobotContainer {
       }, m_shooter));
     
     // While driver holds the Y button Auto Aim to the goal using the left stick for distance control
-    drv.YButton.whenPressed(new InstantCommand(() -> m_PhotonVision.beforeTurnToTarget()))
-      .whileHeld(new InstantCommand(() -> m_PhotonVision.turnToTarget(m_robotDrive, () -> -drv.JoystickLY())))
-      .whenReleased(new InstantCommand(() -> m_PhotonVision.afterTurnToTarget()));
+    drv.YButton.whenPressed(new InstantCommand(() -> m_PhotonVision.lightsOn()))
+      .whileHeld(new InstantCommand(() -> m_PhotonVision.turnToTarget(m_robotDrive, () -> -drv.JoystickLY()), m_robotDrive))
+      .whenReleased(new InstantCommand(() -> m_PhotonVision.lightsOff()));
 
     // When Y button is pressed on operators controller deploy the intake but do not spin the wheels
     op.YButton.whenPressed(new InstantCommand(() -> m_intake.toggleIntakePosition(true)));
