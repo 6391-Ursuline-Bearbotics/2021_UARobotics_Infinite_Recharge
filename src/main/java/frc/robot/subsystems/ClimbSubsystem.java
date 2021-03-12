@@ -59,7 +59,7 @@ public class ClimbSubsystem extends SubsystemBase implements Loggable{
     @Config
     public void setPosition(double position) {
         m_RightClimbMotor.set(ControlMode.Position, position);
-        m_LeftClimbMotor.set(ControlMode.Position, position);
+        m_LeftClimbMotor.set(ControlMode.Position, position + 1000); // Left side seems to be lagging behind
     }
 
     @Log
@@ -76,6 +76,7 @@ public class ClimbSubsystem extends SubsystemBase implements Loggable{
     public void resetEnc(boolean enabled) {
         m_LeftClimbMotor.setSelectedSensorPosition(0);
         m_RightClimbMotor.setSelectedSensorPosition(0);
+        climbstage = 0;
     }
 
     // This is very important for resetting the climber.  This should only be done in the pits with extreme care!

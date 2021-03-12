@@ -96,6 +96,10 @@ public class ShooterSubsystem extends PIDSubsystem implements Loggable {
     var feedforward = m_shooterFeedforward.calculate(setpoint);
     SmartDashboard.putNumber("ShooterPID", output);
     SmartDashboard.putNumber("feedforward", feedforward);
+    if (output > 8 && getMeasurement() > 50) {
+      // output is still high after being up to speed encoder must be broken
+      output = 0;
+    }
     m_shooterMotor.setVoltage(MathUtil.clamp(output + feedforward, 0, 14));
   }
 

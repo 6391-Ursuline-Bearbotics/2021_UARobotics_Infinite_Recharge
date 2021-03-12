@@ -66,4 +66,12 @@ public class Xbox6391 {
    public double JoystickRY() {
       return m_Xbox6391Controller.getY(GenericHID.Hand.kRight);
    }
+
+   public double TriggerL() {
+      return m_Xbox6391Controller.getTriggerAxis(GenericHID.Hand.kLeft);
+   }
+
+   public double TriggerR() {
+      return m_Xbox6391Controller.getTriggerAxis(GenericHID.Hand.kRight);
+   }
 }

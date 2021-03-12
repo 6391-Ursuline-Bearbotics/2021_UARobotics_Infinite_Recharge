@@ -110,6 +110,13 @@ public class RobotContainer {
     // Constantly checks to see if the intake motor has stalled
     m_intake.setDefaultCommand(new RunCommand(m_intake::checkStall, m_intake));
 
+    m_climb.setDefaultCommand(
+      // Use right y axis to control the speed of the climber
+      new RunCommand(
+        () -> m_climb
+          .setOutput(Math.max(op.TriggerL(), drv.TriggerL()),
+            Math.max(op.TriggerR(), drv.TriggerR())), m_climb));
+
     autoChooser.addOption("GalacticSearch", new GalacticSearchAuto(m_robotDrive, m_intake, m_PhotonVision));
     autoChooser.addOption("2R", new GenericAuto(m_robotDrive, "GalacticSearch2R"));
     autoChooser.addOption("Slalom", new Slalom(m_robotDrive));
@@ -175,7 +182,7 @@ public class RobotContainer {
       .whenReleased(new InstantCommand(m_conveyor::turnOff, m_conveyor));
     
     // When start button is pressed for at least a second advance to the next climb stage
-    drv.StartButton.or(op.StartButton).whileActiveOnce(new WaitCommand(1).andThen(new NextClimbPosition(m_climb).withTimeout(5)));
+    drv.StartButton.or(op.StartButton).whileActiveOnce(new WaitCommand(0.5).andThen(new NextClimbPosition(m_climb).withTimeout(5)));
 
     // Create "button" from POV Hat in up direction.  Use both of the angles to the left and right also.
 
