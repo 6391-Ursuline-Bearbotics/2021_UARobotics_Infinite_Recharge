@@ -24,13 +24,12 @@ public class AutoAim extends CommandBase {
   @Override
   public void initialize() {
     m_PhotonVision.lightsOn();
+    m_robotDrive.driveToTarget(() -> 0).withTimeout(3.0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    m_PhotonVision.turnToTarget(m_robotDrive, () -> 0);
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override

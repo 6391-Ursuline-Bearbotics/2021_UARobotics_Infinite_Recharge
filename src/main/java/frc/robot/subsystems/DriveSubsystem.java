@@ -100,6 +100,9 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   @Log
   double lockedheading = 0;
   double currentEncoder = 0;
+  double targetAngle = 0;
+
+  PhotonVision m_PhotonVision;
 
   // Turn PIDControllers
   Constraints turnconstraints = new TrapezoidProfile.Constraints(DriveConstants.kMaxSpeedMetersPerSecond,
@@ -119,8 +122,9 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   /**
    * Creates a new DriveSubsystem.
    */
-  public DriveSubsystem() {
+  public DriveSubsystem(PhotonVision PhotonVision) {
     // Differential Drive Configuration
+    m_PhotonVision = PhotonVision;
     m_drive.setMaxOutput(DriveConstants.kMaxOutputForward, DriveConstants.kMaxOutputRotation);
     m_drive.setMinOutput(DriveConstants.kMinOutputForward, DriveConstants.kMinOutputRotation);
     m_drive.setDeadband(DriveConstants.kDeadbandForward, DriveConstants.kDeadbandRotation);
@@ -554,6 +558,16 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     }
   }
 
+  @Log
+  public boolean atAngle(Double target) {
+    if (Math.abs(getHeading() - target) < 5 &&
+        Math.abs(getTurnRate()) < 10) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   public void stopmotors() {
     m_talonsrxright.set(0);
     m_talonsrxleft.set(0);
@@ -581,11 +595,19 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   }
 
   // Uses the input to control forward speed to the specified heading
-  public Command driveToAngle(DoubleSupplier joystickY, Double heading) {
-    return new InstantCommand(() -> {
-        m_talonsrxright.set(ControlMode.PercentOutput, joystickY.getAsDouble(), DemandType.AuxPID, heading * 10); 
+  public Command driveToTarget(DoubleSupplier joystickY) {
+    return new RunCommand(() -> {
+        var result = m_PhotonVision.m_limePhoton.getLatestResult();
+        if (result.hasTargets()) {
+          targetAngle = result.getBestTarget().getYaw();
+          m_talonsrxright.set(ControlMode.PercentOutput, joystickY.getAsDouble(), DemandType.AuxPID, targetAngle * 10);
+        }
+        else {
+          stopmotors();
+          targetAngle = getHeading();
+        }
         m_drive.feed();
-      }, this);
+      }, this).withInterrupt(() -> atAngle(targetAngle));
   }
 
   // Drives a specified distance to a specified heading.

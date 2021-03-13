@@ -8,7 +8,6 @@
 package frc.robot;
 
 // WPI Imports
-import edu.wpi.cscore.HttpCamera;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -39,7 +38,6 @@ import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ConveyorSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
-import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.PhotonVision;
 // Constant Imports
 import frc.robot.Constants.ShooterConstants;
@@ -54,10 +52,12 @@ import frc.robot.UA6391.Xbox6391;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  public final PhotonVision m_PhotonVision = new PhotonVision();
+  
   @Log
   public final ShooterSubsystem m_shooter = new ShooterSubsystem();
   @Log
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final DriveSubsystem m_robotDrive = new DriveSubsystem(m_PhotonVision);
  /* 
   private final ControlPanelSubsystem m_controlpanel = new ControlPanelSubsystem(); */
   @Log
@@ -68,10 +68,6 @@ public class RobotContainer {
   public final ConveyorSubsystem m_conveyor = new ConveyorSubsystem();
   @Log
   public final ClimbSubsystem m_climb = ClimbSubsystem.Create();
-
-  public final Limelight m_Limelight = new Limelight();
-
-  public final PhotonVision m_PhotonVision = new PhotonVision();
   
   @Log(tabName = "DriveSubsystem")
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -87,7 +83,6 @@ public class RobotContainer {
   Button frontConveyorSensor = new Button(() -> m_conveyor.getFrontConveyor());
   Button topConveyorSensor = new Button(() -> m_conveyor.getTopConveyor());
   Button shooteratsetpoint = new Button(() -> m_shooter.atSetpoint());
-  public HttpCamera m_limelightFeed;
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
@@ -153,12 +148,12 @@ public class RobotContainer {
       }, m_shooter));
     
     // While driver holds the Y button Auto Aim to the goal using the left stick for distance control
-    drv.YButton.whenPressed(new InstantCommand(() -> m_PhotonVision.lightsOn()))
-      .whileHeld(new InstantCommand(() -> m_PhotonVision.turnToTarget(m_robotDrive, () -> -drv.JoystickLY()), m_robotDrive))
-      .whenReleased(new InstantCommand(() -> m_PhotonVision.lightsOff()));
+    drv.YButton.whenActive(new InstantCommand(() -> m_PhotonVision.lightsOn()))
+      .whileActiveOnce(m_robotDrive.driveToTarget(() -> -drv.JoystickLY()))
+      .whenInactive(new InstantCommand(() -> m_PhotonVision.lightsOff()));
 
     // When Y button is pressed on operators controller deploy the intake but do not spin the wheels
-    op.YButton.whenPressed(new InstantCommand(() -> m_intake.toggleIntakePosition(true)));
+    op.YButton.whenActive(new InstantCommand(() -> m_intake.toggleIntakePosition(true)));
 
     // Turn on the conveyor when:
     // the A button is pressed (either controller) and either the top sensor is not blocked or the shooter is up to speed
@@ -178,8 +173,8 @@ public class RobotContainer {
     drv.BumperL.whileActiveOnce(m_robotDrive.driveStraight(() -> -drv.JoystickLY()));
 
     // When the back button is pressed run the conveyor backwards until released
-    drv.BackButton.whenPressed(new InstantCommand(m_conveyor::turnBackwards, m_conveyor))
-      .whenReleased(new InstantCommand(m_conveyor::turnOff, m_conveyor));
+    drv.BackButton.whenActive(new InstantCommand(m_conveyor::turnBackwards, m_conveyor))
+      .whenInactive(new InstantCommand(m_conveyor::turnOff, m_conveyor));
     
     // When start button is pressed for at least a second advance to the next climb stage
     drv.StartButton.or(op.StartButton).whileActiveOnce(new WaitCommand(0.5).andThen(new NextClimbPosition(m_climb).withTimeout(5)));

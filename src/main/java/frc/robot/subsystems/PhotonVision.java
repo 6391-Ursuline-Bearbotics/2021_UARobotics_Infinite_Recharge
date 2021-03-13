@@ -25,14 +25,11 @@ public class PhotonVision {
       m_limePhoton.setLED(LEDMode.kOff);
    }
 
-   public void turnToTarget(DriveSubsystem m_robotDrive, DoubleSupplier joystickY) {
+   public double getYaw() {
       var result = m_limePhoton.getLatestResult();
       if (result.hasTargets()) {
-         // Use the joystick for the forward speed and the Yaw as angle
-         m_robotDrive.driveToAngle(joystickY, -result.getBestTarget().getYaw()).schedule();
-      } else {
-         // If we have no targets, stay still.
-         m_robotDrive.stopmotors();
+         return result.getBestTarget().getYaw();
       }
+      return -999.0;
    }
 }
