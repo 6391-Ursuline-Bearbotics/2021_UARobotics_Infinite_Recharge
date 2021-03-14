@@ -25,12 +25,14 @@ import io.github.oblarg.oblog.annotations.Log;
 import frc.robot.commands.Barrel;
 import frc.robot.commands.GalacticSearchAuto;
 import frc.robot.commands.GenericAuto;
+import frc.robot.commands.LStoCP;
 import frc.robot.commands.NextClimbPosition;
 import frc.robot.commands.Slalom;
 import frc.robot.commands.TrenchAuto;
 import frc.robot.commands.CenterAuto;
 import frc.robot.commands.StealAuto;
 import frc.robot.commands.Bounce;
+import frc.robot.commands.CPtoLS;
 // Subsystem Imports
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -185,10 +187,10 @@ public class RobotContainer {
     drv.StartButton.or(op.StartButton).whileActiveOnce(new WaitCommand(0.5).andThen(new NextClimbPosition(m_climb).withTimeout(5)));
 
     // Create "button" from POV Hat in up direction.  Use both of the angles to the left and right also.
-
+    drv.POVUp.whileActiveOnce(new LStoCP(m_shooter, m_robotDrive, m_intake));
     
     // Create "button" from POV Hat in down direction.  Use both of the angles to the left and right also.
-    
+    drv.POVDown.whileActiveOnce(new CPtoLS(m_shooter, m_robotDrive, m_intake));
 
     // POV Up Direction on Operator Controller relatively increases the current setpoint of the shooter
     op.POVUp.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() + 50);}));
