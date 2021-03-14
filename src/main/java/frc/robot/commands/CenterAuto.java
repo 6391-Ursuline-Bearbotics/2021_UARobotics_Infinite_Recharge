@@ -21,7 +21,8 @@ public class CenterAuto extends SequentialCommandGroup {
           new InstantCommand(() -> m_robotDrive.resetOdometry(trajectory1.getInitialPose())),
 
           //turn shooter on to get up to speed
-          new InstantCommand(() -> m_shooter.setSetpoint(AutoConstants.kAutoShootRPS)),
+          new InstantCommand(() -> {m_shooter.setSetpoint(AutoConstants.kAutoShootRPS);
+              m_shooter.enable();}, m_shooter),
 
           //back up 1 meter
           m_robotDrive.createCommandForTrajectory(trajectory1, false).withTimeout(50).withName("Center1"),

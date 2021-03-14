@@ -33,7 +33,8 @@ public final class Constants {
     
         // Differential Drive setup parameters.  These control how the drivers input translates to motor power.
         public static final double kMaxOutputForward = 1; // % motor ouput
-        public static final double kMaxOutputRotation = 0.3; // % motor ouput
+        public static final double kMaxOutputRotation = 0.5; // % motor ouput
+        public static final double kMaxOutputRotationSlow = 0.25; // % motor ouput
         public static final double kDeadbandForward = 0.05; // % motor ouput
         public static final double kDeadbandRotation = 0.05; // % motor ouput
         public static final double kRampForward = 0.2; // Seconds to go from min to max motor %
@@ -189,7 +190,7 @@ public final class Constants {
         public static final double kShooterNearTrenchRPS = 2000/60;
         public static final double kShooterAutoLineRPS = 1000/60;
         public static final double kShooterToleranceRPS = 200/60;
-        public static final double kShooterToleranceAccel = 3.0;
+        public static final double kShooterToleranceAccel = 20.0;
         
         public static final double kSpinupRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(500.0);
 
@@ -200,7 +201,7 @@ public final class Constants {
             1.0 / (double) kEncoderCPR;
 
         // These are not real PID gains, and will have to be tuned for your specific robot.
-        public static final double kP = 1.2; // .000321 / 1.2 was competition number
+        public static final double kP = 0.12; // .000321 / 1.2 was competition number
         public static final double kI = 0;
         public static final double kD = 0;
         public static final double kF = 0; //Not used
@@ -228,7 +229,7 @@ public final class Constants {
         public static final double kAutoShoot3 = 4;
         public static final double kAutoShoot5 = 6;
 
-        public static final double kAutoShootRPS = 7000/60;
+        public static final double kAutoShootRPS = 7400/60;
         
         public static final double kMaxSpeedMetersPerSecond = 3;
         public static final double kMaxAccelerationMetersPerSecondSquared = 3;

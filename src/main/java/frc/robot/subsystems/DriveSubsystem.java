@@ -560,8 +560,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   @Log
   public boolean atAngle(Double target) {
-    if (Math.abs(getHeading() - target) < 5 &&
-        Math.abs(getTurnRate()) < 10) {
+    if (Math.abs(getHeading() - target) < 2 &&
+        Math.abs(getTurnRate()) < 5) {
       return true;
     } else {
       return false;
@@ -599,7 +599,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     return new RunCommand(() -> {
         var result = m_PhotonVision.m_limePhoton.getLatestResult();
         if (result.hasTargets()) {
-          targetAngle = result.getBestTarget().getYaw();
+          targetAngle = -result.getBestTarget().getYaw();
           m_talonsrxright.set(ControlMode.PercentOutput, joystickY.getAsDouble(), DemandType.AuxPID, targetAngle * 10);
         }
         else {
@@ -607,7 +607,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
           targetAngle = getHeading();
         }
         m_drive.feed();
-      }, this).withInterrupt(() -> atAngle(targetAngle));
+      }, this); //.withInterrupt(() -> atAngle(targetAngle));
   }
 
   // Drives a specified distance to a specified heading.
@@ -619,6 +619,10 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
         m_drive.feed();
       }, this).withInterrupt(() -> atSetpoint())
     );
+  }
+
+  public void setMaxDriveOutput(Double maxForward, Double maxRotation) {
+    m_drive.setMaxOutput(maxForward, maxRotation);
   }
 
   @Config.ToggleButton

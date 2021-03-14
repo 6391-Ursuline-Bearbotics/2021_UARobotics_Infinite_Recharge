@@ -41,6 +41,7 @@ import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.PhotonVision;
 // Constant Imports
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 // Special Imports
 import frc.robot.UA6391.Xbox6391;
@@ -69,7 +70,7 @@ public class RobotContainer {
   @Log
   public final ClimbSubsystem m_climb = ClimbSubsystem.Create();
   
-  @Log(tabName = "DriveSubsystem")
+  @Log(tabName = "Dashboard")
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
   // The driver's controller
@@ -169,8 +170,12 @@ public class RobotContainer {
     drv.BumperR.or(op.BumperR).whenActive(new InstantCommand(() -> m_intake.toggleIntakeWheels(true))
       .andThen(new InstantCommand(() -> m_intake.toggleIntakePosition(true))));
     
-    // When the left bumper is pressed on either controller go to the next climber stage
-    drv.BumperL.whileActiveOnce(m_robotDrive.driveStraight(() -> -drv.JoystickLY()));
+    // When the left bumper is pressed on either controller right joystick is super slow turn
+    drv.BumperL.or(op.BumperL).whileActiveOnce(new InstantCommand(() -> m_robotDrive.setMaxDriveOutput(
+        DriveConstants.kMaxOutputForward, DriveConstants.kMaxOutputRotationSlow)))
+      .whenInactive(new InstantCommand(() -> m_robotDrive.setMaxDriveOutput(
+        DriveConstants.kMaxOutputForward, DriveConstants.kMaxOutputRotation)));
+    //drv.BumperL.whileActiveOnce(m_robotDrive.driveStraight(() -> -drv.JoystickLY()));
 
     // When the back button is pressed run the conveyor backwards until released
     drv.BackButton.whenActive(new InstantCommand(m_conveyor::turnBackwards, m_conveyor))

@@ -21,7 +21,8 @@ public class StealAuto extends SequentialCommandGroup {
             new InstantCommand(() -> m_robotDrive.resetOdometry(trajectory1.getInitialPose())),
 
             // Turn the shooter on and give it time to get up to speed.
-            new InstantCommand(() -> m_shooter.setSetpoint(AutoConstants.kAutoShootRPS)),
+            new InstantCommand(() -> {m_shooter.setSetpoint(AutoConstants.kAutoShootRPS);
+                m_shooter.enable();}, m_shooter),
             
             // Lowers the intake and turns the wheels on
             new InstantCommand(() -> m_intake.deployIntake()),

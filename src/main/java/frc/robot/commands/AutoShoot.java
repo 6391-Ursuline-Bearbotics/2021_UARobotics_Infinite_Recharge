@@ -39,7 +39,7 @@ public class AutoShoot extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (m_shooter.atSetpoint()) {
+    if (m_shooter.atSetpoint() || m_conveyor.getTopConveyor()) {
       m_conveyor.turnOn();
     }
     else {
