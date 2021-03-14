@@ -238,6 +238,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     m_pigeonSim.setRawHeading(m_drivetrainSimulator.getHeading().getDegrees());
 
     m_fieldSim.setRobotPose(getCurrentPose());
+    m_PhotonVision.visionSys.processFrame(getCurrentPose());
   }
 
   public double getDrawnCurrentAmps() {
@@ -588,15 +589,18 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
 
   // Locks the heading and uses the input to control forward speed
   public Command driveStraight(DoubleSupplier joystickY) {
-    return new RunCommand(() -> {
+    return new InstantCommand(() -> currentEncoder = distancesetup(), this).andThen(
+      new RunCommand(() -> {
         m_talonsrxright.set(ControlMode.PercentOutput, joystickY.getAsDouble(), DemandType.AuxPID, lockedheading * 10); 
         m_drive.feed();
-      }, this).beforeStarting(() -> {lockedheading = getHeading(); distancesetup();}, this);
+      }, this).beforeStarting(() -> {lockedheading = getHeading(); distancesetup();}, this)
+    );
   }
 
   // Uses the input to control forward speed to the specified heading
   public Command driveToTarget(DoubleSupplier joystickY) {
-    return new RunCommand(() -> {
+    return new InstantCommand(() -> currentEncoder = distancesetup(), this).andThen(
+      new RunCommand(() -> {
         var result = m_PhotonVision.m_limePhoton.getLatestResult();
         if (result.hasTargets()) {
           targetAngle = -result.getBestTarget().getYaw();
@@ -607,7 +611,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
           targetAngle = getHeading();
         }
         m_drive.feed();
-      }, this); //.withInterrupt(() -> atAngle(targetAngle));
+      }, this) //.withInterrupt(() -> atAngle(targetAngle));
+    );
   }
 
   // Drives a specified distance to a specified heading.
