@@ -113,7 +113,7 @@ public final class Constants {
          * 
          * 	                                    			  kP   kI   kD   kF               Iz    PeakOut */
         public final static Gains kGains_Distanc = new Gains( 0.5, 0.0,  0.0, 0.0,            100,  0.50 );
-        public final static Gains kGains_Turning = new Gains( 0.5, 0.0,  4.0, 0.0,            200,  0.3 );
+        public final static Gains kGains_Turning = new Gains( 0.5, 0.0,  4.0, 0.2,            200,  0.3 );
         public final static Gains kGains_Velocit = new Gains( 1.2, 0.0, 0, 1023.0/6800.0,  300,  1.00 ); //0.2 // .00712
         public final static Gains kGains_MotProf = new Gains( 1.0, 0.0,  0.0, 1023.0/6800.0,  400,  1.00 );
         
