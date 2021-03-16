@@ -40,6 +40,9 @@ public class CenterAuto extends SequentialCommandGroup {
           // Pick up 3 balls in a line in the sheild generator, end near the pillar
           m_robotDrive.createCommandForTrajectory(trajectory3, false).withTimeout(50).withName("Center3"),
 
+          //turn on conveyor
+          new InstantCommand(() -> m_conveyor.turnOn()),
+
           // Raise the intake to avoid hitting the pillar
           new InstantCommand(() -> m_intake.retractIntake()),
 
