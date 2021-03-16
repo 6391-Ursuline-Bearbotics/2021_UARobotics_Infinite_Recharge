@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.subsystems.ConveyorSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -30,7 +31,7 @@ public class CenterAuto extends SequentialCommandGroup {
           // shoot 3 balls
           new AutoShoot(m_shooter, m_conveyor, AutoConstants.kAutoShoot3),
 
-          //back up into rendevouz
+          //back up into rendezvous
           m_robotDrive.createCommandForTrajectory(trajectory2, false).withTimeout(50).withName("Center2"),
 
           //lower and spin intake
@@ -41,6 +42,8 @@ public class CenterAuto extends SequentialCommandGroup {
 
           // Raise the intake to avoid hitting the pillar
           new InstantCommand(() -> m_intake.retractIntake()),
+
+          new WaitCommand(0.5),
 
           // Turn right to avoid going over the bump and go back to our shooting spot.
           m_robotDrive.createCommandForTrajectory(trajectory4, false).withTimeout(50).withName("Center4"),
