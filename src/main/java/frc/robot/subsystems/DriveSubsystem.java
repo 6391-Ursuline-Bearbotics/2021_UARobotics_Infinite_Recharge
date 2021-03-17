@@ -562,7 +562,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   @Log
   public boolean atAngle(Double target) {
     if (Math.abs(getHeading() - target) < 2 &&
-        Math.abs(getTurnRate()) < 5) {
+        Math.abs(getTurnRate()) < .1) {
       return true;
     } else {
       return false;
@@ -611,7 +611,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
           targetAngle = getHeading();
         }
         m_drive.feed();
-      }, this) //.withInterrupt(() -> atAngle(targetAngle));
+      }, this).withInterrupt(() -> atAngle(targetAngle))
     );
   }
 

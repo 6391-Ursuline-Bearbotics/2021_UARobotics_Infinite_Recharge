@@ -33,6 +33,7 @@ import frc.robot.commands.CenterAuto;
 import frc.robot.commands.StealAuto;
 import frc.robot.commands.Bounce;
 import frc.robot.commands.CPtoLS;
+import frc.robot.commands.Center5Ball;
 // Subsystem Imports
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -122,6 +123,7 @@ public class RobotContainer {
     autoChooser.addOption("Barrel", new Barrel(m_robotDrive));
     autoChooser.addOption("Trench Auto", new TrenchAuto(m_shooter, m_robotDrive, m_intake, m_conveyor, m_PhotonVision));
     autoChooser.addOption("Center Auto", new CenterAuto(m_shooter, m_robotDrive, m_intake, m_conveyor, m_PhotonVision));
+    autoChooser.addOption("Center 5 Ball", new Center5Ball(m_shooter, m_robotDrive, m_intake, m_conveyor, m_PhotonVision));
     autoChooser.addOption("Steal Auto", new StealAuto(m_shooter, m_robotDrive, m_intake, m_conveyor, m_PhotonVision));
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
