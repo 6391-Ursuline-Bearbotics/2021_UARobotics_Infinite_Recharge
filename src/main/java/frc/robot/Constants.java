@@ -226,8 +226,8 @@ public final class Constants {
 
     public static final class AutoConstants {
         public static final double kAutoTimeoutSeconds = 12;
-        public static final double kAutoShoot3 = 4;
-        public static final double kAutoShoot5 = 6;
+        public static final double kAutoShootInit = 3;
+        public static final double kAutoShootRest = 6;
 
         public static final double kAutoShootRPS = 7400/60;
         

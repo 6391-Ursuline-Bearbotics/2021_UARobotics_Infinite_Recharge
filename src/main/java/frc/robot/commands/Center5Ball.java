@@ -29,7 +29,7 @@ public class Center5Ball extends SequentialCommandGroup {
             m_robotDrive.createCommandForTrajectory(trajectory1, false).withTimeout(50).withName("Center1"),
 
             // shoot 3 balls
-            new AutoShoot(m_shooter, m_conveyor, AutoConstants.kAutoShoot3),
+            new AutoShoot(m_shooter, m_conveyor, AutoConstants.kAutoShootInit),
 
             //back up into rendezvous
             m_robotDrive.createCommandForTrajectory(trajectory2, false).withTimeout(50).withName("Center2"),
@@ -60,7 +60,7 @@ public class Center5Ball extends SequentialCommandGroup {
             new AutoAim(m_robotDrive, m_PhotonVision),
 
             //shoot other balls
-            new AutoShoot(m_shooter, m_conveyor, AutoConstants.kAutoShoot3)
+            new AutoShoot(m_shooter, m_conveyor, AutoConstants.kAutoShootRest)
         );
     }
 }
