@@ -2,8 +2,9 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.subsystems.ConveyorSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -16,7 +17,6 @@ public class CenterAuto extends SequentialCommandGroup {
       Trajectory trajectory1 = m_robotDrive.loadTrajectoryFromFile("Center1");
       Trajectory trajectory2 = m_robotDrive.loadTrajectoryFromFile("Center2");
       Trajectory trajectory3 = m_robotDrive.loadTrajectoryFromFile("Center3");
-      Trajectory trajectory4 = m_robotDrive.loadTrajectoryFromFile("Center4");
       
       addCommands(
           new InstantCommand(() -> m_robotDrive.resetOdometry(trajectory1.getInitialPose())),
@@ -28,6 +28,8 @@ public class CenterAuto extends SequentialCommandGroup {
           //back up 1 meter
           m_robotDrive.createCommandForTrajectory(trajectory1, false).withTimeout(50).withName("Center1"),
 
+          new AutoAim(m_robotDrive, m_PhotonVision),
+
           // shoot 3 balls
           new AutoShoot(m_shooter, m_conveyor, AutoConstants.kAutoShoot3),
 
@@ -37,19 +39,24 @@ public class CenterAuto extends SequentialCommandGroup {
           //lower and spin intake
           new InstantCommand(() -> m_intake.deployIntake()),
 
-          // Pick up 3 balls in a line in the sheild generator, end near the pillar
-          m_robotDrive.createCommandForTrajectory(trajectory3, false).withTimeout(50).withName("Center3"),
+          new ParallelRaceGroup(
+            // Pick up 3 balls in a straight line then turn back towards the goal
+            m_robotDrive.createCommandForTrajectory(trajectory3, false).withTimeout(5).withName("Center3"),
 
-          //turn on conveyor
-          new InstantCommand(() -> m_conveyor.turnOn()),
-
-          // Raise the intake to avoid hitting the pillar
+            //turn on conveyor
+            new RunCommand(() -> {
+                    if (!m_conveyor.getTopConveyor()) {
+                        m_conveyor.turnOn();
+                    }
+                    else {
+                        m_conveyor.turnOff();
+                    }
+                }
+            , m_conveyor)
+          ),
+          
+          // Raise the intake
           new InstantCommand(() -> m_intake.retractIntake()),
-
-          new WaitCommand(0.5),
-
-          // Turn right to avoid going over the bump and go back to our shooting spot.
-          m_robotDrive.createCommandForTrajectory(trajectory4, false).withTimeout(50).withName("Center4"),
 
           // AutoAim to make sure we are pointed directly at the target
           new AutoAim(m_robotDrive, m_PhotonVision),

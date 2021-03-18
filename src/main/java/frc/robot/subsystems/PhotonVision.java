@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import java.util.function.DoubleSupplier;
-
 import org.photonvision.LEDMode;
 import org.photonvision.PhotonCamera;
 import org.photonvision.SimVisionSystem;
@@ -15,7 +13,7 @@ import frc.robot.Constants.PhotonConstants;
 
 public class PhotonVision {
    // Creates a new PhotonCamera.
-   public PhotonCamera m_limePhoton = new PhotonCamera("Limelight");
+   public PhotonCamera m_limePhoton = new PhotonCamera("gloworm");
    public PhotonCamera m_HD3000 = new PhotonCamera("HD3000");
    public SimVisionSystem visionSys;
 
@@ -23,7 +21,7 @@ public class PhotonVision {
       m_limePhoton.setPipelineIndex(PhotonConstants.kLimePipe);
       m_HD3000.setPipelineIndex(PhotonConstants.kHD3000Pipe);
 
-      String camName = "Limelight";
+      String camName = "gloworm";
       double camDiagFOV = 75.0; // degrees
       double camPitch = 10.0;     // degrees
       Transform2d cameraToRobot = new Transform2d(new Translation2d(0.0, 0.0), new Rotation2d()); // meters

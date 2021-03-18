@@ -602,8 +602,10 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     return new InstantCommand(() -> currentEncoder = distancesetup(), this).andThen(
       new RunCommand(() -> {
         var result = m_PhotonVision.m_limePhoton.getLatestResult();
+        SmartDashboard.putBoolean("hastargets", result.hasTargets());
         if (result.hasTargets()) {
           targetAngle = -result.getBestTarget().getYaw();
+          SmartDashboard.putNumber("targetangle", targetAngle);
           m_talonsrxright.set(ControlMode.PercentOutput, joystickY.getAsDouble(), DemandType.AuxPID, targetAngle * 10);
         }
         else {
@@ -611,7 +613,7 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
           targetAngle = getHeading();
         }
         m_drive.feed();
-      }, this).withInterrupt(() -> atAngle(targetAngle))
+      }, this) //.withInterrupt(() -> atAngle(targetAngle))
     );
   }
 
