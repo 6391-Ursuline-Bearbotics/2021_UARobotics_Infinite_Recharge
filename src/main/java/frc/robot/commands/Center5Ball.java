@@ -16,7 +16,7 @@ public class Center5Ball extends SequentialCommandGroup {
     public Center5Ball(ShooterSubsystem m_shooter, DriveSubsystem m_robotDrive, IntakeSubsystem m_intake, ConveyorSubsystem m_conveyor, PhotonVision m_PhotonVision) {        
         Trajectory trajectory1 = m_robotDrive.loadTrajectoryFromFile("Center1");
         Trajectory trajectory2 = m_robotDrive.loadTrajectoryFromFile("Center2");
-        Trajectory trajectory3 = m_robotDrive.loadTrajectoryFromFile("Ball3");
+        Trajectory trajectory3 = m_robotDrive.loadTrajectoryFromFile("Ball3Slow");
         
         addCommands(
             new InstantCommand(() -> m_robotDrive.resetOdometry(trajectory1.getInitialPose())),
@@ -39,7 +39,7 @@ public class Center5Ball extends SequentialCommandGroup {
 
             new ParallelRaceGroup(
                 // Pick up 5 balls in a fishook shape and turn back towards the goal
-                m_robotDrive.createCommandForTrajectory(trajectory3, false).withTimeout(50).withName("Ball3"),
+                m_robotDrive.createCommandForTrajectory(trajectory3, false).withTimeout(50).withName("Ball3Slow"),
 
                 //turn on conveyor
                 new RunCommand(() -> {

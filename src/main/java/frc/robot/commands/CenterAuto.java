@@ -16,7 +16,7 @@ public class CenterAuto extends SequentialCommandGroup {
   public CenterAuto(ShooterSubsystem m_shooter, DriveSubsystem m_robotDrive, IntakeSubsystem m_intake, ConveyorSubsystem m_conveyor, PhotonVision m_PhotonVision) {        
       Trajectory trajectory1 = m_robotDrive.loadTrajectoryFromFile("Center1");
       Trajectory trajectory2 = m_robotDrive.loadTrajectoryFromFile("Center2");
-      Trajectory trajectory3 = m_robotDrive.loadTrajectoryFromFile("Center3");
+      Trajectory trajectory3 = m_robotDrive.loadTrajectoryFromFile("Center3Slow");
       
       addCommands(
           new InstantCommand(() -> m_robotDrive.resetOdometry(trajectory1.getInitialPose())),
@@ -27,8 +27,6 @@ public class CenterAuto extends SequentialCommandGroup {
 
           //back up 1 meter
           m_robotDrive.createCommandForTrajectory(trajectory1, false).withTimeout(50).withName("Center1"),
-
-          new AutoAim(m_robotDrive, m_PhotonVision),
 
           // shoot 3 balls
           new AutoShoot(m_shooter, m_conveyor, AutoConstants.kAutoShoot3),
@@ -41,7 +39,7 @@ public class CenterAuto extends SequentialCommandGroup {
 
           new ParallelRaceGroup(
             // Pick up 3 balls in a straight line then turn back towards the goal
-            m_robotDrive.createCommandForTrajectory(trajectory3, false).withTimeout(5).withName("Center3"),
+            m_robotDrive.createCommandForTrajectory(trajectory3, false).withTimeout(5).withName("Center3Slow"),
 
             //turn on conveyor
             new RunCommand(() -> {
