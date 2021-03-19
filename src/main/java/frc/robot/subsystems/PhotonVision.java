@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Transform2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.PhotonConstants;
 
 public class PhotonVision {
@@ -23,9 +24,9 @@ public class PhotonVision {
 
       String camName = "gloworm";
       double camDiagFOV = 75.0; // degrees
-      double camPitch = 10.0;     // degrees
+      double camPitch = LimelightConstants.kCameraAngle;     // degrees
       Transform2d cameraToRobot = new Transform2d(new Translation2d(0.0, 0.0), new Rotation2d()); // meters
-      double camHeightOffGround = 0.85; // meters
+      double camHeightOffGround = LimelightConstants.kCameraHeight; // meters
       double maxLEDRange = 20;          // meters
       int camResolutionWidth = 640;     // pixels
       int camResolutionHeight = 480;    // pixels
@@ -42,9 +43,9 @@ public class PhotonVision {
                                     minTargetArea);
 
       var targetPose = new Pose2d(new Translation2d(15.97, 2.47), new Rotation2d()); // meters
-      double targetHeightAboveGround = 2.3; // meters
-      double targetWidth = 0.54;           // meters
-      double targetHeight = 0.25;          // meters
+      double targetWidth = 0.8;           // meters
+      double targetHeight = 0.762;          // meters
+      double targetHeightAboveGround = LimelightConstants.kTargetHeight - targetHeight / 2.0; // meters
       
       var newTgt = new SimVisionTarget(targetPose,
                                        targetHeightAboveGround,

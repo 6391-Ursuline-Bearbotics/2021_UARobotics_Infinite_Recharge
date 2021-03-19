@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import io.github.oblarg.oblog.annotations.Log;
-
+import frc.robot.commands.AutoAim;
 // Command Imports
 import frc.robot.commands.Barrel;
 import frc.robot.commands.GalacticSearchAuto;
@@ -61,7 +61,7 @@ public class RobotContainer {
   @Log
   public final ShooterSubsystem m_shooter = new ShooterSubsystem();
   @Log
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem(m_PhotonVision);
+  public final DriveSubsystem m_robotDrive = new DriveSubsystem();
  /* 
   private final ControlPanelSubsystem m_controlpanel = new ControlPanelSubsystem(); */
   @Log
@@ -153,9 +153,7 @@ public class RobotContainer {
       }, m_shooter));
     
     // While driver holds the Y button Auto Aim to the goal using the left stick for distance control
-    drv.YButton.whenActive(new InstantCommand(() -> m_PhotonVision.lightsOn()))
-      .whileActiveOnce(m_robotDrive.driveToTarget(() -> -drv.JoystickLY()))
-      .whenInactive(new InstantCommand(() -> m_PhotonVision.lightsOff()));
+    drv.YButton.whileActiveOnce(new AutoAim(m_robotDrive, m_PhotonVision, m_shooter, () -> -drv.JoystickLY()));
 
     // When Y button is pressed on operators controller deploy the intake but do not spin the wheels
     op.YButton.whenActive(new InstantCommand(() -> m_intake.toggleIntakePosition(true)));

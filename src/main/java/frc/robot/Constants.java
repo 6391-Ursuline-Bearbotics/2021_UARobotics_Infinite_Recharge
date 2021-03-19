@@ -286,19 +286,11 @@ public final class Constants {
     }
 
     public static final class LimelightConstants {
-        public static final double CAMERA_ANGLE = 0;
-        public static final double CAMERA_HEIGHT = 0;
-        public static final double TARGET_HEIGHT = 0;
-        public static final int TARGET_PIPELINE = 0;
-        public static final int DEFAULT_PIPELINE = 1;
-        public static final int DRIVE_PIPELINE = 2;
-        public static final int LED_ON = 3;
-        public static final int LED_OFF = 1;
-        public static final double TURN_TO_TARGET_TOLERANCE = 1.5;
-        public static final double RANGE_TOO_CLOSE =4;
-        public static final double RANGE_TOO_FAR=-9;
-        public static final double RANGE_PRIME_START=0;
-        public static final double RANGE_PRIME_END=-2;
+        public static final double kCameraAngle = 20; // Degrees
+        public static final double kCameraHeight = .8; // Meters
+        public static final double kTargetHeight = 2.49; // Meters
+        // public static final double kMinimumRange = 4; // Meters
+        // public static final double kMaximumRange = -9; // Meters
     }
 
     public static final class PhotonConstants {

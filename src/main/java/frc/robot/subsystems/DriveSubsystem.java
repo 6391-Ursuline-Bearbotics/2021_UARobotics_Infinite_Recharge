@@ -102,8 +102,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   double currentEncoder = 0;
   double targetAngle = 0;
 
-  PhotonVision m_PhotonVision;
-
   // Turn PIDControllers
   Constraints turnconstraints = new TrapezoidProfile.Constraints(DriveConstants.kMaxSpeedMetersPerSecond,
                                              DriveConstants.kMaxAccelerationMetersPerSecondSquared);
@@ -122,9 +120,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   /**
    * Creates a new DriveSubsystem.
    */
-  public DriveSubsystem(PhotonVision PhotonVision) {
+  public DriveSubsystem() {
     // Differential Drive Configuration
-    m_PhotonVision = PhotonVision;
     m_drive.setMaxOutput(DriveConstants.kMaxOutputForward, DriveConstants.kMaxOutputRotation);
     m_drive.setMinOutput(DriveConstants.kMinOutputForward, DriveConstants.kMinOutputRotation);
     m_drive.setDeadband(DriveConstants.kDeadbandForward, DriveConstants.kDeadbandRotation);
@@ -238,7 +235,6 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     m_pigeonSim.setRawHeading(m_drivetrainSimulator.getHeading().getDegrees());
 
     m_fieldSim.setRobotPose(getCurrentPose());
-    m_PhotonVision.visionSys.processFrame(getCurrentPose());
   }
 
   public double getDrawnCurrentAmps() {
@@ -598,23 +594,14 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
   }
 
   // Uses the input to control forward speed to the specified heading
-  public Command driveToTarget(DoubleSupplier joystickY) {
-    return new InstantCommand(() -> currentEncoder = distancesetup(), this).andThen(
-      new RunCommand(() -> {
-        var result = m_PhotonVision.m_limePhoton.getLatestResult();
-        SmartDashboard.putBoolean("hastargets", result.hasTargets());
-        if (result.hasTargets()) {
-          targetAngle = -result.getBestTarget().getYaw();
-          SmartDashboard.putNumber("targetangle", targetAngle);
-          m_talonsrxright.set(ControlMode.PercentOutput, joystickY.getAsDouble(), DemandType.AuxPID, targetAngle * 10);
-        }
-        else {
-          stopmotors();
-          targetAngle = getHeading();
-        }
-        m_drive.feed();
-      }, this) //.withInterrupt(() -> atAngle(targetAngle))
-    );
+  public void driveToTarget(Double fwd, Double heading) {
+    // Make sure we are using distance mode
+    if (m_talonsrxleft.getControlMode() != ControlMode.Follower) {
+      distancesetup();
+    }
+    
+    // Drive to given heading at the speed specified
+    m_talonsrxright.set(ControlMode.PercentOutput, fwd, DemandType.AuxPID, targetAngle * 10);
   }
 
   // Drives a specified distance to a specified heading.

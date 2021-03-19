@@ -53,6 +53,7 @@ public class Robot extends TimedRobot {
     double drawCurrent = m_robotContainer.getRobotDrive().getDrawnCurrentAmps();
     double loadedVoltage = BatterySim.calculateDefaultBatteryLoadedVoltage(drawCurrent);
     RoboRioSim.setVInVoltage(loadedVoltage);
+    m_robotContainer.m_PhotonVision.visionSys.processFrame(m_robotContainer.m_robotDrive.getCurrentPose());
   }
 
   /**

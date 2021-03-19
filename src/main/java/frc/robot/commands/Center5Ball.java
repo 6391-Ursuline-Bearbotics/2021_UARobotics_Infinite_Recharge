@@ -57,7 +57,7 @@ public class Center5Ball extends SequentialCommandGroup {
             new InstantCommand(() -> m_intake.retractIntake()),            
             
             // AutoAim to make sure we are pointed directly at the target
-            new AutoAim(m_robotDrive, m_PhotonVision),
+            new AutoAim(m_robotDrive, m_PhotonVision, m_shooter, () -> 0),
 
             //shoot other balls
             new AutoShoot(m_shooter, m_conveyor, AutoConstants.kAutoShootRest)

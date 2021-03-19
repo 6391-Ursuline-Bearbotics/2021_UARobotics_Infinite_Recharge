@@ -30,7 +30,7 @@ public class StealAuto extends SequentialCommandGroup {
             // Runs the Steal1 trajectory that grabs 2 balls in their trench and then goes across the field to our shooting spot.
             m_robotDrive.createCommandForTrajectory(trajectory1, false).withTimeout(50).withName("Steal1"),
 
-            new AutoAim(m_robotDrive, m_PhotonVision),
+            new AutoAim(m_robotDrive, m_PhotonVision, m_shooter, () -> 0),
 
             // Shoot all 5 balls that we have collected (will probably be just 3 for other autos)
             new AutoShoot(m_shooter, m_conveyor, AutoConstants.kAutoShootRest)
