@@ -197,10 +197,10 @@ public class RobotContainer {
     //drv.POVDown.whileActiveOnce(new CPtoLS(m_shooter, m_robotDrive, m_intake));
 
     // POV Up Direction on Operator Controller relatively increases the current setpoint of the shooter
-    op.POVUp.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() + 1);}));
+    op.POVUpish.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() + 1);}));
 
     // POV Down Direction on Operator Controller relatively increases the current setpoint of the shooter
-    op.POVDown.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() - 1);}));
+    op.POVDownish.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() - 1);}));
   }
 
   public DriveSubsystem getRobotDrive() {

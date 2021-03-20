@@ -9,6 +9,11 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class Xbox6391 {
    public final XboxController m_Xbox6391Controller;
 
+   public final Trigger POVUpish;
+   public final Trigger POVDownish;
+   public final Trigger POVLeftish;
+   public final Trigger POVRightish;
+
    public final Trigger POVUp;
    public final Trigger POVDown;
    public final Trigger POVLeft;
@@ -31,10 +36,15 @@ public class Xbox6391 {
    public Xbox6391 (int port) {
       m_Xbox6391Controller = new XboxController(port);
 
-      POVUp = new POVButton(m_Xbox6391Controller, 315).or(new POVButton(m_Xbox6391Controller, 0)).or(new POVButton(m_Xbox6391Controller, 45));
-      POVDown = new POVButton(m_Xbox6391Controller, 225).or(new POVButton(m_Xbox6391Controller, 180)).or(new POVButton(m_Xbox6391Controller, 135));
-      POVLeft = new POVButton(m_Xbox6391Controller, 225).or(new POVButton(m_Xbox6391Controller, 270)).or(new POVButton(m_Xbox6391Controller, 315));
-      POVRight = new POVButton(m_Xbox6391Controller, 45).or(new POVButton(m_Xbox6391Controller, 90)).or(new POVButton(m_Xbox6391Controller, 135));
+      POVUpish = new POVButton(m_Xbox6391Controller, 315).or(new POVButton(m_Xbox6391Controller, 0)).or(new POVButton(m_Xbox6391Controller, 45));
+      POVDownish = new POVButton(m_Xbox6391Controller, 225).or(new POVButton(m_Xbox6391Controller, 180)).or(new POVButton(m_Xbox6391Controller, 135));
+      POVLeftish = new POVButton(m_Xbox6391Controller, 225).or(new POVButton(m_Xbox6391Controller, 270)).or(new POVButton(m_Xbox6391Controller, 315));
+      POVRightish = new POVButton(m_Xbox6391Controller, 45).or(new POVButton(m_Xbox6391Controller, 90)).or(new POVButton(m_Xbox6391Controller, 135));
+
+      POVUp = new POVButton(m_Xbox6391Controller, 0);
+      POVRight = new POVButton(m_Xbox6391Controller, 90);
+      POVDown = new POVButton(m_Xbox6391Controller, 180);
+      POVLeft = new POVButton(m_Xbox6391Controller, 270);
 
       XButton = new JoystickButton(m_Xbox6391Controller, XboxController.Button.kX.value);
       YButton = new JoystickButton(m_Xbox6391Controller, XboxController.Button.kY.value);
