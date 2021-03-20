@@ -187,16 +187,20 @@ public class RobotContainer {
     drv.StartButton.or(op.StartButton).whileActiveOnce(new WaitCommand(0.5).andThen(new NextClimbPosition(m_climb).withTimeout(5)));
 
     // Create "button" from POV Hat in up direction.  Use both of the angles to the left and right also.
-    drv.POVUp.whileActiveOnce(new LStoCP(m_shooter, m_robotDrive, m_intake));
-    
+    //drv.POVUp.whileActiveOnce(new LStoCP(m_shooter, m_robotDrive, m_intake));
+    drv.POVUp.whenActive(() -> m_shooter.setSetpoint(ShooterConstants.kShooter1));
+    drv.POVRight.whenActive(() -> m_shooter.setSetpoint(ShooterConstants.kShooter2));
+    drv.POVDown.whenActive(() -> m_shooter.setSetpoint(ShooterConstants.kShooter3));
+    drv.POVLeft.whenActive(() -> m_shooter.setSetpoint(ShooterConstants.kShooter4));
+
     // Create "button" from POV Hat in down direction.  Use both of the angles to the left and right also.
-    drv.POVDown.whileActiveOnce(new CPtoLS(m_shooter, m_robotDrive, m_intake));
+    //drv.POVDown.whileActiveOnce(new CPtoLS(m_shooter, m_robotDrive, m_intake));
 
     // POV Up Direction on Operator Controller relatively increases the current setpoint of the shooter
-    op.POVUp.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() + 50);}));
+    op.POVUp.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() + 1);}));
 
     // POV Down Direction on Operator Controller relatively increases the current setpoint of the shooter
-    op.POVDown.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() - 50);}));
+    op.POVDown.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() - 1);}));
   }
 
   public DriveSubsystem getRobotDrive() {

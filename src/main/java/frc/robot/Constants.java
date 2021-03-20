@@ -187,8 +187,10 @@ public final class Constants {
         public static final int kShooterMotorPort2 = 9;
     
         public static final double kShooterFarTrenchRPS = 7100/60;
-        public static final double kShooterNearTrenchRPS = 2000/60;
-        public static final double kShooterAutoLineRPS = 1000/60;
+        public static final double kShooter1 = 7000/60;
+        public static final double kShooter2 = 6900/60;
+        public static final double kShooter3 = 6800/60;
+        public static final double kShooter4 = 6700/60;
         public static final double kShooterToleranceRPS = 240/60;
         public static final double kShooterToleranceAccel = 25.0;
         
@@ -288,7 +290,7 @@ public final class Constants {
     public static final class LimelightConstants {
         public static final double kCameraAngle = 20; // Degrees
         public static final double kCameraHeight = .8; // Meters
-        public static final double kTargetHeight = 2.49; // Meters
+        public static final double kTargetHeight = Units.inchesToMeters(81.19); // Height to bottom of the tape
         // public static final double kMinimumRange = 4; // Meters
         // public static final double kMaximumRange = -9; // Meters
     }
