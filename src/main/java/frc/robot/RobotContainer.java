@@ -155,9 +155,6 @@ public class RobotContainer {
     // While driver holds the Y button Auto Aim to the goal using the left stick for distance control
     drv.YButton.whileActiveOnce(new AutoAim(m_robotDrive, m_PhotonVision, m_shooter, () -> -drv.JoystickLY()));
 
-    // When Y button is pressed on operators controller deploy the intake but do not spin the wheels
-    op.YButton.whenActive(new InstantCommand(() -> m_intake.toggleIntakePosition(true)));
-
     // Turn on the conveyor when:
     // the A button is pressed (either controller) and either the top sensor is not blocked or the shooter is up to speed
     // if the bottom sensor is blocked (ball waiting to go up) unless top sensor blocked (the ball has no place to go)

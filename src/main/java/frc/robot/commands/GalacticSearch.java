@@ -71,7 +71,7 @@ public class GalacticSearch extends SequentialCommandGroup {
          }, m_robotDrive),
       
          // Select Command based on selectedPath from above
-         new SelectCommand(Map.ofEntries(
+         new InstantCommand(() -> new SelectCommand(Map.ofEntries(
             Map.entry("1R", 
                // Reset robot pose to the beginning of 1R and Run it
                m_robotDrive.createCommandForTrajectory(trajectory1R, true).withTimeout(50).withName("GalacticSearch1R")),
@@ -84,7 +84,7 @@ public class GalacticSearch extends SequentialCommandGroup {
             Map.entry("2B", 
                // Reset robot pose to the beginning of 2B and Run it
                m_robotDrive.createCommandForTrajectory(trajectory2B, true).withTimeout(50).withName("GalacticSearch2B"))),
-         i)
+         i).schedule())
       );
    }
 }
