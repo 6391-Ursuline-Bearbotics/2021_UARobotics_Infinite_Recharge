@@ -601,7 +601,8 @@ public class DriveSubsystem extends SubsystemBase implements Loggable{
     }
     
     // Drive to given heading at the speed specified
-    m_talonsrxright.set(ControlMode.PercentOutput, fwd, DemandType.AuxPID, targetAngle * 10);
+    m_talonsrxright.set(ControlMode.PercentOutput, fwd, DemandType.AuxPID, heading * 10);
+    m_drive.feed();
   }
 
   // Drives a specified distance to a specified heading.

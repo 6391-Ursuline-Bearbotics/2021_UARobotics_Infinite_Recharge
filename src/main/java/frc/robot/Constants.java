@@ -288,7 +288,7 @@ public final class Constants {
     }
 
     public static final class LimelightConstants {
-        public static final double kCameraAngle = 20; // Degrees
+        public static final double kCameraAngle = 0; // Degrees
         public static final double kCameraHeight = .8; // Meters
         public static final double kTargetHeight = Units.inchesToMeters(81.19); // Height to bottom of the tape
         // public static final double kMinimumRange = 4; // Meters

@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Transform2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.util.Units;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.Constants.PhotonConstants;
 
@@ -42,10 +43,12 @@ public class PhotonVision {
                                     camResolutionHeight,
                                     minTargetArea);
 
-      var targetPose = new Pose2d(new Translation2d(15.97, 2.47), new Rotation2d()); // meters
-      double targetWidth = 0.8;           // meters
-      double targetHeight = 0.762;          // meters
-      double targetHeightAboveGround = LimelightConstants.kTargetHeight - targetHeight / 2.0; // meters
+      double tgtXPos = Units.feetToMeters(54);
+      double tgtYPos = Units.feetToMeters(27 / 2) - Units.inchesToMeters(43.75) - Units.inchesToMeters(48.0 / 2.0);
+      var targetPose = new Pose2d(new Translation2d(tgtXPos, tgtYPos), new Rotation2d(0.0)); // meters
+      double targetWidth = Units.inchesToMeters(41.30) - Units.inchesToMeters(6.70);
+      double targetHeight = Units.inchesToMeters(98.19) - Units.inchesToMeters(81.19);
+      double targetHeightAboveGround = LimelightConstants.kTargetHeight; // meters
       
       var newTgt = new SimVisionTarget(targetPose,
                                        targetHeightAboveGround,

@@ -9,6 +9,7 @@ import java.util.function.DoubleSupplier;
 import org.photonvision.PhotonUtils;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.LimelightConstants;
 import frc.robot.subsystems.DriveSubsystem;
@@ -28,7 +29,7 @@ public class AutoAim extends CommandBase {
     m_shooter = shooter;
     m_joystickY = joystickY;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(m_drive);
+    addRequirements(m_robotDrive);
   }
 
   // Called when the command is initially scheduled.
@@ -55,7 +56,7 @@ public class AutoAim extends CommandBase {
 
       // Get the distance to the Target
       double range = PhotonUtils.calculateDistanceToTargetMeters(LimelightConstants.kCameraHeight, LimelightConstants.kTargetHeight,
-                  Math.toRadians(LimelightConstants.kCameraAngle), result.getBestTarget().getPitch());
+          Units.degreesToRadians(LimelightConstants.kCameraAngle), Units.degreesToRadians(result.getBestTarget().getPitch()));
       
       // this should actually be a conversion from range to speed
       double speedRPS = m_shooter.getMeasurement();
