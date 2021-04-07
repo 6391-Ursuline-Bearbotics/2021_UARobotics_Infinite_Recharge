@@ -117,7 +117,7 @@ public class RobotContainer {
             Math.max(op.TriggerR(), drv.TriggerR())), m_climb));
 
     autoChooser.addOption("GalacticSearch", new GalacticSearchAuto(m_robotDrive, m_intake, m_PhotonVision));
-    autoChooser.addOption("2R", new GenericAuto(m_robotDrive, "GalacticSearch2R"));
+    autoChooser.addOption("hook", new GenericAuto(m_robotDrive, "Ball3Slow"));
     autoChooser.addOption("Slalom", new Slalom(m_robotDrive));
     autoChooser.addOption("Bounce", new Bounce(m_robotDrive));
     autoChooser.addOption("Barrel", new Barrel(m_robotDrive));
@@ -171,7 +171,7 @@ public class RobotContainer {
     
     // When the left bumper is pressed on either controller right joystick is super slow turn
     drv.BumperL.or(op.BumperL).whileActiveOnce(new InstantCommand(() -> m_robotDrive.setMaxDriveOutput(
-        DriveConstants.kMaxOutputForward, DriveConstants.kMaxOutputRotationSlow)))
+        DriveConstants.kMaxOutputForwardSlow, DriveConstants.kMaxOutputRotationSlow)))
       .whenInactive(new InstantCommand(() -> m_robotDrive.setMaxDriveOutput(
         DriveConstants.kMaxOutputForward, DriveConstants.kMaxOutputRotation)));
     //drv.BumperL.whileActiveOnce(m_robotDrive.driveStraight(() -> -drv.JoystickLY()));
