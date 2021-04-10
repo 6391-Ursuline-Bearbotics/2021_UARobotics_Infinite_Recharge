@@ -57,7 +57,8 @@ public class AutoAim extends CommandBase {
       // Get the distance to the Target
       double range = PhotonUtils.calculateDistanceToTargetMeters(LimelightConstants.kCameraHeight, LimelightConstants.kTargetHeight,
           Units.degreesToRadians(LimelightConstants.kCameraAngle), Units.degreesToRadians(result.getBestTarget().getPitch()));
-      
+      SmartDashboard.putNumber("distanceToTarget", Units.metersToFeet(range));
+
       // this should actually be a conversion from range to speed
       double speedRPS = m_shooter.getMeasurement();
 

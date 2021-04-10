@@ -24,6 +24,7 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import frc.robot.Constants.ShooterConstants;
 import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Config;
 import io.github.oblarg.oblog.annotations.Log;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
@@ -138,5 +139,20 @@ public class ShooterSubsystem extends PIDSubsystem implements Loggable {
   @Log(tabName = "Dashboard", name = "Good to Shoot?")
   public boolean atSetpoint() {
     return shooterPID.atSetpoint() && shooterPID.getSetpoint() > 0 && this.isEnabled();
+  }
+
+  @Config
+  public void setShooterRPS(double rps) {
+    this.setSetpoint(rps);
+  }
+
+  @Config
+  public void enableShooter(boolean enable) {
+    if (enable) {
+      this.enable();
+    }
+    else {
+      this.disable();
+    }
   }
 }
