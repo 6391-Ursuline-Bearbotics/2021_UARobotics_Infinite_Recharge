@@ -188,10 +188,10 @@ public final class Constants {
         public static final int kShooterMotorPort2 = 9;
     
         public static final double kShooterFarTrenchRPS = 7100/60;
-        public static final double kShooter1 = 7000/60;
-        public static final double kShooter2 = 6900/60;
-        public static final double kShooter3 = 6800/60;
-        public static final double kShooter4 = 6700/60;
+        public static final double kShooter1 = 116;
+        public static final double kShooter2 = 114;
+        public static final double kShooter3 = 112;
+        public static final double kShooter4 = 110;
         public static final double kShooterToleranceRPS = 240/60;
         public static final double kShooterToleranceAccel = 25.0;
         

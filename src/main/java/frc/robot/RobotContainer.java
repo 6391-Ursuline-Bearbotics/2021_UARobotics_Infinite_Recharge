@@ -198,6 +198,11 @@ public class RobotContainer {
 
     // POV Down Direction on Operator Controller relatively increases the current setpoint of the shooter
     op.POVDownish.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() - 1);}));
+
+    // Add a light rumble when there is a ball at the bottom of the conveyor moving up.
+    topConveyorSensor.negate().and(frontConveyorSensor)
+        .whenActive(() -> {drv.setLeftRumble(0.3); drv.setRightRumble(0.3);})
+        .whenInactive(() -> {drv.setLeftRumble(0); drv.setRightRumble(0);});
   }
 
   public DriveSubsystem getRobotDrive() {

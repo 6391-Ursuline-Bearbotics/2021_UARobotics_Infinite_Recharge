@@ -84,4 +84,12 @@ public class Xbox6391 {
    public double TriggerR() {
       return m_Xbox6391Controller.getTriggerAxis(GenericHID.Hand.kRight);
    }
+
+   public void setLeftRumble(double value) {
+      m_Xbox6391Controller.setRumble(GenericHID.RumbleType.kLeftRumble, value);
+   }
+
+   public void setRightRumble(double value) {
+      m_Xbox6391Controller.setRumble(GenericHID.RumbleType.kRightRumble, value);
+   }
 }

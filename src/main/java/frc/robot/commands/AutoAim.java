@@ -63,10 +63,10 @@ public class AutoAim extends CommandBase {
       double speedRPS = m_shooter.getMeasurement();
 
       // set shooter speed to value based on distance
-      m_shooter.setSetpoint(speedRPS);
+      //m_shooter.setSetpoint(speedRPS);
 
       // should already be enabled and up to speed by operator but just in case
-      m_shooter.enable();
+      //m_shooter.enable();
     }
     else {
       // If we don't have a target stop since we don't know where we are going possibly should use regular arcade here?
