@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.ConveyorSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -22,7 +23,7 @@ public class Center5Ball extends SequentialCommandGroup {
             new InstantCommand(() -> m_robotDrive.resetOdometry(trajectory1.getInitialPose())),
 
             //turn shooter on to get up to speed
-            new InstantCommand(() -> {m_shooter.setSetpoint(AutoConstants.kAutoShootRPS);
+            new InstantCommand(() -> {m_shooter.setSetpoint(ShooterConstants.kShooter4);
                 m_shooter.enable();}, m_shooter),
 
             //back up 1 meter

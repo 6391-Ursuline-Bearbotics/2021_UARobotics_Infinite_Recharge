@@ -190,19 +190,24 @@ public class RobotContainer {
     drv.POVDown.whenActive(() -> m_shooter.setSetpoint(ShooterConstants.kShooter3));
     drv.POVLeft.whenActive(() -> m_shooter.setSetpoint(ShooterConstants.kShooter4));
 
+    op.POVUp.whenActive(() -> m_shooter.setSetpoint(ShooterConstants.kShooter1));
+    op.POVRight.whenActive(() -> m_shooter.setSetpoint(ShooterConstants.kShooter2));
+    op.POVDown.whenActive(() -> m_shooter.setSetpoint(ShooterConstants.kShooter3));
+    op.POVLeft.whenActive(() -> m_shooter.setSetpoint(ShooterConstants.kShooter4));
+
     // Create "button" from POV Hat in down direction.  Use both of the angles to the left and right also.
     //drv.POVDown.whileActiveOnce(new CPtoLS(m_shooter, m_robotDrive, m_intake));
 
     // POV Up Direction on Operator Controller relatively increases the current setpoint of the shooter
-    op.POVUpish.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() + 1);}));
+    //op.POVUpish.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() + 1);}));
 
     // POV Down Direction on Operator Controller relatively increases the current setpoint of the shooter
-    op.POVDownish.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() - 1);}));
+    //op.POVDownish.whenActive(new InstantCommand(() -> {m_shooter.setSetpoint(m_shooter.getSetpoint() - 1);}));
 
     // Add a light rumble when there is a ball at the bottom of the conveyor moving up.
-    topConveyorSensor.negate().and(frontConveyorSensor)
+    /* topConveyorSensor.negate().and(frontConveyorSensor)
         .whenActive(() -> {drv.setLeftRumble(0.3); drv.setRightRumble(0.3);})
-        .whenInactive(() -> {drv.setLeftRumble(0); drv.setRightRumble(0);});
+        .whenInactive(() -> {drv.setLeftRumble(0); drv.setRightRumble(0);}); */
   }
 
   public DriveSubsystem getRobotDrive() {

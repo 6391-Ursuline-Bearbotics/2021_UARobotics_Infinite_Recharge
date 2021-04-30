@@ -2,7 +2,10 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.subsystems.ConveyorSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -21,9 +24,35 @@ public class TrenchAuto extends SequentialCommandGroup {
             // robot will start on the field at the right spot (hopefully) but it is useful for testing / simulation.
             new InstantCommand(() -> m_robotDrive.resetOdometry(trajectory1.getInitialPose())),
             
+            new InstantCommand(() -> {m_shooter.setSetpoint(AutoConstants.kAutoShootRPS);
+                m_shooter.enable();}, m_shooter),
+
             m_robotDrive.createCommandForTrajectory(trajectory1, false).withTimeout(50).withName("Center1"),
+
+            new AutoShoot(m_shooter, m_conveyor, AutoConstants.kAutoShootInit),
+
+            new InstantCommand(() -> m_intake.deployIntake()),
+
             m_robotDrive.createCommandForTrajectory(trajectory2, false).withTimeout(50).withName("Trench2"),
-            m_robotDrive.createCommandForTrajectory(trajectory3, false).withTimeout(50).withName("Trench3")
+
+            new ParallelRaceGroup(
+                // Pick up 3 balls in a straight line then turn back towards the goal
+                m_robotDrive.createCommandForTrajectory(trajectory3, false).withTimeout(5).withName("Trench3"),
+
+                //turn on conveyor
+                new RunCommand(() -> {
+                        if (!m_conveyor.getTopConveyor()) {
+                            m_conveyor.turnOn();
+                        }
+                        else {
+                            m_conveyor.turnOff();
+                        }
+                    }
+                , m_conveyor)
+            ),
+
+            new AutoShoot(m_shooter, m_conveyor, AutoConstants.kAutoShootRest)
       );
+
   }
 }
