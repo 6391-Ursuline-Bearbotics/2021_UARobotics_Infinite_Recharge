@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.simulation.XboxControllerSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -177,7 +178,7 @@ public class RobotContainer {
     //drv.BumperL.whileActiveOnce(m_robotDrive.driveStraight(() -> -drv.JoystickLY()));
 
     // When the back button is pressed run the conveyor backwards until released
-    drv.BackButton.whenActive(new InstantCommand(m_conveyor::turnBackwards, m_conveyor))
+    drv.BackButton.or(op.BackButton).whenActive(new InstantCommand(m_conveyor::turnBackwards, m_conveyor))
       .whenInactive(new InstantCommand(m_conveyor::turnOff, m_conveyor));
     
     // When start button is pressed for at least a second advance to the next climb stage
@@ -194,6 +195,14 @@ public class RobotContainer {
     op.POVRight.whenActive(() -> m_shooter.setSetpoint(ShooterConstants.kShooter2));
     op.POVDown.whenActive(() -> m_shooter.setSetpoint(ShooterConstants.kShooter3));
     op.POVLeft.whenActive(() -> m_shooter.setSetpoint(ShooterConstants.kShooter4));
+
+    op.POVRight.whenActive(new InstantCommand(m_conveyor::CPRightSlow, m_conveyor))
+      .whenInactive(new InstantCommand(m_conveyor::CPOff, m_conveyor));
+  
+    op.POVLeft.whenActive(new InstantCommand(m_conveyor::CPLeftSlow, m_conveyor))
+      .whenInactive(new InstantCommand(m_conveyor::CPOff, m_conveyor));
+
+    op.POVUp.whenActive(new StartEndCommand(m_conveyor::CPOn, m_conveyor::CPOff, m_conveyor).withTimeout(4));
 
     // Create "button" from POV Hat in down direction.  Use both of the angles to the left and right also.
     //drv.POVDown.whileActiveOnce(new CPtoLS(m_shooter, m_robotDrive, m_intake));

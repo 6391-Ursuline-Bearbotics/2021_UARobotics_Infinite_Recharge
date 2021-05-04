@@ -113,7 +113,7 @@ public final class Constants {
          * Not all set of Gains are used in this project and may be removed as desired.
          * 
          * 	                                    			  kP   kI   kD   kF               Iz    PeakOut */
-        public final static Gains kGains_Distanc = new Gains( 0.5, 0.0,  0.0, 0.0,            100,  0.50 );
+        public final static Gains kGains_Distanc = new Gains( 0.1, 0.0,  0.0, 0.2,            100,  0.30 );
         public final static Gains kGains_Turning = new Gains( 0.05, 0.0,  4.0, 100,            200,  0.3 );
         public final static Gains kGains_Velocit = new Gains( 1.2, 0.0, 0, 1023.0/6800.0,  300,  1.00 ); //0.2 // .00712
         public final static Gains kGains_MotProf = new Gains( 1.0, 0.0,  0.0, 1023.0/6800.0,  400,  1.00 );
@@ -187,7 +187,7 @@ public final class Constants {
         public static final int kShooterMotorPort = 8;
         public static final int kShooterMotorPort2 = 9;
     
-        public static final double kShooterFarTrenchRPS = 7100/60;
+        public static final double kShooterFarTrenchRPS = 112;
         public static final double kShooter1 = 116;
         public static final double kShooter2 = 114;
         public static final double kShooter3 = 112;
@@ -232,7 +232,7 @@ public final class Constants {
         public static final double kAutoShootInit = 3;
         public static final double kAutoShootRest = 6;
 
-        public static final double kAutoShootRPS = 7400/60;
+        public static final double kAutoShootRPS = 112;
         
         public static final double kMaxSpeedMetersPerSecond = 3;
         public static final double kMaxAccelerationMetersPerSecondSquared = 3;

@@ -40,6 +40,26 @@ public class ConveyorSubsystem extends SubsystemBase implements Loggable{
     }
 
     @Config
+    public void CPOn() {
+        this.m_ConveyorMotor2.set(1);
+    }
+
+    @Config
+    public void CPLeftSlow() {
+        this.m_ConveyorMotor2.set(-0.5);
+    }
+
+    @Config
+    public void CPRightSlow() {
+        this.m_ConveyorMotor2.set(0.5);
+    }
+
+    @Config
+    public void CPOff() {
+        this.m_ConveyorMotor2.set(0);
+    }
+
+    @Config
     public void turnBackwards() {
         this.m_ConveyorMotor1.set(ConveyorConstants.kConveyorBackSpeed);
         this.m_ConveyorMotor2.set(ConveyorConstants.kConveyorBackSpeed);

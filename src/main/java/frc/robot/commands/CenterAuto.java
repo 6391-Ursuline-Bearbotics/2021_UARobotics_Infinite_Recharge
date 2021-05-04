@@ -43,7 +43,7 @@ public class CenterAuto extends SequentialCommandGroup {
 
             //turn on conveyor
             new RunCommand(() -> {
-                    if (!m_conveyor.getTopConveyor()) {
+                    if (m_conveyor.getTopConveyor()) {
                         m_conveyor.turnOn();
                     }
                     else {
