@@ -31,10 +31,6 @@ public class AutoShoot extends CommandBase {
   @Override
   public void initialize() {
     startTime = Timer.getFPGATimestamp();
-    // Make sure the shooter is spinning start it if not
-    if (m_shooter.getSetpoint() == 0) {
-      m_shooter.setSetpoint(AutoConstants.kAutoShootRPS);
-    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.

@@ -192,8 +192,8 @@ public final class Constants {
         public static final double kShooter2 = 114;
         public static final double kShooter3 = 112;
         public static final double kShooter4 = 110;
-        public static final double kShooterToleranceRPS = 240/60;
-        public static final double kShooterToleranceAccel = 25.0;
+        public static final double kShooterToleranceRPS = 6.0;
+        public static final double kShooterToleranceAccel = 30.0;
         
         public static final double kSpinupRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(500.0);
 
@@ -211,7 +211,7 @@ public final class Constants {
     
         // On a real robot the feedforward constants should be empirically determined; these are
         // reasonable guesses.
-        public static final double kSVolts = 0.87; // .05 original / .92 comp
+        public static final double kSVolts = 1;//0.87; // .05 original / .92 comp
         public static final double kVVoltSecondsPerRotation = 0.0774; // 12 / .0764 comp
         public static final double kA = 0.00003; //.0429 comp
     }

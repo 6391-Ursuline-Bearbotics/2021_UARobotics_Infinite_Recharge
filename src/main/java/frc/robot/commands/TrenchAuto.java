@@ -55,7 +55,7 @@ public class TrenchAuto extends SequentialCommandGroup {
 
             m_robotDrive.createCommandForTrajectory(trajectory3, false).withTimeout(50).withName("Trench3Slow"),
 
-            new AutoAim(m_robotDrive, m_PhotonVision, m_shooter, () -> 0).withTimeout(.25),
+            new AutoAim(m_robotDrive, m_PhotonVision, m_shooter, () -> 0).withTimeout(.35),
 
             new AutoShoot(m_shooter, m_conveyor, AutoConstants.kAutoShootRest)
       );

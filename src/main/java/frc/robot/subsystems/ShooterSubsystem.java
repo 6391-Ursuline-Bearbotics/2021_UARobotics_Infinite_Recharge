@@ -120,6 +120,11 @@ public class ShooterSubsystem extends PIDSubsystem implements Loggable {
     return m_angularVelocity;
   }
 
+  @Log
+  public double getShooterVoltage() {
+    return m_shooterMotor.get();
+  }
+
   public double getAngle() {
     return m_shooterEncoder.getDistance();
   }
